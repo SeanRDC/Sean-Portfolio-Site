@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beads Bracelet E-Commerce - Sean</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/project-page.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -13,302 +14,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/s-32px.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/s-180px.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/s-192px.png" />
-    
-    <style>
-        /* Project Page Specific Styles */
-        .project-hero {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: calc(var(--nav-height) + var(--spacing-xl)) var(--spacing-md) var(--spacing-lg);
-            text-align: center;
-            animation: fadeIn 0.8s ease;
-        }
-
-        .project-hero h1 {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 7vw, 5.5rem);
-            font-weight: 400;
-            margin-bottom: var(--spacing-sm);
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-        }
-
-        .project-subtitle {
-            font-size: 20px;
-            color: var(--color-secondary);
-            margin-bottom: var(--spacing-md);
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-md);
-            flex-wrap: wrap;
-            margin-top: var(--spacing-md);
-            padding-top: var(--spacing-md);
-            border-top: 1px solid var(--color-border);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .meta-item {
-            text-align: center;
-        }
-
-        .meta-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--color-secondary);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-
-        .meta-value {
-            font-size: 15px;
-            color: var(--color-primary);
-            font-weight: 500;
-        }
-
-        .project-content {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: var(--spacing-lg) var(--spacing-md);
-        }
-
-        .project-section {
-            margin-bottom: var(--spacing-xl);
-            animation: fadeInUp 0.8s ease backwards;
-        }
-
-        .project-section:nth-child(1) { animation-delay: 0.1s; }
-        .project-section:nth-child(2) { animation-delay: 0.2s; }
-        .project-section:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section-heading {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 400;
-            margin-bottom: var(--spacing-md);
-            letter-spacing: -0.01em;
-        }
-
-        .project-description {
-            max-width: 800px;
-            margin: 0 auto var(--spacing-lg);
-            font-size: 17px;
-            line-height: 1.8;
-            color: var(--color-secondary);
-        }
-
-        .project-description p {
-            margin-bottom: var(--spacing-sm);
-        }
-
-        /* Image Showcase Grid */
-        .image-showcase {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .showcase-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            background: var(--color-surface);
-            aspect-ratio: 4/3;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
-        }
-
-        .showcase-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .showcase-item.featured {
-            grid-column: span 2;
-            aspect-ratio: 16/9;
-        }
-
-        .showcase-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            transition: transform var(--transition-smooth);
-        }
-
-        .showcase-item:hover .showcase-placeholder {
-            transform: scale(1.05);
-        }
-
-        /* Project Links Section */
-        .project-links {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-md);
-            margin: var(--spacing-xl) 0;
-            flex-wrap: wrap;
-        }
-
-        .project-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--color-primary);
-            color: var(--color-background);
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 15px;
-            letter-spacing: 0.5px;
-            transition: all var(--transition-smooth);
-            text-decoration: none;
-            border: 2px solid var(--color-primary);
-        }
-
-        .project-link-btn:hover {
-            opacity: 1;
-            background: var(--color-accent);
-            border-color: var(--color-accent);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        .project-link-btn.secondary {
-            background: transparent;
-            color: var(--color-primary);
-            border: 2px solid var(--color-border);
-        }
-
-        .project-link-btn.secondary:hover {
-            background: var(--color-surface);
-            border-color: var(--color-primary);
-        }
-
-        .project-link-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        /* Project Details Grid */
-        .project-details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--spacing-md);
-            padding: var(--spacing-lg);
-            background: var(--color-surface);
-            border-radius: 12px;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .detail-block h4 {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: var(--spacing-xs);
-            color: var(--color-primary);
-        }
-
-        .detail-block p, .detail-block ul {
-            color: var(--color-secondary);
-            font-size: 15px;
-            line-height: 1.7;
-        }
-
-        .detail-block ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .detail-block li {
-            padding: 4px 0;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .detail-block li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--color-accent);
-            font-weight: bold;
-        }
-
-        /* Back Navigation */
-        .back-nav {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: calc(var(--nav-height) + var(--spacing-sm)) var(--spacing-md) 0;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            color: var(--color-secondary);
-            font-size: 14px;
-            transition: all var(--transition-fast);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-        }
-
-        .back-link:hover {
-            color: var(--color-accent);
-            transform: translateX(-4px);
-        }
-
-        .back-link svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .image-showcase {
-                grid-template-columns: 1fr;
-            }
-
-            .showcase-item.featured {
-                grid-column: auto;
-                aspect-ratio: 4/3;
-            }
-
-            .project-meta {
-                gap: var(--spacing-sm);
-            }
-
-            .project-links {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .project-link-btn {
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -375,73 +80,41 @@
 
         <!-- Image Showcase -->
         <section class="project-section">
-            <h2 class="section-heading">Visual Design & Features</h2>
+            <h2 class="section-heading">Visual Design</h2>
             
             <div class="image-showcase">
-                <div class="showcase-item featured">
-                    <div class="showcase-placeholder" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);">
-                        <svg width="200" height="200" viewBox="0 0 200 200" opacity="0.7">
-                            <!-- Shopping Cart Icon -->
-                            <circle cx="70" cy="170" r="8" fill="white"/>
-                            <circle cx="130" cy="170" r="8" fill="white"/>
-                            <path d="M 40 50 L 60 50 L 80 130 L 140 130" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
-                            <path d="M 60 50 L 80 130 L 140 130 L 150 80 L 70 80 Z" fill="white" opacity="0.6"/>
-                            <!-- Beads -->
-                            <circle cx="100" cy="80" r="12" fill="white"/>
-                            <circle cx="120" cy="80" r="12" fill="white" opacity="0.8"/>
-                            <circle cx="80" cy="80" r="12" fill="white" opacity="0.8"/>
-                        </svg>
+                <div class="showcase-item">
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-1.png" alt="Weather app main interface" class="zoomable">
                     </div>
                 </div>
                 
                 <div class="showcase-item">
-                    <div class="showcase-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                        <svg width="120" height="120" viewBox="0 0 120 120" opacity="0.7">
-                            <!-- Product Grid -->
-                            <rect x="15" y="15" width="40" height="40" rx="4" fill="white"/>
-                            <rect x="65" y="15" width="40" height="40" rx="4" fill="white" opacity="0.8"/>
-                            <rect x="15" y="65" width="40" height="40" rx="4" fill="white" opacity="0.8"/>
-                            <rect x="65" y="65" width="40" height="40" rx="4" fill="white" opacity="0.6"/>
-                        </svg>
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-2.png" alt="Forecast view" class="zoomable">
                     </div>
                 </div>
                 
                 <div class="showcase-item">
-                    <div class="showcase-placeholder" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                        <svg width="120" height="120" viewBox="0 0 120 120" opacity="0.7">
-                            <!-- Payment/Checkout -->
-                            <rect x="30" y="40" width="60" height="40" rx="6" fill="none" stroke="white" stroke-width="3"/>
-                            <line x1="40" y1="55" x2="65" y2="55" stroke="white" stroke-width="2"/>
-                            <circle cx="75" cy="65" r="6" fill="white"/>
-                        </svg>
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-3.png" alt="Mobile responsive design" class="zoomable">
                     </div>
                 </div>
                 
                 <div class="showcase-item">
-                    <div class="showcase-placeholder" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
-                        <svg width="120" height="120" viewBox="0 0 120 120" opacity="0.7">
-                            <!-- Custom Designer Tool -->
-                            <circle cx="60" cy="60" r="35" fill="none" stroke="white" stroke-width="3"/>
-                            <circle cx="60" cy="35" r="8" fill="white"/>
-                            <circle cx="85" cy="60" r="8" fill="white" opacity="0.8"/>
-                            <circle cx="60" cy="85" r="8" fill="white" opacity="0.8"/>
-                            <circle cx="35" cy="60" r="8" fill="white" opacity="0.8"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="showcase-item">
-                    <div class="showcase-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <svg width="120" height="120" viewBox="0 0 120 120" opacity="0.7">
-                            <!-- Mobile Responsive -->
-                            <rect x="40" y="20" width="40" height="80" rx="6" fill="none" stroke="white" stroke-width="3"/>
-                            <circle cx="60" cy="90" r="4" fill="white"/>
-                            <rect x="48" y="32" width="24" height="42" fill="white" opacity="0.6"/>
-                        </svg>
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-4.png" alt="Weather details panel" class="zoomable">
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- Image Modal -->
+        <div id="imageModal" class="image-modal">
+            <span class="modal-close">&times;</span>
+            <img class="modal-content" id="modalImage">
+            <div class="modal-caption" id="modalCaption"></div>
+        </div>
 
         <!-- Project Links -->
         <div class="project-links">
