@@ -3,93 +3,204 @@
  * Handles smooth scrolling, animations, and interactions
  */
 
+
 // ==========================================
-// USER RETURN FIX
+// NAVIGATION FUNCTIONALITY
 // ==========================================
-(function() {
-    'use strict';
 
-    // Fix 1: Handle page loaded from cache (back/forward button)
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            console.log('Page loaded from cache');
-            document.body.style.display = 'block';
-            document.documentElement.style.display = 'block';
-        }
-    });
-
-    // Fix 2: Handle back/forward navigation
-    window.addEventListener('popstate', function(event) {
-        console.log('Back/Forward button pressed');
-        document.body.style.opacity = '1';
-        document.body.style.display = 'block';
+// Set active navigation link based on current page
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    navLinks.forEach(link => {
+        // Remove any existing active classes
+        link.classList.remove('active');
         
-        // Restore scroll position if saved
-        if (event.state && event.state.scrollPosition) {
-            window.scrollTo(0, event.state.scrollPosition);
-        }
-    });
-
-    // Fix 3: Save scroll position before leaving page
-    window.addEventListener('beforeunload', function() {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-        sessionStorage.setItem('lastPage', window.location.href);
-    });
-
-    // Fix 4: Restore page state on load
-    window.addEventListener('DOMContentLoaded', function() {
-        const lastPage = sessionStorage.getItem('lastPage');
-        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        // Get the href and normalize it
+        const href = link.getAttribute('href');
         
-        if (scrollPosition && lastPage === window.location.href) {
-            window.scrollTo(0, parseInt(scrollPosition));
+        // Check if this link matches the current page
+        if (href === currentPage || 
+            (currentPage === '' && href === 'index.html') ||
+            (currentPage === 'index.html' && href === 'index.html')) {
+            link.classList.add('active');
         }
+    });
+});
+
+// ==========================================
+// IMAGE ZOOM MODAL FUNCTIONALITY
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    const closeBtn = document.querySelector('.modal-close');
+    const zoomableImages = document.querySelectorAll('.zoomable');
+
+    // Only run if modal exists (project pages)
+    if (modal && modalImg) {
         
-        // Ensure page is visible
-        document.body.style.display = 'block';
-        document.body.style.opacity = '1';
-    });
-
-    // Fix 5: iOS Safari specific fix
-    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        window.onpageshow = function(event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        };
-    }
-
-    // Fix 6: Handle visibility change
-    document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') {
-            document.body.style.display = 'block';
-            document.body.style.opacity = '1';
-        }
-    });
-
-    // Fix 7: Custom back button handling
-    document.addEventListener('DOMContentLoaded', function() {
-        const backButtons = document.querySelectorAll('.back-link, .back-button');
-        backButtons.forEach(function(button) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    window.location.href = 'work.html';
-                }
+        // Add click event to all zoomable images
+        zoomableImages.forEach(img => {
+            img.addEventListener('click', function() {
+                modal.classList.add('active');
+                modalImg.src = this.src;
+                modalCaption.textContent = this.alt;
+                // Prevent body scrolling when modal is open
+                document.body.style.overflow = 'hidden';
             });
+        });
+
+        // Close modal when clicking the X button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+
+        // Close modal when clicking the image
+        if (modalImg) {
+            modalImg.addEventListener('click', closeModal);
+        }
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Function to close modal
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+});
+
+// ==========================================
+// SMOOTH SCROLLING FOR ANCHOR LINKS
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    
+    anchorLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Skip if it's just "#"
+            if (href === '#') return;
+            
+            const targetId = href.substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                e.preventDefault();
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+// ==========================================
+// MOBILE MENU TOGGLE (if needed)
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    }
+});
+
+// ==========================================
+// FADE IN ANIMATIONS ON SCROLL
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all project sections
+    const sections = document.querySelectorAll('.project-section');
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+});
+
+// ==========================================
+// FORM VALIDATION
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const email = form.querySelector('input[type="email"]');
+            
+            if (email && !validateEmail(email.value)) {
+                e.preventDefault();
+                alert('Please enter a valid email address');
+                email.focus();
+            }
         });
     });
 
-    // Fix 8: Force hardware acceleration
-    document.addEventListener('DOMContentLoaded', function() {
-        document.body.style.transform = 'translateZ(0)';
-        document.body.style.webkitTransform = 'translateZ(0)';
-    });
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+});
 
-    console.log('Back navigation fix initialized');
-})();
+// ==========================================
+// PREVENT NAVIGATION ISSUES
+// ==========================================
+
+// Clear any stored navigation state when page loads
+window.addEventListener('pageshow', function(event) {
+    // Remove active class from all nav links first
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    // Then reapply based on current page
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage || 
+            (currentPage === '' && href === 'index.html')) {
+            link.classList.add('active');
+        }
+    });
+});
 
 // ==========================================
 // SMOOTH SCROLL FOR ANCHOR LINKS
