@@ -3,6 +3,17 @@
  * Handles smooth scrolling, animations, and interactions
  */
 
+function goBackOrFallback(fallbackUrl) {
+    // Check if there is a referrer (meaning the user came from somewhere)
+    // AND if the history length suggests there is a stack to go back to.
+    if (document.referrer && window.history.length > 1) {
+        window.history.back();
+    } else {
+        // If there is no history, redirect to a default page (e.g., Home)
+        window.location.href = fallbackUrl;
+    }
+}
+
 // ==========================================
 // NAVIGATION ACTIVE STATE
 // ==========================================
