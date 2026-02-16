@@ -3,7 +3,6 @@
  * Handles smooth scrolling, animations, and interactions
  */
 
-
 // ==========================================
 // NAVIGATION FUNCTIONALITY
 // ==========================================
@@ -87,34 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==========================================
-// SMOOTH SCROLLING FOR ANCHOR LINKS
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    
-    anchorLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            
-            // Skip if it's just "#"
-            if (href === '#') return;
-            
-            const targetId = href.substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                e.preventDefault();
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
-
-// ==========================================
 // MOBILE MENU TOGGLE (if needed)
 // ==========================================
 
@@ -127,57 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
             navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
         });
-    }
-});
-
-// ==========================================
-// FADE IN ANIMATIONS ON SCROLL
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe all project sections
-    const sections = document.querySelectorAll('.project-section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-});
-
-// ==========================================
-// FORM VALIDATION
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form');
-    
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const email = form.querySelector('input[type="email"]');
-            
-            if (email && !validateEmail(email.value)) {
-                e.preventDefault();
-                alert('Please enter a valid email address');
-                email.focus();
-            }
-        });
-    });
-
-    function validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
     }
 });
 
@@ -438,55 +358,3 @@ if ('IntersectionObserver' in window) {
         imageObserver.observe(img);
     });
 }
-
-// ==========================================
-// ZOOM EFFECT
-// ==========================================
-
-// Image Zoom Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const modalCaption = document.getElementById('modalCaption');
-    const closeBtn = document.getElementsByClassName('modal-close')[0];
-    const zoomableImages = document.querySelectorAll('.zoomable');
-
-    // Add click event to all zoomable images
-    zoomableImages.forEach(function(img) {
-        img.addEventListener('click', function() {
-            modal.classList.add('active');
-            modalImg.src = this.src;
-            modalCaption.innerHTML = this.alt;
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-        });
-    });
-
-    // Close modal when clicking the X
-    closeBtn.addEventListener('click', function() {
-        closeModal();
-    });
-
-    // Close modal when clicking on the image
-    modalImg.addEventListener('click', function() {
-        closeModal();
-    });
-
-    // Close modal when clicking outside the image
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    // Close modal on ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            closeModal();
-        }
-    });
-
-    function closeModal() {
-        modal.classList.remove('active');
-        document.body.style.overflow = ''; // Restore scrolling
-    }
-});
