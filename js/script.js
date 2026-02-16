@@ -44,26 +44,56 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add click event to all zoomable images
         zoomableImages.forEach(img => {
-            img.addEventListener('click', function() {
-                modal.classList.add('active');
+            img.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Set the modal content
                 modalImg.src = this.src;
-                modalCaption.textContent = this.alt;
-                // Prevent body scrolling when modal is open
+                modalImg.alt = this.alt;
+                
+                if (modalCaption) {
+                    modalCaption.textContent = this.alt;
+                }
+                
+                // Show modal
+                modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                
+                console.log('Modal opened with image:', this.src); // Debug
             });
         });
 
+        // Close modal function
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Clear the image src after animation
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) {
+                    modalImg.src = '';
+                }
+            }, 300);
+        }
+
         // Close modal when clicking the X button
         if (closeBtn) {
-            closeBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeModal();
+            });
         }
 
         // Close modal when clicking the image
         if (modalImg) {
-            modalImg.addEventListener('click', closeModal);
+            modalImg.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeModal();
+            });
         }
 
-        // Close modal when clicking outside the image
+        // Close modal when clicking the background
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();
@@ -76,12 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeModal();
             }
         });
-
-        // Function to close modal
-        function closeModal() {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
     }
 });
 
