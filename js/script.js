@@ -4,6 +4,34 @@
  */
 
 // ==========================================
+// USER RETURN FIX
+// ==========================================
+
+// Simple Back Navigation Fix
+(function() {
+    // Prevent blank screen on back navigation
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || performance.navigation.type === 2) {
+            document.body.style.display = 'block';
+            window.location.reload();
+        }
+    });
+
+    // Save and restore scroll position
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('scrollY', window.scrollY);
+    });
+
+    window.addEventListener('DOMContentLoaded', function() {
+        const scrollY = sessionStorage.getItem('scrollY');
+        if (scrollY) {
+            window.scrollTo(0, parseInt(scrollY));
+            sessionStorage.removeItem('scrollY');
+        }
+    });
+})();
+
+// ==========================================
 // SMOOTH SCROLL FOR ANCHOR LINKS
 // ==========================================
 
