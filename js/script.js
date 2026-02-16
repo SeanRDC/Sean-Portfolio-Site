@@ -4,29 +4,32 @@
  */
 
 // ==========================================
-// NAVIGATION FUNCTIONALITY
+// NAVIGATION ACTIVE STATE
 // ==========================================
 
-// Set active navigation link based on current page
 document.addEventListener('DOMContentLoaded', function() {
+    setActiveNavLink();
+});
+
+// Also update on back/forward navigation
+window.addEventListener('popstate', function() {
+    setActiveNavLink();
+});
+
+function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-links a');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     
     navLinks.forEach(link => {
-        // Remove any existing active classes
         link.classList.remove('active');
-        
-        // Get the href and normalize it
         const href = link.getAttribute('href');
         
-        // Check if this link matches the current page
         if (href === currentPage || 
-            (currentPage === '' && href === 'index.html') ||
-            (currentPage === 'index.html' && href === 'index.html')) {
+            (currentPage === '' && href === 'index.html')) {
             link.classList.add('active');
         }
     });
-});
+}
 
 // ==========================================
 // IMAGE ZOOM MODAL FUNCTIONALITY
@@ -39,16 +42,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeBtn = document.querySelector('.modal-close');
     const zoomableImages = document.querySelectorAll('.zoomable');
 
-    // Only run if modal exists (project pages)
     if (modal && modalImg) {
         
-        // Add click event to all zoomable images
+        // Open modal when clicking zoomable images
         zoomableImages.forEach(img => {
             img.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Set the modal content
                 modalImg.src = this.src;
                 modalImg.alt = this.alt;
                 
@@ -56,11 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     modalCaption.textContent = this.alt;
                 }
                 
-                // Show modal
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                
-                console.log('Modal opened with image:', this.src); // Debug
             });
         });
 
@@ -69,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.classList.remove('active');
             document.body.style.overflow = '';
             
-            // Clear the image src after animation
             setTimeout(() => {
                 if (!modal.classList.contains('active')) {
                     modalImg.src = '';
@@ -77,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }
 
-        // Close modal when clicking the X button
+        // Close with X button
         if (closeBtn) {
             closeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -85,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Close modal when clicking the image
+        // Close when clicking image
         if (modalImg) {
             modalImg.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -93,20 +90,46 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Close modal when clicking the background
+        // Close when clicking background
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();
             }
         });
 
-        // Close modal with Escape key
+        // Close with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.classList.contains('active')) {
                 closeModal();
             }
         });
     }
+});
+
+// ==========================================
+// SMOOTH SCROLLING FOR ANCHOR LINKS
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    
+    anchorLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            const targetId = href.substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                e.preventDefault();
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 });
 
 // ==========================================
@@ -142,32 +165,6 @@ window.addEventListener('pageshow', function(event) {
         if (href === currentPage || 
             (currentPage === '' && href === 'index.html')) {
             link.classList.add('active');
-        }
-    });
-});
-
-// ==========================================
-// SMOOTH SCROLL FOR ANCHOR LINKS
-// ==========================================
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        
-        // Skip if it's just '#' or empty
-        if (!href || href === '#') return;
-        
-        const target = document.querySelector(href);
-        
-        if (target) {
-            e.preventDefault();
-            const navHeight = document.querySelector('.navigation').offsetHeight;
-            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
         }
     });
 });
