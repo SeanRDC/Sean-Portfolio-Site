@@ -4,6 +4,61 @@
  */
 
 // ==========================================
+// FIX BLANK PAGE ON BACK BUTTON
+// ==========================================
+
+// Force page to fully reload/reset on back button
+window.addEventListener('pageshow', function(event) {
+    // If page is loaded from cache (back button), reset everything
+    if (event.persisted) {
+        // Force reset all styles
+        document.body.style.cssText = '';
+        
+        // Reset all elements with animations
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.opacity = '';
+            el.style.transform = '';
+            el.style.animation = '';
+        });
+        
+        // Trigger reflow
+        void document.body.offsetHeight;
+        
+        // Or force full page reload if needed
+        // window.location.reload();
+    }
+    
+    // Always reset modal and body overflow
+    resetPageState();
+});
+
+// Also on regular load
+window.addEventListener('load', function() {
+    resetPageState();
+});
+
+function resetPageState() {
+    // Reset body
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    
+    // Reset modal
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.classList.remove('active');
+        const modalImg = document.getElementById('modalImage');
+        if (modalImg) {
+            modalImg.src = '';
+        }
+    }
+    
+    // Update navigation
+    setActiveNavLink();
+}
+
+// ==========================================
 // NAVIGATION ACTIVE STATE
 // ==========================================
 
