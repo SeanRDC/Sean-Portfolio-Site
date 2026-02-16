@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Weather App - Sean</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/project-page.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="author" content="Sean Rhani Dela Cruz" />
+    <link rel="shortcut icon" href="assets/favicon/s-48px.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/s-32px.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/s-180px.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/s-192px.png" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navigation">
+        <div class="logo">
+            <a href="index.html">
+                <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <text x="20" y="27" text-anchor="middle" font-size="20" font-weight="600">S</text>
+                </svg>
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="work.html">Work</a></li>
+            <li><a href="index.html">About</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Back Navigation -->
+    <div class="back-nav">
+        <a href="work.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Work
+        </a>
+    </div>
+
+    <!-- Project Hero -->
+    <section class="project-hero">
+        <h1>JavaScript Weather Application</h1>
+        <p class="project-subtitle">A dynamic, real-time weather application built with vanilla JavaScript that provides accurate weather forecasts, interactive maps, and personalized weather alerts for any location worldwide.</p>
+        
+        <div class="project-meta">
+            <div class="meta-item">
+                <div class="meta-label">Role</div>
+                <div class="meta-value">Frontend Developer</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Year</div>
+                <div class="meta-value">2025</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Platform</div>
+                <div class="meta-value">Web Application</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <div class="project-content">
+        <!-- Overview Section -->
+        <section class="project-section">
+            <h2 class="section-heading">Project Overview</h2>
+            <div class="project-description">
+                <p>The JavaScript Weather Application is a sophisticated web-based tool that delivers real-time weather information with an elegant, user-friendly interface. Built entirely with vanilla JavaScript, this project demonstrates advanced API integration, asynchronous programming, and modern web development practices.</p>
+                
+                <p>Users can search for any city worldwide and instantly receive comprehensive weather data including current conditions, hourly forecasts, and 7-day predictions. The application features dynamic backgrounds that change based on weather conditions, geolocation support for automatic location detection, and the ability to save favorite locations for quick access.</p>
+                
+                <p>With a focus on performance and responsiveness, the application ensures fast load times and smooth interactions across all devices. The clean, minimalist design puts weather information front and center while providing intuitive navigation and data visualization through charts and icons.</p>
+            </div>
+        </section>
+
+        <!-- Image Showcase -->
+        <section class="project-section">
+            <h2 class="section-heading">Visual Design</h2>
+            
+            <div class="image-showcase">
+                <div class="showcase-item">
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-1.png" alt="Weather app main interface" class="zoomable">
+                    </div>
+                </div>
+                
+                <div class="showcase-item">
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-2.png" alt="Forecast view" class="zoomable">
+                    </div>
+                </div>
+                
+                <div class="showcase-item">
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-3.png" alt="Mobile responsive design" class="zoomable">
+                    </div>
+                </div>
+                
+                <div class="showcase-item">
+                    <div class="showcase-placeholder">
+                        <img src="assets/images/js-showcase-4.png" alt="Weather details panel" class="zoomable">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Modal -->
+        <div id="imageModal" class="image-modal">
+            <span class="modal-close">&times;</span>
+            <img class="modal-content" id="modalImage">
+            <div class="modal-caption" id="modalCaption"></div>
+        </div>
+
+        <!-- Project Links -->
+        <div class="project-links">
+            <a href="#" class="project-link-btn" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                </svg>
+                View Source Code
+            </a>
+            
+            <a href="#" class="project-link-btn secondary" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M2 12h20"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Visit Live Demo
+            </a>
+        </div>
+
+        <!-- Project Details -->
+        <section class="project-section">
+            <h2 class="section-heading">Project Details</h2>
+            
+            <div class="project-details-grid">
+                <div class="detail-block">
+                    <h4>Key Features</h4>
+                    <ul>
+                        <li>Real-time weather data integration</li>
+                        <li>Geolocation API support</li>
+                        <li>7-day forecast with hourly breakdown</li>
+                        <li>Dynamic weather-based UI themes</li>
+                        <li>Favorite locations management</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-block">
+                    <h4>Technologies</h4>
+                    <ul>
+                        <li>Vanilla JavaScript (ES6+)</li>
+                        <li>OpenWeatherMap API</li>
+                        <li>HTML5 & CSS3</li>
+                        <li>LocalStorage API</li>
+                        <li>Chart.js for data visualization</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-block">
+                    <h4>Development Process</h4>
+                    <ul>
+                        <li>API research and integration planning</li>
+                        <li>Component architecture design</li>
+                        <li>Asynchronous data handling</li>
+                        <li>Error handling and edge cases</li>
+                        <li>Performance optimization</li>
+                        <li>Cross-browser testing</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-block">
+                    <h4>Impact & Goals</h4>
+                    <p>This project demonstrates proficiency in JavaScript fundamentals, API integration, and creating responsive web applications. It serves as a practical tool for users needing quick, reliable weather information while showcasing clean code architecture and modern development practices.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Project Navigation -->
+        <section class="project-section" style="text-align: center; padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border);">
+            <a href="work.html" class="project-link-btn secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3h18v18H3z"/>
+                    <path d="M9 9h6v6H9z"/>
+                </svg>
+                View All Projects
+            </a>
+        </section>
+    </div>
+
+    <!-- Footer / Contact -->
+    <footer id="contact" class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="mailto:delacruzseanrhani@gmail.com?subject=Inquiry from Portfolio">Email Me</a>
+                    <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" target="_blank">LinkedIn</a>
+                    <a href="https://github.com/SeanRDC" target="_blank">Github</a>
+                    <a href="https://www.fiverr.com/sean_jarin" target="_blank">Fiverr</a>
+                    <a href="https://v2.onlinejobs.ph/jobseekers/info/4763197" target="_blank">OnlineJobs.ph</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>delacruzseanrhani@gmail.com</p>
+                <p>Available for select projects</p>
+            </div>
+            
+            <div class="footer-cta">
+                <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" target="_blank" class="cta-button">Get in Touch</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Sean Rhani Dela Cruz • Philippines, Pampanga</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
