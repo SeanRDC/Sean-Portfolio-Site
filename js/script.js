@@ -6,29 +6,89 @@
 // ==========================================
 // USER RETURN FIX
 // ==========================================
-
-// Simple Back Navigation Fix
 (function() {
-    // Prevent blank screen on back navigation
+    'use strict';
+
+    // Fix 1: Handle page loaded from cache (back/forward button)
     window.addEventListener('pageshow', function(event) {
-        if (event.persisted || performance.navigation.type === 2) {
+        if (event.persisted) {
+            console.log('Page loaded from cache');
             document.body.style.display = 'block';
-            window.location.reload();
+            document.documentElement.style.display = 'block';
         }
     });
 
-    // Save and restore scroll position
+    // Fix 2: Handle back/forward navigation
+    window.addEventListener('popstate', function(event) {
+        console.log('Back/Forward button pressed');
+        document.body.style.opacity = '1';
+        document.body.style.display = 'block';
+        
+        // Restore scroll position if saved
+        if (event.state && event.state.scrollPosition) {
+            window.scrollTo(0, event.state.scrollPosition);
+        }
+    });
+
+    // Fix 3: Save scroll position before leaving page
     window.addEventListener('beforeunload', function() {
-        sessionStorage.setItem('scrollY', window.scrollY);
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+        sessionStorage.setItem('lastPage', window.location.href);
     });
 
+    // Fix 4: Restore page state on load
     window.addEventListener('DOMContentLoaded', function() {
-        const scrollY = sessionStorage.getItem('scrollY');
-        if (scrollY) {
-            window.scrollTo(0, parseInt(scrollY));
-            sessionStorage.removeItem('scrollY');
+        const lastPage = sessionStorage.getItem('lastPage');
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        
+        if (scrollPosition && lastPage === window.location.href) {
+            window.scrollTo(0, parseInt(scrollPosition));
+        }
+        
+        // Ensure page is visible
+        document.body.style.display = 'block';
+        document.body.style.opacity = '1';
+    });
+
+    // Fix 5: iOS Safari specific fix
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    }
+
+    // Fix 6: Handle visibility change
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            document.body.style.display = 'block';
+            document.body.style.opacity = '1';
         }
     });
+
+    // Fix 7: Custom back button handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const backButtons = document.querySelectorAll('.back-link, .back-button');
+        backButtons.forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'work.html';
+                }
+            });
+        });
+    });
+
+    // Fix 8: Force hardware acceleration
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.style.transform = 'translateZ(0)';
+        document.body.style.webkitTransform = 'translateZ(0)';
+    });
+
+    console.log('Back navigation fix initialized');
 })();
 
 // ==========================================
