@@ -239,3 +239,55 @@ if ('IntersectionObserver' in window) {
         imageObserver.observe(img);
     });
 }
+
+// ==========================================
+// ZOOM EFFECT
+// ==========================================
+
+// Image Zoom Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    const closeBtn = document.getElementsByClassName('modal-close')[0];
+    const zoomableImages = document.querySelectorAll('.zoomable');
+
+    // Add click event to all zoomable images
+    zoomableImages.forEach(function(img) {
+        img.addEventListener('click', function() {
+            modal.classList.add('active');
+            modalImg.src = this.src;
+            modalCaption.innerHTML = this.alt;
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+    });
+
+    // Close modal when clicking the X
+    closeBtn.addEventListener('click', function() {
+        closeModal();
+    });
+
+    // Close modal when clicking on the image
+    modalImg.addEventListener('click', function() {
+        closeModal();
+    });
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+});
