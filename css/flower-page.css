@@ -121,14 +121,26 @@
   transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
+/* Make all showcase items even */
+.showcase-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--color-surface);
+  aspect-ratio: 4/3; /* All images same aspect ratio */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
 .showcase-item:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
+/* Remove featured class styling */
 .showcase-item.featured {
-  grid-column: span 2;
-  aspect-ratio: 16/9;
+  grid-column: auto; /* Makes it same as others */
+  aspect-ratio: 4/3; /* Same aspect ratio */
 }
 
 .showcase-placeholder {
@@ -137,12 +149,106 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   transition: transform var(--transition-smooth);
+  overflow: hidden;
+}
+
+.showcase-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .showcase-item:hover .showcase-placeholder {
   transform: scale(1.05);
+}
+
+/* Zoomable cursor */
+.zoomable {
+  cursor: zoom-in;
+}
+
+/* Image Modal Styles */
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.95);
+  animation: fadeIn 0.3s ease;
+}
+
+.image-modal.active {
+  display: block;
+}
+
+.modal-content {
+  margin: auto;
+  display: block;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  object-fit: contain;
+  animation: zoomIn 0.3s ease;
+  cursor: zoom-out;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 30px;
+  right: 50px;
+  color: #fff;
+  font-size: 50px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 10000;
+  line-height: 1;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #bbb;
+}
+
+.modal-caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 20px 0;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-close {
+    top: 15px;
+    right: 25px;
+    font-size: 35px;
+  }
+  
+  .modal-content {
+    width: 95%;
+  }
 }
 
 /* Project Links Section */
