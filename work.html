@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work - Sean</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/work.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -17,22 +16,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navigation">
-        <div class="logo">
-            <a href="index.html">
-                <svg width="40" height="40" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                    <text x="20" y="27" text-anchor="middle" font-size="20" font-weight="600">S</text>
-                </svg>
-            </a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="work.html">Work</a></li>
-            <li><a href="certificates.html">Certificates</a></li>
-            <li><a href="index.html">About</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
-        </ul>
-    </nav>
+    <div id="nav-placeholder"></div>
 
     <!-- Main Content -->
     <main class="work-container">
@@ -43,8 +27,29 @@
 
         <!-- Portfolio Grid -->
         <div class="portfolio-grid">
+            
             <!-- Project 1 -->
-            <a href="flower-page.html" style="text-decoration: none; color: inherit;">
+            <a href="project.html?id=beaded" style="text-decoration: none; color: inherit;">
+                <article class="project-card">
+                    <div class="project-image">
+                        <div class="placeholder-image has-image">
+                            <img src="assets/images/bead-showcase-1.png" alt="Beaded by Unknown E-Commerce Platform">
+                            <div class="project-overlay">
+                                <div class="project-overlay-content">
+                                    <p>Full-stack MERN platform featuring an interactive custom bracelet visualizer, secure PayMongo integration, 2FA security, and a comprehensive admin dashboard.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Beaded by Unknown E-Commerce</h3>
+                        <span class="year">2026</span>
+                    </div>
+                </article>
+            </a>
+
+            <!-- Project 2 -->
+            <a href="project.html?id=flower" style="text-decoration: none; color: inherit;">
                 <article class="project-card">
                     <div class="project-image">
                         <div class="placeholder-image has-image">
@@ -63,48 +68,8 @@
                 </article>
             </a>
 
-            <!-- Project 2 -->
-            <a href="beads-bracelet-page.html" style="text-decoration: none; color: inherit;">
-                <article class="project-card">
-                    <div class="project-image">
-                        <div class="placeholder-image has-image">
-                            <img src="assets/images/port-2.png" alt="Beads Bracelet E-Commerce">
-                            <div class="project-overlay">
-                                <div class="project-overlay-content">
-                                    <p>Full-featured online store for handcrafted beaded jewelry with custom designer</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Beads Bracelet E-Commerce</h3>
-                        <span class="year">2025</span>
-                    </div>
-                </article>
-            </a>
-
             <!-- Project 3 -->
-            <a href="kids-emotion.html" style="text-decoration: none; color: inherit;">
-                <article class="project-card">
-                    <div class="project-image">
-                        <div class="placeholder-image has-image">
-                            <img src="assets/images/port-3.png" alt="Mind Sprite App Landing Page">
-                            <div class="project-overlay">
-                                <div class="project-overlay-content">
-                                    <p>A sample of a landing page for a kids Emotion app with animations</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Mind Sprite App Landing Page</h3>
-                        <span class="year">2026</span>
-                    </div>
-                </article>
-            </a>
-
-            <!-- Project 4 -->
-            <a href="js-project.html" style="text-align: none; color: inherit;">
+            <a href="js-project.html" style="text-decoration: none; color: inherit;">
                 <article class="project-card">
                     <div class="project-image">
                         <div class="placeholder-image has-image">
@@ -122,6 +87,25 @@
                     </div>
                 </article>
             </a>
+            
+            <!-- Project 4 -->
+            <article class="project-card">
+                <div class="project-image">
+                    <div class="placeholder-image">
+                        <div class="placeholder-number">04</div>
+                        <div class="project-overlay">
+                            <div class="project-overlay-content">
+                                <p>Empty Project</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3>Empty project</h3>
+                    <span class="year">****</span>
+                </div>
+            </article>
+
             <!-- Project 5 -->
             <article class="project-card">
                 <div class="project-image">
@@ -129,7 +113,7 @@
                         <div class="placeholder-number">05</div>
                         <div class="project-overlay">
                             <div class="project-overlay-content">
-                                <p>Empty Project</p>
+                                <p>Empty project</p>
                             </div>
                         </div>
                     </div>
@@ -193,56 +177,11 @@
                     <span class="year">****</span>
                 </div>
             </article>
-
-            <!-- Project 9 -->
-            <article class="project-card">
-                <div class="project-image">
-                    <div class="placeholder-image">
-                        <div class="placeholder-number">09</div>
-                        <div class="project-overlay">
-                            <div class="project-overlay-content">
-                                <p>Empty project</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <h3>Empty project</h3>
-                    <span class="year">****</span>
-                </div>
-            </article>
         </div>
     </main>
 
     <!-- Footer / Contact -->
-    <footer id="contact" class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Connect</h3>
-                <div class="social-links">
-                    <a href="mailto:delacruzseanrhani@gmail.com?subject=Inquiry from Portfolio">Email Me</a>
-                    <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" target="_blank">LinkedIn</a>
-                    <a href="https://github.com/SeanRDC" target="_blank">Github</a>
-                    <a href="https://www.fiverr.com/sean_jarin" target="_blank">Fiverr</a>
-                    <a href="https://v2.onlinejobs.ph/jobseekers/info/4763197" target="_blank">OnlineJobs.ph</a>
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <p>delacruzseanrhani@gmail.com</p>
-                <p>Available for select projects</p>
-            </div>
-            
-            <div class="footer-cta">
-                <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" target="_blank" class="cta-button">Get in Touch</a>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2026 Sean Rhani Dela Cruz • Philippines, Pampanga</p>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
 
     <script src="js/script.js"></script>
 </body>

@@ -3,6 +3,47 @@
  * Handles smooth scrolling, animations, and interactions
  */
 
+/**
+ * Component Loader
+ * Fetches the navigation and footer and injects them into the page
+ */
+async function loadComponents() {
+    try {
+        // 1. Fetch and inject the Navigation
+        const navElement = document.getElementById('nav-placeholder');
+        if (navElement) {
+            const navResponse = await fetch('components/nav.html');
+            navElement.innerHTML = await navResponse.text();
+        }
+
+        // 2. Fetch and inject the Footer
+        const footerElement = document.getElementById('footer-placeholder');
+        if (footerElement) {
+            const footerResponse = await fetch('components/footer.html');
+            footerElement.innerHTML = await footerResponse.text();
+        }
+
+        // 3. Re-initialize scripts that rely on the Nav/Footer existing
+        setActiveNavLink();
+        updateYear();
+        
+        // Setup mobile menu toggle if you have one
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+        }
+    } catch (error) {
+        console.error('Error loading components:', error);
+    }
+}
+
+// Run the loader as soon as the DOM is ready
+document.addEventListener('DOMContentLoaded', loadComponents);
+
 // ==========================================
 // FIX BLANK PAGE ON BACK BUTTON
 // ==========================================
