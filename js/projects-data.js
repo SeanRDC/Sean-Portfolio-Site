@@ -94,6 +94,58 @@ const projectsDatabase = {
                 <p>The project aims to make botanical knowledge accessible and engaging, helping users discover new flowers, and appreciate the diversity of floral species. The intuitive interface ensures that both beginners and experts can easily navigate and find the information they need.</p>
             </div>
         `,
-        achievementsHtml: "" // Left blank because Flower doesn't have an achievements section!
+        achievementsHtml: "" // Left blank because Flower doesn't have an achievements section
+    },
+
+    "pixel": {
+        title: "Pixel Clothing Website",
+        subtitle: "A stylish, responsive web storefront designed for a fictional fashion brand specializing in pixel-art-inspired apparel.",
+        role: "Frontend Developer & UI Designer",
+        year: "2025",
+        platform: "Web Application",
+        overviewHtml: `
+            <p>Pixel Clothing is a niche e-commerce storefront dedicated to a fictional apparel brand that merges modern street fashion with retro pixel-art aesthetics. The project focuses on creating a visually striking interface that resonates with gaming culture and digital art enthusiasts.</p>
+            <p>The platform prioritizes a high-performance shopping experience, featuring a categorized product catalog, interactive hover effects for product previews, and a fully responsive layout that maintains its unique aesthetic across desktops, tablets, and mobile devices.</p>
+            <p>Special attention was given to the visual identity, utilizing a vibrant color palette and sharp, pixelated design elements that reinforce the brand's creative direction while ensuring high readability and modern usability standards.</p>
+        `,
+        images: [
+            "assets/images/pixel-showcase-1.png",
+            "assets/images/pixel-showcase-2.png",
+            "assets/images/pixel-showcase-3.png",
+            "assets/images/pixel-showcase-4.png"
+        ],
+        links: [
+            { text: "View Design Prototype", url: "#", type: "primary" },
+            { text: "Visit Live Website", url: "#", type: "secondary" }
+        ],
+        detailBlocks: [
+            {
+                title: "Frontend Features",
+                items: ["Dynamic product grid", "Search and category filtering", "Responsive mobile-first navigation", "Optimized image loading", "Interactive UI components"]
+            },
+            {
+                title: "Design Elements",
+                items: ["Pixel-art inspired iconography", "Vibrant digital color theory", "Custom typography integration", "Consistent brand identity", "Intuitive user flow"]
+            },
+            {
+                title: "Technologies",
+                items: ["HTML5 & Semantic Tags", "CSS3 (Flexbox & Grid)", "JavaScript (DOM Manipulation)", "AOS (Animate On Scroll)", "Figma for UI Design"]
+            }
+        ],
+        goalsHtml: `
+            <div class="project-description" style="grid-column: 1 / -1; margin-top: var(--spacing-md);">
+                <h4>Project Goals</h4>
+                <p>The primary objective was to build a specialized storefront that proves high-quality fashion retail can be blended with unconventional digital aesthetics. The goal was to master responsive layouts and CSS animations to provide a smooth, engaging experience that feels as creative as the clothing it showcases.</p>
+            </div>
+        `,
+        achievementsHtml: `
+            <section class="project-section">
+                <h2 class="section-heading">Key Achievements</h2>
+                <div class="project-description">
+                    <p>Developed a custom CSS grid system that perfectly balances pixel-inspired blocky elements with the fluid requirements of modern responsive web design. Successfully implemented interactive scroll animations to enhance the "digital" feel of the browsing experience.</p>
+                    <p>Designed a cohesive visual language from scratch, including custom buttons and containers that mimic retro gaming interfaces without sacrificing the professional look required for a modern e-commerce storefront.</p>
+                </div>
+            </section>
+        `
     }
 };
