@@ -575,26 +575,32 @@ a:hover {
 .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: var(--spacing-md);
+    gap: 0;
     margin-bottom: var(--spacing-xl);
+    border: 1px solid var(--color-border);
 }
 
 .project-card {
     background: var(--color-surface);
-    border-radius: var(--radius-lg);
+    border-radius: 0;
     overflow: hidden;
-    border: none;
-    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-border);
+    margin: -1px 0 0 -1px; 
+    box-shadow: none; 
     transition: all var(--transition-smooth);
     display: flex;
     flex-direction: column;
     opacity: 0;
     transform: translateY(20px);
+    position: relative;
+    z-index: 1; 
 }
 
 .project-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary);
+    z-index: 2; 
 }
 
 .project-image {
@@ -1115,7 +1121,11 @@ a:hover {
         margin: 0 auto var(--spacing-md);
     }
     
-    .portfolio-grid,
+    .portfolio-grid {
+        grid-template-columns: 1fr;
+        gap: 0; /* Keeps portfolio gapless on mobile */
+    }
+
     .skills-grid,
     .footer-content,
     .image-showcase {
