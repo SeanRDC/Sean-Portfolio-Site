@@ -163,5 +163,65 @@ const projectsDatabase = {
                 </div>
             </section>
         `
+    },
+
+    "debut": {
+        title: "Lumina 18 - Immersive Birthday Invitation",
+        subtitle: "A highly animated, visually stunning digital landing page serving as an exclusive invitation and event hub for an elegant 18th birthday celebration.",
+        role: "Creative Developer & UI Animator",
+        year: "2026",
+        platform: "Interactive Web Experience",
+        overviewHtml: `
+            <p><strong>Lumina 18</strong> reimagines the traditional birthday invitation as a breathtaking digital experience. Designed to capture the magic and elegance of a milestone 18th birthday, this landing page guides guests through a beautifully choreographed visual journey.</p>
+            <p>The site heavily utilizes scroll-triggered animations, parallax effects, and smooth page transitions to complement the aesthetic beauty of the event. Guests can explore the debutante's photo gallery, uncover venue details through interactive maps, and submit their attendance via a seamless, custom-built RSVP form.</p>
+            <p>Every interaction—from the initial custom loading sequence to the micro-interactions on the buttons—was meticulously crafted to ensure the website feels alive, creating a memorable first impression for every guest before the party even begins.</p>
+        `,
+        images: [
+            "assets/images/debut-1.png",
+            "assets/images/debut-2.png",
+            "assets/images/debut-3.png",
+            "assets/images/debut-4.png"
+        ],
+        links: [
+            { text: "View Animation Storyboard", url: "https://www.figma.com/design/sample/Debut-Invitation", type: "primary" },
+            { text: "Experience Live Invitation", url: "https://lumina18-invitation.vercel.app", type: "secondary" }
+        ],
+        detailBlocks: [
+            {
+                title: "Key Features",
+                items: [
+                    "Cinematic scroll-triggered animations and parallax backgrounds", 
+                    "Dynamic, masonry-style photo gallery with lightbox integration", 
+                    "Interactive, real-time RSVP submission form with automated email confirmations", 
+                    "Custom pre-loader sequence setting the thematic tone",
+                    "Fully responsive design optimized for seamless mobile guest access"
+                ]
+            },
+            {
+                title: "Technologies",
+                items: [
+                    "Frontend: React.js, Vite", 
+                    "Animation: GSAP (GreenSock), Framer Motion", 
+                    "Styling: Tailwind CSS, Custom CSS Keyframes", 
+                    "Backend (RSVP): Node.js, Nodemailer"
+                ]
+            },
+            {
+                title: "Design Process",
+                items: [
+                    "Establishing a cohesive mood board and elegant color palette", 
+                    "Storyboarding scroll-linked animation sequences to ensure narrative flow", 
+                    "Prototyping micro-interactions and page transitions in Figma", 
+                    "Aggressive performance optimization to ensure smooth 60fps animations across all devices"
+                ]
+            }
+        ],
+        goalsHtml: `
+            <div class="detail-block">
+                <h4>Impact & Goals</h4>
+                <p>The primary goal was to elevate the standard paper event invitation into a piece of interactive digital art. By prioritizing fluid animations and high-end design aesthetics, the project successfully built anticipation and excitement among guests, while simultaneously streamlining the RSVP tracking process for the event organizers.</p>
+            </div>
+        `,
+        achievementsHtml: "" 
     }
 };
