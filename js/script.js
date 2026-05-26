@@ -1,33 +1,20 @@
-/**
- * Portfolio Website - Main JavaScript
- * Handles smooth scrolling, animations, and interactions
- */
-
-/**
- * Component Loader
- * Fetches the navigation and footer and injects them into the page
- */
 async function loadComponents() {
     try {
-        // 1. Fetch and inject the Navigation
         const navElement = document.getElementById('nav-placeholder');
         if (navElement) {
             const navResponse = await fetch('components/nav.html');
             navElement.innerHTML = await navResponse.text();
         }
 
-        // 2. Fetch and inject the Footer
         const footerElement = document.getElementById('footer-placeholder');
         if (footerElement) {
             const footerResponse = await fetch('components/footer.html');
             footerElement.innerHTML = await footerResponse.text();
         }
 
-        // 3. Re-initialize scripts that rely on the Nav/Footer existing
         setActiveNavLink();
         updateYear();
         
-        // Setup mobile menu toggle if you have one
         const menuToggle = document.querySelector('.menu-toggle');
         const navLinks = document.querySelector('.nav-links');
         if (menuToggle && navLinks) {
@@ -37,25 +24,16 @@ async function loadComponents() {
             });
         }
     } catch (error) {
-        console.error('Error loading components:', error);
+        console.error(error);
     }
 }
 
-// Run the loader as soon as the DOM is ready
 document.addEventListener('DOMContentLoaded', loadComponents);
 
-// ==========================================
-// FIX BLANK PAGE ON BACK BUTTON
-// ==========================================
-
-// Force page to fully reload/reset on back button
 window.addEventListener('pageshow', function(event) {
-    // If page is loaded from cache (back button), reset everything
     if (event.persisted) {
-        // Force reset all styles
         document.body.style.cssText = '';
         
-        // Reset all elements with animations
         const allElements = document.querySelectorAll('*');
         allElements.forEach(el => {
             el.style.opacity = '';
@@ -63,29 +41,21 @@ window.addEventListener('pageshow', function(event) {
             el.style.animation = '';
         });
         
-        // Trigger reflow
         void document.body.offsetHeight;
-        
-        // Or force full page reload if needed
-        // window.location.reload();
     }
     
-    // Always reset modal and body overflow
     resetPageState();
 });
 
-// Also on regular load
 window.addEventListener('load', function() {
     resetPageState();
 });
 
 function resetPageState() {
-    // Reset body
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.width = '';
     
-    // Reset modal
     const modal = document.getElementById('imageModal');
     if (modal) {
         modal.classList.remove('active');
@@ -95,19 +65,13 @@ function resetPageState() {
         }
     }
     
-    // Update navigation
     setActiveNavLink();
 }
-
-// ==========================================
-// NAVIGATION ACTIVE STATE
-// ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     setActiveNavLink();
 });
 
-// Also update on back/forward navigation
 window.addEventListener('popstate', function() {
     setActiveNavLink();
 });
@@ -127,10 +91,6 @@ function setActiveNavLink() {
     });
 }
 
-// ==========================================
-// IMAGE ZOOM MODAL FUNCTIONALITY
-// ==========================================
-
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
@@ -140,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (modal && modalImg) {
         
-        // Open modal when clicking zoomable images
         zoomableImages.forEach(img => {
             img.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -158,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Close modal function
         function closeModal() {
             modal.classList.remove('active');
             document.body.style.overflow = '';
@@ -170,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }
 
-        // Close with X button
         if (closeBtn) {
             closeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -178,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Close when clicking image
         if (modalImg) {
             modalImg.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -186,14 +142,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Close when clicking background
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();
             }
         });
 
-        // Close with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.classList.contains('active')) {
                 closeModal();
@@ -201,10 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// ==========================================
-// SMOOTH SCROLLING FOR ANCHOR LINKS
-// ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
@@ -228,10 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ==========================================
-// MOBILE MENU TOGGLE (if needed)
-// ==========================================
-
 document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -244,17 +190,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ==========================================
-// PREVENT NAVIGATION ISSUES
-// ==========================================
-
-// Clear any stored navigation state when page loads
 window.addEventListener('pageshow', function(event) {
-    // Remove active class from all nav links first
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach(link => link.classList.remove('active'));
     
-    // Then reapply based on current page
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
@@ -265,13 +204,9 @@ window.addEventListener('pageshow', function(event) {
     });
 });
 
-// ==========================================
-// SCROLL ANIMATIONS
-// ==========================================
-
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px -100px 0px'
 };
 
 const fadeInObserver = new IntersectionObserver((entries) => {
@@ -279,24 +214,18 @@ const fadeInObserver = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
+            fadeInObserver.unobserve(entry.target); 
         }
     });
 }, observerOptions);
 
-// Observe elements that should fade in
-const fadeElements = document.querySelectorAll('.timeline-block, .project-card');
+const fadeElements = document.querySelectorAll('.timeline-block, .project-card, .certificate-card, .skills-column');
 fadeElements.forEach(el => {
-    // Set initial state
     el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    
+    el.style.transform = 'translateY(40px)'; 
+    el.style.transition = 'opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
     fadeInObserver.observe(el);
 });
-
-// ==========================================
-// NAVIGATION BACKGROUND ON SCROLL
-// ==========================================
 
 let lastScroll = 0;
 const nav = document.querySelector('.navigation');
@@ -304,7 +233,6 @@ const nav = document.querySelector('.navigation');
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
-    // Add shadow when scrolled
     if (currentScroll > 50) {
         nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
     } else {
@@ -314,23 +242,21 @@ window.addEventListener('scroll', () => {
     lastScroll = currentScroll;
 });
 
-// ==========================================
-// CURSOR EFFECT (OPTIONAL - FOR DESKTOP)
-// ==========================================
-
 if (window.matchMedia("(min-width: 1024px)").matches) {
     const cursor = document.createElement('div');
     cursor.className = 'custom-cursor';
     cursor.style.cssText = `
         position: fixed;
-        width: 8px;
-        height: 8px;
+        top: 0; left: 0;
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--color-primary);
         border-radius: 50%;
-        background: rgba(0, 102, 255, 0.6);
         pointer-events: none;
         z-index: 9999;
-        transition: transform 0.15s ease;
-        mix-blend-mode: difference;
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+        mix-blend-mode: exclusion;
     `;
     document.body.appendChild(cursor);
     
@@ -343,32 +269,27 @@ if (window.matchMedia("(min-width: 1024px)").matches) {
     });
     
     function animate() {
-        // Smooth follow effect
-        cursorX += (mouseX - cursorX) * 0.2;
-        cursorY += (mouseY - cursorY) * 0.2;
-        
-        cursor.style.left = cursorX - 4 + 'px';
-        cursor.style.top = cursorY - 4 + 'px';
-        
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
         requestAnimationFrame(animate);
     }
     animate();
     
-    // Grow cursor on interactive elements
     const interactiveElements = document.querySelectorAll('a, button, .project-card');
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'scale(2)';
+            cursor.style.width = '50px';
+            cursor.style.height = '50px';
+            cursor.style.backgroundColor = 'rgba(0,0,0,0.05)';
         });
         el.addEventListener('mouseleave', () => {
-            cursor.style.transform = 'scale(1)';
+            cursor.style.width = '30px';
+            cursor.style.height = '30px';
+            cursor.style.backgroundColor = 'transparent';
         });
     });
 }
-
-// ==========================================
-// TIMELINE PROGRESS INDICATOR
-// ==========================================
 
 const timelineBlocks = document.querySelectorAll('.timeline-block');
 
@@ -376,7 +297,7 @@ if (timelineBlocks.length > 0) {
     const progressObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.borderLeftColor = 'var(--color-accent)';
+                entry.target.style.borderLeftColor = 'var(--color-primary)';
                 entry.target.style.borderLeftWidth = '2px';
             }
         });
@@ -393,10 +314,6 @@ if (timelineBlocks.length > 0) {
     });
 }
 
-// ==========================================
-// PAGE TRANSITION EFFECT
-// ==========================================
-
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     
@@ -406,12 +323,10 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// Add transition on page navigation
 document.querySelectorAll('a:not([href^="#"]):not([href^="mailto"])').forEach(link => {
     link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
         
-        // Skip external links
         if (href && !href.startsWith('http') && href.includes('.html')) {
             e.preventDefault();
             
@@ -425,10 +340,6 @@ document.querySelectorAll('a:not([href^="#"]):not([href^="mailto"])').forEach(li
     });
 });
 
-// ==========================================
-// FOOTER YEAR AUTO-UPDATE
-// ==========================================
-
 const updateYear = () => {
     const yearElement = document.querySelector('.footer-bottom p');
     if (yearElement) {
@@ -439,24 +350,8 @@ const updateYear = () => {
 
 updateYear();
 
-// ==========================================
-// CONSOLE SIGNATURE
-// ==========================================
+console.log('%c👋 Hello There! ', 'background: #000; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold;');
 
-console.log(
-    '%c👋 Hello There! ',
-    'background: #0066ff; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold;'
-);
-console.log(
-    '%cLooking for something? Feel free to reach out!',
-    'color: #666; font-size: 14px; padding: 5px 0;'
-);
-
-// ==========================================
-// PERFORMANCE OPTIMIZATION
-// ==========================================
-
-// Lazy load images if you add actual images later
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
