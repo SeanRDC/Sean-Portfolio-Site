@@ -206,7 +206,7 @@ window.addEventListener('pageshow', function(event) {
 
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    rootMargin: '0px 0px -50px 0px'
 };
 
 const fadeInObserver = new IntersectionObserver((entries) => {
@@ -222,8 +222,8 @@ const fadeInObserver = new IntersectionObserver((entries) => {
 const fadeElements = document.querySelectorAll('.timeline-block, .project-card, .certificate-card, .skills-column');
 fadeElements.forEach(el => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(40px)'; 
-    el.style.transition = 'opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
+    el.style.transform = 'translateY(20px)'; 
+    el.style.transition = 'opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)';
     fadeInObserver.observe(el);
 });
 
@@ -234,85 +234,13 @@ window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 50) {
-        nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
+        nav.style.borderBottom = '1px solid rgba(0,0,0,0.08)';
     } else {
-        nav.style.boxShadow = 'none';
+        nav.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
     }
     
     lastScroll = currentScroll;
 });
-
-if (window.matchMedia("(min-width: 1024px)").matches) {
-    const cursor = document.createElement('div');
-    cursor.className = 'custom-cursor';
-    cursor.style.cssText = `
-        position: fixed;
-        top: 0; left: 0;
-        width: 30px;
-        height: 30px;
-        border: 1px solid var(--color-primary);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-        transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
-        mix-blend-mode: exclusion;
-    `;
-    document.body.appendChild(cursor);
-    
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-    
-    function animate() {
-        cursorX += (mouseX - cursorX) * 0.15;
-        cursorY += (mouseY - cursorY) * 0.15;
-        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
-        requestAnimationFrame(animate);
-    }
-    animate();
-    
-    const interactiveElements = document.querySelectorAll('a, button, .project-card');
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.style.width = '50px';
-            cursor.style.height = '50px';
-            cursor.style.backgroundColor = 'rgba(0,0,0,0.05)';
-        });
-        el.addEventListener('mouseleave', () => {
-            cursor.style.width = '30px';
-            cursor.style.height = '30px';
-            cursor.style.backgroundColor = 'transparent';
-        });
-    });
-}
-
-const timelineBlocks = document.querySelectorAll('.timeline-block');
-
-if (timelineBlocks.length > 0) {
-    const progressObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.borderLeftColor = 'var(--color-primary)';
-                entry.target.style.borderLeftWidth = '2px';
-            }
-        });
-    }, {
-        threshold: 0.5
-    });
-    
-    timelineBlocks.forEach(block => {
-        block.style.borderLeft = '2px solid transparent';
-        block.style.paddingLeft = 'var(--spacing-sm)';
-        block.style.transition = 'border-color 0.4s ease';
-        
-        progressObserver.observe(block);
-    });
-}
 
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
@@ -350,7 +278,7 @@ const updateYear = () => {
 
 updateYear();
 
-console.log('%c👋 Hello There! ', 'background: #000; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold;');
+console.log('%c👋', 'font-size: 16px;');
 
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries) => {
