@@ -792,6 +792,7 @@ a:hover {
 .project-section {
     margin-bottom: var(--spacing-xl);
     animation: fadeInUp 0.8s ease backwards;
+    border: 1px solid var(--color-border);
 }
 
 .project-section:nth-child(1) { animation-delay: 0.1s; }
@@ -995,6 +996,7 @@ a:hover {
 .project-link-btn.secondary {
     background: var(--color-surface);
     color: var(--color-primary);
+    border: 1px solid var(--color-border);
 }
 
 .project-link-btn.secondary:hover {
