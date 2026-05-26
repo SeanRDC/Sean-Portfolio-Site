@@ -54,15 +54,15 @@ const projectsDatabase = {
     },
 
     "flower": {
-        title: "Flower Catalogue Website",
-        subtitle: "A modern, searchable digital catalogue designed to help users discover and explore a diverse collection of flowers with detailed information and beautiful imagery.",
-        role: "Web Designer & Developer",
-        year: "2025",
-        platform: "Web Application",
+        title: "Peony - Full-Stack Flower Catalogue",
+        subtitle: "A dynamic, full-stack web application featuring 200 botanically classified flowers, advanced multi-parameter filtering, and secure user authentication for personalized collections.",
+        role: "Full-Stack Web Developer",
+        year: "2026",
+        platform: "Full-Stack Web Application",
         overviewHtml: `
-            <p>The Flower Catalogue Website is a comprehensive digital platform that brings the beauty and diversity of flowers to users' fingertips. Designed with both enthusiasts and casual browsers in mind, this project combines elegant visual design with intuitive functionality.</p>
-            <p>The platform features an advanced search system that allows users to filter flowers by type, color, season, and care requirements. Each flower entry includes detailed information, and high-quality imagery to provide a complete understanding of each species.</p>
-            <p>With a focus on user experience and accessibility, the website ensures that discovering and learning about flowers is both enjoyable and informative for users of all knowledge levels.</p>
+            <p><strong>Peony</strong> is a comprehensive full-stack digital catalogue that brings the beauty and diversity of flowers to users' fingertips. Designed with a seamless user interface and powered by a robust backend, the platform allows users to explore a massive database of blooms with incredible speed and precision.</p>
+            <p>The core of the platform is built on a custom botanical database containing 200 uniquely classified flowers. Users can utilize an advanced backend filtering system to narrow down discoveries by specific traits such as color, petal shape, botanical type, and symbolism. A real-time dynamic search bar further enhances navigation with instant visual suggestions.</p>
+            <p>Beyond browsing, Peony offers a deeply personalized experience. Implementing a highly secure authentication system featuring Google OAuth, custom JWT login, and API-driven OTP email verification, users can safely create accounts to save their favorite flowers and curate custom botanical collections.</p>
         `,
         images: [
             "assets/images/port-1.png",
@@ -77,24 +77,40 @@ const projectsDatabase = {
         detailBlocks: [
             {
                 title: "Key Features",
-                items: ["Search and filter system", "Detailed flower profiles", "Responsive design for all devices", "Interactive image galleries"]
+                items: [
+                    "Advanced backend filtering (Color, Petal Shape, Type, Symbolism)", 
+                    "Secure OTP email verification and Google OAuth Sign-In", 
+                    "Personalized user dashboards for Favorites and Collections", 
+                    "Dynamic search bar with real-time visual auto-suggestions",
+                    "Custom global modal and alert system for seamless UI/UX"
+                ]
             },
             {
                 title: "Technologies",
-                items: ["HTML5 & CSS3", "JavaScript (ES6+)", "Responsive Web Design", "UI/UX Best Practices"]
+                items: [
+                    "Frontend: React, Framer Motion, React Router", 
+                    "Backend: Node.js, Express.js", 
+                    "Database: MongoDB Atlas, Mongoose", 
+                    "Security & APIs: JWT, Bcrypt, Resend Email API"
+                ]
             },
             {
-                title: "Design Process",
-                items: ["User research and personas", "Wireframing and prototyping", "Visual design in Figma", "Iterative testing and refinement", "Development and deployment"]
+                title: "Development Process",
+                items: [
+                    "Full-stack MERN architecture and deployment", 
+                    "Engineering a custom botanical data classification seeder", 
+                    "Managing complex global states via React Context", 
+                    "Designing responsive, animated components and loading states"
+                ]
             }
         ],
         goalsHtml: `
             <div class="detail-block">
                 <h4>Impact & Goals</h4>
-                <p>The project aims to make botanical knowledge accessible and engaging, helping users discover new flowers, and appreciate the diversity of floral species. The intuitive interface ensures that both beginners and experts can easily navigate and find the information they need.</p>
+                <p>The primary goal was to architect a performant, data-driven platform that evolved beyond a static front-end design into a fully functional web application. By integrating a scalable MongoDB backend and strict user authentication protocols, the project successfully delivers a highly interactive, reliable, and personalized experience for botanical enthusiasts.</p>
             </div>
         `,
-        achievementsHtml: "" // Left blank because Flower doesn't have an achievements section
+        achievementsHtml: "" 
     },
 
     "pixel": {
