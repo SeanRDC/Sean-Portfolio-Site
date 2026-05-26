@@ -19,7 +19,7 @@ const projectsDatabase = {
         ],
         links: [
             { text: "View High-Fidelity Prototype", url: "#", type: "primary" },
-            { text: "Visit Live Website", url: "#", type: "secondary" }
+            { text: "Visit Live Website", url: "https://www.beadedbyunknown.shop", type: "secondary" }
         ],
         detailBlocks: [
             {
@@ -72,7 +72,7 @@ const projectsDatabase = {
         ],
         links: [
             { text: "View High-Fidelity Design", url: "https://www.figma.com/design/oiRcTe3ELknVuerEfHZcGC/Flower-Catalogue-Website?node-id=0-1&t=WxXDQcj3uxaawKoF-1", type: "primary" },
-            { text: "Visit Live Website", url: "https://seanrdc.github.io/Flower-Catalogue-Website/", type: "secondary" }
+            { text: "Visit Live Website", url: "https://flower-catalogue-website.vercel.app", type: "secondary" }
         ],
         detailBlocks: [
             {
