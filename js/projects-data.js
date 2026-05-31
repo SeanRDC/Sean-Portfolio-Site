@@ -114,15 +114,15 @@ const projectsDatabase = {
     },
 
     "pixel": {
-        title: "Pixel Clothing Website",
-        subtitle: "A stylish, responsive web storefront designed for a fictional fashion brand specializing in pixel-art-inspired apparel.",
+        title: "Retro MC: Interactive RPG Storefront",
+        subtitle: "An immersive, gamified e-commerce experience blending retro pixel-art aesthetics with modern React web functionality.",
         role: "Frontend Developer & UI Designer",
-        year: "2025",
-        platform: "Web Application",
+        year: "2026",
+        platform: "Web Application (Next.js)",
         overviewHtml: `
-            <p>Pixel Clothing is a niche e-commerce storefront dedicated to a fictional apparel brand that merges modern street fashion with retro pixel-art aesthetics. The project focuses on creating a visually striking interface that resonates with gaming culture and digital art enthusiasts.</p>
-            <p>The platform prioritizes a high-performance shopping experience, featuring a categorized product catalog, interactive hover effects for product previews, and a fully responsive layout that maintains its unique aesthetic across desktops, tablets, and mobile devices.</p>
-            <p>Special attention was given to the visual identity, utilizing a vibrant color palette and sharp, pixelated design elements that reinforce the brand's creative direction while ensuring high readability and modern usability standards.</p>
+            <p>Retro MC redefines the standard e-commerce storefront by transforming the shopping experience into an interactive, retro RPG environment. Instead of a traditional grid, users interact with a merchant character (EJ) and browse halftone graphic tees through a dynamic, sliding inventory system.</p>
+            <p>The platform prioritizes deep interactivity, featuring typing dialogue effects, animated parchment scroll popups for quests and guides, and a highly responsive layout that seamlessly adapts its complex UI from large desktop monitors down to mobile devices.</p>
+            <p>Special attention was given to bridging state-driven React logic with advanced CSS keyframe animations, ensuring that opening the cart, docking the inventory, and triggering modal transitions feel as snappy and immersive as a classic video game.</p>
         `,
         images: [
             "assets/images/pixel-showcase-1.png",
@@ -137,29 +137,29 @@ const projectsDatabase = {
         detailBlocks: [
             {
                 title: "Frontend Features",
-                items: ["Dynamic product grid", "Search and category filtering", "Responsive mobile-first navigation", "Optimized image loading", "Interactive UI components"]
+                items: ["Interactive merchant dialogue system", "Docking & sliding inventory drawer", "Animated scroll-based popups", "Dynamic shopping cart sidebar", "Fluid responsive UI layouts"]
             },
             {
                 title: "Design Elements",
-                items: ["Pixel-art inspired iconography", "Vibrant digital color theory", "Custom typography integration", "Consistent brand identity", "Intuitive user flow"]
+                items: ["Pixel-art & retro gaming UI", "Medieval fantasy aesthetic", "Custom CSS scroll animations", "Gamified user experience", "Strict pixel aspect-ratio control"]
             },
             {
                 title: "Technologies",
-                items: ["HTML5 & Semantic Tags", "CSS3 (Flexbox & Grid)", "JavaScript (DOM Manipulation)", "AOS (Animate On Scroll)", "Figma for UI Design"]
+                items: ["React / Next.js", "Advanced CSS3 (Keyframes & Variables)", "JavaScript (State Management)", "HTML5 Semantic Structure"]
             }
         ],
         goalsHtml: `
             <div class="project-description" style="grid-column: 1 / -1; margin-top: var(--spacing-md);">
                 <h4>Project Goals</h4>
-                <p>The primary objective was to build a specialized storefront that proves high-quality fashion retail can be blended with unconventional digital aesthetics. The goal was to master responsive layouts and CSS animations to provide a smooth, engaging experience that feels as creative as the clothing it showcases.</p>
+                <p>The primary objective was to build a specialized storefront that completely gamifies the retail experience. The goal was to master the synchronization between React state management and complex CSS animations to provide a smooth, engaging experience that perfectly mimics a retro game interface without sacrificing the usability of a modern shop.</p>
             </div>
         `,
         achievementsHtml: `
             <section class="project-section">
                 <h2 class="section-heading">Key Achievements</h2>
                 <div class="project-description">
-                    <p>Developed a custom CSS grid system that perfectly balances pixel-inspired blocky elements with the fluid requirements of modern responsive web design. Successfully implemented interactive scroll animations to enhance the "digital" feel of the browsing experience.</p>
-                    <p>Designed a cohesive visual language from scratch, including custom buttons and containers that mimic retro gaming interfaces without sacrificing the professional look required for a modern e-commerce storefront.</p>
+                    <p>Successfully engineered a complex, layered UI system where dynamic React states (like the shopping cart and inventory drawer) perfectly sequence advanced CSS keyframe animations without overlapping or causing layout shifts.</p>
+                    <p>Developed a DRY (Don't Repeat Yourself) CSS architecture for the modal popups, utilizing CSS variables to dynamically control height and unroll animations across different screens. Implemented fluid spacing utilizing CSS <code>clamp()</code> to guarantee the pixel art assets retain their perfect dimensions across all devices.</p>
                 </div>
             </section>
         `
