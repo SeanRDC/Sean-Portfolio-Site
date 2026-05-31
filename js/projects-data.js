@@ -132,7 +132,7 @@ const projectsDatabase = {
         ],
         links: [
             { text: "View Design Prototype", url: "#", type: "primary" },
-            { text: "Visit Live Website", url: "#", type: "secondary" }
+            { text: "Visit Live Website", url: "https://pixel-clothing-website.vercel.app/", type: "secondary" }
         ],
         detailBlocks: [
             {
