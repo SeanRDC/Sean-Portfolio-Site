@@ -108,6 +108,7 @@ export default function WorkView() {
   };
 
   const n = projects.length;
+  console.log(n);
   const containerW = typeof window !== "undefined" ? window.innerWidth : 1280;
   const paneW = clamp(containerW * 0.58, 440, 660);
   const gap = 48;
@@ -215,7 +216,9 @@ export default function WorkView() {
                       style={{ width: `${paneW}px` }}
                     >
                       <button
-                        ref={(el) => (slidesRef.current[i] = el)}
+                        ref={(el) => {
+                          slidesRef.current[i] = el;
+                        }}
                         onClick={(e) => handleProjectClick(e, p.id)}
                         className="glass glass-edge block w-full overflow-hidden rounded-[28px] p-4 text-left will-change-transform"
                         style={{
