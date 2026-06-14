@@ -35,14 +35,18 @@ export default function Dock() {
         <Link to="/" className="flex items-center" aria-label="Home">
           <span
             className={`rounded-lg transition-all duration-500 ${scrolled ? "h-5 w-5" : "h-7 w-7"}`}
-            style={{ background: "linear-gradient(135deg, var(--violet), var(--cyan))", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55)" }}
+            style={{
+              background: "linear-gradient(135deg, var(--violet), var(--cyan))",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55)",
+            }}
           />
         </Link>
         {links.map((l) => (
           <Link
             key={l.label}
             to={l.to}
-            className={`font-medium transition-colors duration-300 ${scrolled ? "text-sm" : "text-[15px]"} ${
+            // FIX: Changed transition-colors duration-300 to transition-all duration-500
+            className={`font-medium transition-all duration-500 ${scrolled ? "text-sm" : "text-[15px]"} ${
               isActive(l.to) ? "text-ink" : "text-ink-muted hover:text-ink"
             }`}
           >
@@ -55,7 +59,10 @@ export default function Dock() {
           className={`rounded-pill font-semibold text-ink transition-all duration-500 ${
             scrolled ? "px-3.5 py-1.5 text-sm" : "px-5 py-2 text-[15px]"
           }`}
-          style={{ background: "var(--glass-fill-strong)", border: "1px solid var(--edge-light)" }}
+          style={{
+            background: "var(--glass-fill-strong)",
+            border: "1px solid var(--edge-light)",
+          }}
         >
           Contact
         </button>

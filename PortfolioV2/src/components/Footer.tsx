@@ -9,9 +9,13 @@ import {
 import Reveal from "./Reveal";
 
 const socials = [
-  { label: "Email", icon: Mail, href: "#" },
-  { label: "LinkedIn", icon: Users, href: "#" },
-  { label: "GitHub", icon: Code, href: "#" },
+  { label: "Email", icon: Mail, href: "mailto:delacruzseanrhani@gmail.com" },
+  {
+    label: "LinkedIn",
+    icon: Users,
+    href: "https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334",
+  },
+  { label: "GitHub", icon: Code, href: "https://github.com/SeanRDC" },
   { label: "Fiverr", icon: Briefcase, href: "#" },
   { label: "OnlineJobs", icon: Globe, href: "#" },
 ];
@@ -79,10 +83,10 @@ export default function Footer() {
                 </span>
                 <a
                   data-cursor
-                  href="mailto:hello@example.com"
+                  href="mailto:delacruzseanrhani@gmail.com"
                   className="text-[15px] text-ink-muted transition-colors hover:text-ink"
                 >
-                  hello@example.com
+                  delacruzseanrhani@gmail.com
                 </a>
                 <span className="text-[15px] text-ink-muted">
                   Available worldwide · Remote
@@ -94,7 +98,7 @@ export default function Footer() {
               <span>
                 © {new Date().getFullYear()} — Designed, programmed & automated.
               </span>
-              <span>Crafted with liquid glass.</span>
+              <span>Sean Rhani Dela Cruz</span>
             </div>
           </div>
         </Reveal>

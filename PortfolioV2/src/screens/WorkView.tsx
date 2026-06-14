@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -14,16 +15,16 @@ const projects = [
     desc: "A custom bracelet builder and points-based loyalty engine. What started as a hobby originating from imagination scaled into a complete digital storefront.",
   },
   {
-    id: "flower-catalogue",
-    title: "Flower Catalogue",
-    category: "UI/UX Design",
-    desc: "A lush, immersive visual directory utilizing fluid typography and dynamic data mapping.",
-  },
-  {
     id: "pixel-ecommerce",
     title: "Pixel E-Commerce",
     category: "Full-Stack Development",
     desc: "MERN stack architecture delivering seamless cart state management and secure authentication.",
+  },
+  {
+    id: "flower-catalogue",
+    title: "Flower Catalogue",
+    category: "UI/UX Design",
+    desc: "A lush, immersive visual directory utilizing fluid typography and dynamic data mapping.",
   },
   {
     id: "debut-invitation",
@@ -34,31 +35,34 @@ const projects = [
 ];
 
 export default function WorkView() {
+  const navigate = useNavigate();
   const pinRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // State for the transition overlay
+  const [transitioning, setTransitioning] = useState<{
+    active: boolean;
+    rect: DOMRect | null;
+  }>({ active: false, rect: null });
 
   useGSAP(
     () => {
       const panels = gsap.utils.toArray<HTMLElement>(".project-pane");
-
-      // Calculate scroll distance for horizontal track
       const totalWidth = trackRef.current?.scrollWidth || 0;
       const viewportWidth = window.innerWidth;
       const distanceToScroll = totalWidth - viewportWidth;
 
-      // Pin the container and slide the track horizontally
       gsap.to(panels, {
         x: () => -distanceToScroll,
         ease: "none",
         scrollTrigger: {
           trigger: pinRef.current,
           pin: true,
-          scrub: 1, // Weighted fluid feel
+          scrub: 1,
           end: () => `+=${viewportWidth * 3}`,
         },
       });
 
-      // Nested Focus Logic per pane
       panels.forEach((panel) => {
         gsap.fromTo(
           panel,
@@ -83,8 +87,49 @@ export default function WorkView() {
     { scope: pinRef },
   );
 
+  const handleProjectClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    id: string,
+  ) => {
+    if (transitioning.active) return;
+
+    // Grab the exact coordinates of the clicked card
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+
+    setTransitioning({ active: true, rect });
+
+    // Animate the overlay expanding to full screen
+    gsap.to(".transition-overlay", {
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      borderRadius: 0,
+      duration: 0.7,
+      ease: "power4.inOut",
+      onComplete: () => {
+        navigate(`/project/${id}`);
+      },
+    });
+  };
+
   return (
     <section className="relative overflow-hidden bg-void">
+      {/* Expanding Transition Overlay */}
+      {transitioning.active && transitioning.rect && (
+        <div
+          className="transition-overlay fixed z-[100] bg-panel-deep"
+          style={{
+            top: transitioning.rect.top,
+            left: transitioning.rect.left,
+            width: transitioning.rect.width,
+            height: transitioning.rect.height,
+            borderRadius: "32px",
+          }}
+        />
+      )}
+
       <div className="flex min-h-[40vh] items-end px-6 pb-12 pt-28 md:px-10">
         <Reveal>
           <span className="mb-3 inline-block text-xs font-medium uppercase tracking-[0.16em] text-ink-muted">
@@ -111,12 +156,13 @@ export default function WorkView() {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="project-pane glass glass-edge relative h-full w-[85vw] max-w-4xl flex-shrink-0 overflow-hidden rounded-[32px] p-10 flex flex-col justify-end"
+              onClick={(e) => handleProjectClick(e, project.id)}
+              className="project-pane glass glass-edge relative h-full w-[85vw] max-w-4xl flex-shrink-0 overflow-hidden rounded-[32px] p-10 flex flex-col justify-end cursor-none"
               data-cursor
             >
-              <div className="absolute inset-0 -z-10 bg-panel-deep" />
+              <div className="absolute inset-0 -z-10 bg-panel-deep pointer-events-none" />
 
-              <div className="relative z-10 w-full max-w-md glass p-8 rounded-[24px]">
+              <div className="relative z-10 w-full max-w-md glass p-8 rounded-[24px] pointer-events-none transition-transform duration-300 hover:scale-[1.02]">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-cyan">
                   {project.category}
                 </span>
@@ -124,6 +170,9 @@ export default function WorkView() {
                   {project.title}
                 </h2>
                 <p className="text-ink-muted leading-relaxed">{project.desc}</p>
+                <span className="mt-6 inline-block text-sm font-semibold uppercase tracking-widest text-violet">
+                  View Project →
+                </span>
               </div>
             </div>
           ))}

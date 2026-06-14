@@ -84,7 +84,7 @@ export default function HeroSection() {
                 }}
               />
               <span className="absolute font-display text-4xl font-semibold tracking-tight text-ink/90">
-                JD
+                S
               </span>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function HeroSection() {
           </h1>
           <p className="hero-bio mt-7 max-w-xl text-lg leading-relaxed text-ink-muted">
             I specialize in designing, programming, and automating digital
-            products — crafting interfaces that feel inevitable and the systems
+            products crafting interfaces that feel inevitable and the systems
             that quietly run them.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
