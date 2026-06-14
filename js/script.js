@@ -217,56 +217,33 @@ window.addEventListener("scroll", () => {
 });
 
 if (window.matchMedia("(min-width: 1024px)").matches) {
-  const cursor = document.createElement("div");
-  cursor.className = "custom-cursor";
-  cursor.style.cssText = `
-        position: fixed;
-        top: 0; left: 0;
-        width: 30px;
-        height: 30px;
-        border: 1px solid var(--color-primary);
-        border-radius: 0;
-        pointer-events: none;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-        transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
-        mix-blend-mode: exclusion;
-    `;
-  document.body.appendChild(cursor);
-
-  let mouseX = 0,
-    mouseY = 0;
-  let cursorX = 0,
-    cursorY = 0;
-
-  document.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  function animate() {
-    cursorX += (mouseX - cursorX) * 0.15;
-    cursorY += (mouseY - cursorY) * 0.15;
-    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
-    requestAnimationFrame(animate);
-  }
-  animate();
-
-  const interactiveElements = document.querySelectorAll(
-    "a, button, .project-card",
-  );
-  interactiveElements.forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      cursor.style.width = "50px";
-      cursor.style.height = "50px";
-      cursor.style.backgroundColor = "rgba(0,0,0,0.05)";
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    gsap.set(cursor, {
+        position: 'fixed', top: 0, left: 0, width: 30, height: 30,
+        border: '1px solid var(--color-primary)', borderRadius: '50%',
+        pointerEvents: 'none', zIndex: 9999, xPercent: -50, yPercent: -50,
+        mixBlendMode: 'exclusion'
     });
-    el.addEventListener("mouseleave", () => {
-      cursor.style.width = "30px";
-      cursor.style.height = "30px";
-      cursor.style.backgroundColor = "transparent";
+    document.body.appendChild(cursor);
+
+    const setX = gsap.quickSetter(cursor, "x", "px");
+    const setY = gsap.quickSetter(cursor, "y", "px");
+
+    document.addEventListener("mousemove", e => {
+        setX(e.clientX);
+        setY(e.clientY);
     });
-  });
+
+    const interactiveElements = document.querySelectorAll('a, button, .project-card, .certificate-link');
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            gsap.to(cursor, { width: 50, height: 50, backgroundColor: 'rgba(0,0,0,0.05)', duration: 0.3 });
+        });
+        el.addEventListener('mouseleave', () => {
+            gsap.to(cursor, { width: 30, height: 30, backgroundColor: 'transparent', duration: 0.3 });
+        });
+    });
 }
 
 window.addEventListener("load", () => {
