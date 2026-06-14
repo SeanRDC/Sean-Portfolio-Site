@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import type { ReactNode } from "react";
 
-// LIQUID-REVEAL: unblur + rise + scale on viewport entry (IntersectionObserver).
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Reveal({
   children,
   delay = 0,
@@ -11,30 +15,36 @@ export default function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const container = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  useGSAP(
+    () => {
+      gsap.fromTo(
+        container.current,
+        { opacity: 0, filter: "blur(20px)", scale: 0.96 },
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          scale: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          delay: delay / 1000,
+          scrollTrigger: {
+            trigger: container.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+    },
+    { scope: container },
+  );
 
   return (
     <div
-      ref={ref}
-      className={`reveal ${visible ? "is-visible" : ""} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+      ref={container}
+      className={className}
+      style={{ willChange: "opacity, transform, filter" }}
     >
       {children}
     </div>
