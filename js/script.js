@@ -330,3 +330,68 @@ if ("IntersectionObserver" in window) {
     imageObserver.observe(img);
   });
 }
+
+// Register the ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
+
+function initGSAPAnimations() {
+  const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 1 } });
+
+  tl.from(".navigation", { y: -100, opacity: 0, duration: 0.8 })
+
+    .from(".profile-section .profile-image", { x: -30, opacity: 0 }, "-=0.4")
+    .from(
+      ".profile-section .bio p",
+      { y: 20, opacity: 0, stagger: 0.1 },
+      "-=0.6",
+    )
+
+    .from(
+      ".work-intro h1, .work-intro p, .certificates-header h1, .certificates-header p",
+      {
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+      },
+      "-=0.8",
+    );
+
+  const revealElements = gsap.utils.toArray(
+    ".timeline-block, .project-card, .certificate-card, .skills-column",
+  );
+
+  revealElements.forEach((el, i) => {
+    gsap.from(el, {
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        toggleActions: "play none none reverse",
+      },
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+  });
+
+  const projectImages = gsap.utils.toArray(".project-image img");
+
+  projectImages.forEach((img) => {
+    gsap.set(img, { scale: 1.15 });
+
+    gsap.to(img, {
+      scrollTrigger: {
+        trigger: img.parentElement,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+      yPercent: 15,
+      ease: "none",
+    });
+  });
+}
+
+window.addEventListener("load", () => {
+  setTimeout(initGSAPAnimations, 100);
+});
