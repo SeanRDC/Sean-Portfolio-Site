@@ -1,285 +1,272 @@
-import { useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  ExternalLink,
+  ArrowRight,
+} from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import TiltCard from "../components/TiltCard";
-
-gsap.registerPlugin(ScrollTrigger);
-
-// Centralized project data tailored to your builds
-const projectData: Record<string, any> = {
-  "beaded-by-unknown": {
-    title: "Beaded by Unknown",
-    subtitle: "From imagination to a full digital storefront.",
-    meta: ["Full-Stack", "2026", "Web Platform"],
-    overview:
-      "What began as a simple hobby originating from imagination required a robust digital home. I designed and developed a comprehensive e-commerce platform featuring a custom bracelet builder and a points-based loyalty engine to reward returning customers.",
-    tech: ["React", "Node.js", "MongoDB", "Express"],
-    features: [
-      "Custom Bracelet Builder",
-      "Points-Based Loyalty Engine",
-      "Seamless Checkout",
-    ],
-    goals: [
-      "Translate a physical hobby into a digital experience",
-      "Increase customer retention",
-    ],
-    achievements: [
-      "Successfully launched full-stack platform",
-      "High engagement on builder tool",
-    ],
-  },
-  "pixel-ecommerce": {
-    title: "Pixel E-Commerce",
-    subtitle: "A scalable MERN stack storefront.",
-    meta: ["Developer", "2026", "Web Application"],
-    overview:
-      "A full-stack e-commerce architecture built from the ground up. The focus was on secure architecture, implementing JWT authentication, strict MongoDB schemas, and an intuitive admin dashboard with a menu editor system.",
-    tech: ["React", "Express", "Node.js", "MongoDB", "JWT Auth"],
-    features: [
-      "Admin Dashboard",
-      "Menu Editor System",
-      "Secure Cart State",
-      "Pop-up Error UI",
-    ],
-    goals: [
-      "Master MERN architecture",
-      "Build secure auth flows without standard alerts",
-    ],
-    achievements: [
-      "Zero-alert UI design (pure pop-ups)",
-      "Robust database schema mapping",
-    ],
-  },
-  "flower-catalogue": {
-    title: "Flower Catalogue",
-    subtitle: "Immersive visual directory.",
-    meta: ["UI/UX Designer", "2025", "Figma / React"],
-    overview:
-      "A lush, immersive visual directory utilizing fluid typography and dynamic data mapping to showcase botanical collections.",
-    tech: ["Figma", "React", "GSAP", "Tailwind CSS"],
-    features: [
-      "Fluid Typography",
-      "Dynamic Data Mapping",
-      "Parallax Image Galleries",
-    ],
-    goals: [
-      "Push visual interaction boundaries",
-      "Optimize high-res image loading",
-    ],
-    achievements: [
-      "Seamless 60fps scroll performance",
-      "Award-winning layout design",
-    ],
-  },
-  "debut-invitation": {
-    title: "Debut Invitation",
-    subtitle: "Personalized event experience.",
-    meta: ["Front-End", "2026", "Web Experience"],
-    overview:
-      "A personalized digital invitation experience featuring elegant motion design and interactive RSVP handling.",
-    tech: ["React", "GSAP", "Vite", "Tailwind CSS"],
-    features: ["Motion Graphics", "Interactive RSVP", "Timeline Reveal"],
-    goals: [
-      "Create an elegant digital keepsake",
-      "Simplify guest list management",
-    ],
-    achievements: [
-      "Perfect lighthouse performance score",
-      "Zero-friction user journey",
-    ],
-  },
-};
+import Reveal from "../components/Reveal";
+import GalleryFrame from "../components/project/GalleryFrame";
+import { getProject, getNeighbors } from "../data/projects";
 
 export default function ProjectView() {
   const { id } = useParams<{ id: string }>();
-  const project = id ? projectData[id] : null;
+  const navigate = useNavigate();
+  const project = getProject(id);
+  const { prev, next } = getNeighbors(id);
 
   const heroRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
+  useGSAP(() => {
+    if (!heroRef.current || !contentRef.current) return;
 
-  useGSAP(
-    () => {
-      if (!project) return;
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      // 1. Hero Reveal (simulating the end of the morph)
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.fromTo(
-        ".hero-slab",
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, delay: 0.2 },
+    tl.fromTo(
+      heroRef.current,
+      { scale: 1.04, filter: "blur(12px)", opacity: 0 },
+      { scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.9 },
+    )
+      .fromTo(
+        contentRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9 },
+        "-=0.6",
       )
-        .fromTo(
-          ".hero-chip",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 },
-          "-=0.6",
-        )
-        .fromTo(
-          ".overview-text",
-          { filter: "blur(10px)", opacity: 0, y: 20 },
-          { filter: "blur(0px)", opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-          "-=0.4",
-        );
-
-      // 2. Details Grid 2x2 Diagonal Stagger
-      const cells = gsap.utils.toArray<HTMLElement>(".grid-cell");
-      gsap.fromTo(
-        cells,
-        { filter: "blur(14px)", opacity: 0, scale: 0.95 },
-        {
-          filter: "blur(0px)",
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          stagger: { amount: 0.3, from: "start" },
-          scrollTrigger: {
-            trigger: gridRef.current,
-            start: "top 80%",
-          },
-        },
+      .fromTo(
+        ".hero-cta-btns",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6 },
+        "-=0.4",
       );
-    },
-    { scope: heroRef, dependencies: [project] },
-  );
+  }, [id]);
 
   if (!project)
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        Project Not Found
+      <div className="flex h-screen items-center justify-center font-display text-xl">
+        Project not found.
       </div>
     );
 
-  return (
-    <article ref={heroRef} className="pb-32">
-      {/* 5.1 Project Hero */}
-      <section className="relative h-[80vh] w-full overflow-hidden bg-panel-deep flex items-end p-6 md:p-14">
-        {/* Abstract background gradient to simulate the visual */}
-        <div className="absolute inset-0 bg-gradient-to-b from-void/20 to-void/90" />
+  const meta = [
+    { label: "Role", value: project.role },
+    { label: "Year", value: project.year },
+    { label: "Platform", value: project.platform },
+  ];
 
-        <div className="hero-slab relative z-10 glass glass-edge w-full max-w-4xl rounded-[32px] p-8 md:p-12">
-          <div className="mb-6 flex flex-wrap gap-3">
-            {project.meta.map((m: string) => (
-              <span
-                key={m}
-                className="hero-chip glass px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-widest text-ink-muted"
+  const cells = [
+    { label: "Technologies", items: project.technologies, chips: true },
+    { label: "Features", items: project.features },
+    { label: "Goals", items: project.goals },
+    { label: "Key Achievements", items: project.achievements, glow: true },
+  ];
+
+  return (
+    <div className="px-6 pb-32 pt-28 md:px-10">
+      <div className="mx-auto max-w-5xl">
+        {/* Breadcrumb Back Link */}
+        <Link
+          to="/work"
+          data-cursor
+          className="mb-7 inline-flex items-center gap-2 text-sm text-ink-muted transition-colors hover:text-ink"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.75} /> Selected Work
+        </Link>
+
+        {/* GSAP Hero */}
+        <div
+          ref={heroRef}
+          className="relative overflow-hidden rounded-[28px]"
+          style={{
+            height: "70vh",
+            background: project.cover,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            border: "1px solid var(--edge-light)",
+            boxShadow:
+              "var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,0.32)",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-void/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-5 p-5 md:flex-row md:items-end md:justify-between md:p-7">
+            <div
+              ref={contentRef}
+              className="glass-strong glass-edge max-w-2xl rounded-[22px] p-6 md:p-8"
+            >
+              <h1 className="font-display text-4xl font-semibold leading-[1] tracking-tightest text-ink md:text-5xl">
+                {project.title}
+              </h1>
+              <p className="mt-3 text-lg text-ink-muted">{project.subtitle}</p>
+              <div className="mt-5 flex flex-wrap gap-2.5">
+                {meta.map((m) => (
+                  <span
+                    key={m.label}
+                    className="glass flex items-center gap-1.5 rounded-pill px-3.5 py-2 text-xs font-medium text-ink"
+                  >
+                    <span className="text-ink-faint">{m.label}</span> {m.value}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="hero-cta-btns flex flex-shrink-0 flex-col gap-3">
+              <a
+                data-cursor
+                href={project.prototypeUrl}
+                className="group inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3.5 text-[15px] font-semibold transition-transform duration-300 hover:scale-[1.03]"
+                style={{
+                  background: "var(--solid-bg)",
+                  color: "var(--solid-fg)",
+                  boxShadow: "var(--solid-shadow)",
+                }}
               >
-                {m}
-              </span>
+                View Prototype{" "}
+                <ArrowUpRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  strokeWidth={2}
+                />
+              </a>
+              <a
+                data-cursor
+                href={project.liveUrl}
+                className="glass glass-edge inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3.5 text-[15px] font-semibold text-ink transition-transform duration-300 hover:scale-[1.03]"
+              >
+                Live Website{" "}
+                <ExternalLink className="h-4 w-4" strokeWidth={1.75} />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Overview */}
+        <Reveal delay={100} className="mt-24">
+          <span className="mb-4 inline-block text-xs font-medium uppercase tracking-[0.16em] text-ink-muted">
+            Overview
+          </span>
+          <div className="max-w-3xl">
+            {project.overview.map((para, i) => (
+              <p
+                key={i}
+                className={`text-xl leading-relaxed ${i === 0 ? "text-ink" : "text-ink-muted"} ${i > 0 ? "mt-6" : ""}`}
+              >
+                {para}
+              </p>
             ))}
           </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-ink mb-4">
-            {project.title}
-          </h1>
-          <p className="text-xl text-cyan font-medium">{project.subtitle}</p>
-        </div>
-      </section>
+        </Reveal>
 
-      {/* 5.2 Project Overview */}
-      <section className="mx-auto max-w-4xl px-6 py-24 md:px-10">
-        <p className="overview-text text-2xl md:text-3xl leading-relaxed tracking-tight text-ink-muted">
-          {project.overview}
-        </p>
+        {/* Gallery Component */}
+        {project.gallery && project.gallery.length > 0 && (
+          <Reveal delay={200}>
+            <GalleryFrame images={project.gallery} />
+          </Reveal>
+        )}
 
-        {/* 5.4 Primary Project Links */}
-        <div className="mt-12 flex gap-4">
-          <button
-            data-cursor
-            className="overview-text rounded-pill bg-ink px-8 py-4 text-[15px] font-semibold text-void transition-transform hover:scale-[1.03]"
-          >
-            View Prototype →
-          </button>
-          <button
-            data-cursor
-            className="overview-text glass glass-edge rounded-pill px-8 py-4 text-[15px] font-semibold text-ink transition-transform hover:scale-[1.03]"
-          >
-            Live Website
-          </button>
-        </div>
-      </section>
-
-      {/* 5.5 Details Grid */}
-      <section className="mx-auto max-w-6xl px-6 md:px-10">
-        <div ref={gridRef} className="grid md:grid-cols-2 gap-6">
-          <TiltCard className="grid-cell glass glass-edge rounded-[24px] p-8">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-violet mb-6">
-              Technologies
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {project.tech.map((t: string) => (
-                <span
-                  key={t}
-                  className="glass px-3 py-1.5 rounded-md text-sm text-ink-muted"
+        {/* Details Grid (Tech, Features, Goals, Achievements) */}
+        <section className="py-24">
+          <div className="grid gap-5 md:grid-cols-2">
+            {cells.map((c, i) => (
+              <Reveal key={c.label} delay={i * 80}>
+                <div
+                  className="glass glass-edge h-full rounded-[22px] p-7"
+                  style={
+                    c.glow
+                      ? {
+                          boxShadow:
+                            "var(--shadow-glass), inset 0 1px 0 rgba(255,255,255,0.32), 0 0 40px rgba(123,92,255,0.22)",
+                        }
+                      : undefined
+                  }
                 >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </TiltCard>
+                  <h3 className="mb-5 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
+                    {c.label}
+                  </h3>
+                  {c.chips ? (
+                    <div className="flex flex-wrap gap-2">
+                      {c.items.map((it) => (
+                        <span
+                          key={it}
+                          className="glass rounded-pill px-3.5 py-2 text-sm font-medium text-ink"
+                        >
+                          {it}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <ul className="flex flex-col gap-3">
+                      {c.items.map((it) => (
+                        <li
+                          key={it}
+                          className="flex items-start gap-2.5 text-[15px] text-ink"
+                        >
+                          <span
+                            className="mt-2 h-1 w-1 flex-shrink-0 rounded-full"
+                            style={{
+                              background: c.glow
+                                ? "var(--violet)"
+                                : "var(--cyan)",
+                            }}
+                          />
+                          {it}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
 
-          <TiltCard className="grid-cell glass glass-edge rounded-[24px] p-8">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-cyan mb-6">
-              Features
-            </h3>
-            <ul className="flex flex-col gap-3">
-              {project.features.map((f: string) => (
-                <li key={f} className="text-ink-muted flex items-center gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-          </TiltCard>
-
-          <TiltCard className="grid-cell glass glass-edge rounded-[24px] p-8">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-rose mb-6">
-              Goals
-            </h3>
-            <ul className="flex flex-col gap-3">
-              {project.goals.map((g: string) => (
-                <li key={g} className="text-ink-muted flex items-center gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose" />
-                  {g}
-                </li>
-              ))}
-            </ul>
-          </TiltCard>
-
-          <TiltCard className="grid-cell glass glass-edge rounded-[24px] p-8 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-violet/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl" />
-            <h3 className="relative z-10 text-sm font-semibold uppercase tracking-widest text-ink mb-6">
-              Key Achievements
-            </h3>
-            <ul className="relative z-10 flex flex-col gap-3">
-              {project.achievements.map((a: string) => (
-                <li
-                  key={a}
-                  className="text-ink flex items-center gap-3 font-medium"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet" />
-                  {a}
-                </li>
-              ))}
-            </ul>
-          </TiltCard>
-        </div>
-
-        {/* 5.6 Next Project Loop */}
-        <div className="mt-20 flex justify-center">
-          <Link
-            to="/work"
-            data-cursor
-            className="glass glass-edge px-8 py-4 rounded-pill text-ink hover:text-cyan transition-colors font-medium flex items-center gap-2"
-          >
-            ← Back to Showcase
-          </Link>
-        </div>
-      </section>
-    </article>
+        {/* Next / Previous Project Navigation */}
+        <Reveal>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {prev && (
+              <button
+                data-cursor
+                onClick={() => navigate(`/project/${prev.id}`)}
+                className="glass glass-edge group flex items-center gap-4 rounded-[22px] p-5 text-left transition-transform duration-300 hover:-translate-y-0.5"
+              >
+                <ArrowLeft
+                  className="h-5 w-5 flex-shrink-0 text-ink-muted transition-transform group-hover:-translate-x-1"
+                  strokeWidth={1.75}
+                />
+                <div>
+                  <span className="text-xs uppercase tracking-[0.12em] text-ink-faint">
+                    Previous
+                  </span>
+                  <p className="font-display text-lg font-semibold tracking-tight text-ink">
+                    {prev.title}
+                  </p>
+                </div>
+              </button>
+            )}
+            {next && (
+              <button
+                data-cursor
+                onClick={() => navigate(`/project/${next.id}`)}
+                className="glass glass-edge group flex items-center justify-end gap-4 rounded-[22px] p-5 text-right transition-transform duration-300 hover:-translate-y-0.5 sm:col-start-2"
+              >
+                <div>
+                  <span className="text-xs uppercase tracking-[0.12em] text-ink-faint">
+                    Next
+                  </span>
+                  <p className="font-display text-lg font-semibold tracking-tight text-ink">
+                    {next.title}
+                  </p>
+                </div>
+                <ArrowRight
+                  className="h-5 w-5 flex-shrink-0 text-ink-muted transition-transform group-hover:translate-x-1"
+                  strokeWidth={1.75}
+                />
+              </button>
+            )}
+          </div>
+        </Reveal>
+      </div>
+    </div>
   );
 }

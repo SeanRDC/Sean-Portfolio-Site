@@ -4,15 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: "#060608",
-        "panel-deep": "#0c0c14",
+        void: "var(--void)",
+        "panel-deep": "var(--panel-deep)",
         violet: "#7b5cff",
         cyan: "#4fd2ff",
         rose: "#ff6fa5",
         ink: {
-          DEFAULT: "#f4f5fa",
-          muted: "#9ca0b4",
-          faint: "#5e627a",
+          DEFAULT: "var(--ink)",
+          muted: "var(--ink-muted)",
+          faint: "var(--ink-faint)",
         },
       },
       fontFamily: {

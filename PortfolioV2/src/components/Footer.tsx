@@ -7,15 +7,12 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import Reveal from "./Reveal";
+import ThemeToggle from "./ThemeToggle";
 
 const socials = [
-  { label: "Email", icon: Mail, href: "mailto:delacruzseanrhani@gmail.com" },
-  {
-    label: "LinkedIn",
-    icon: Users,
-    href: "https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334",
-  },
-  { label: "GitHub", icon: Code, href: "https://github.com/SeanRDC" },
+  { label: "Email", icon: Mail, href: "#" },
+  { label: "LinkedIn", icon: Users, href: "#" }, // Safely using Users
+  { label: "GitHub", icon: Code, href: "#" }, // Safely using Code
   { label: "Fiverr", icon: Briefcase, href: "#" },
   { label: "OnlineJobs", icon: Globe, href: "#" },
 ];
@@ -38,11 +35,11 @@ export default function Footer() {
                 <a
                   data-cursor
                   href="mailto:hello@example.com"
-                  className="group mt-1 inline-flex items-center gap-2 rounded-pill px-6 py-3 text-[15px] font-semibold text-void transition-transform duration-300 hover:scale-[1.03]"
+                  className="group mt-1 inline-flex items-center gap-2 rounded-pill px-6 py-3 text-[15px] font-semibold transition-transform duration-300 hover:scale-[1.03]"
                   style={{
-                    background: "linear-gradient(135deg, #f4f5fa, #c9ccdb)",
-                    boxShadow:
-                      "0 10px 30px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.8)",
+                    background: "var(--solid-bg)",
+                    color: "var(--solid-fg)",
+                    boxShadow: "var(--solid-shadow)",
                   }}
                 >
                   Get in Touch
@@ -83,10 +80,10 @@ export default function Footer() {
                 </span>
                 <a
                   data-cursor
-                  href="mailto:delacruzseanrhani@gmail.com"
+                  href="mailto:hello@example.com"
                   className="text-[15px] text-ink-muted transition-colors hover:text-ink"
                 >
-                  delacruzseanrhani@gmail.com
+                  hello@example.com
                 </a>
                 <span className="text-[15px] text-ink-muted">
                   Available worldwide · Remote
@@ -94,11 +91,13 @@ export default function Footer() {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-sm text-ink-faint sm:flex-row sm:items-center">
+            <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-sm text-ink-faint sm:flex-row sm:items-center">
               <span>
                 © {new Date().getFullYear()} — Designed, programmed & automated.
               </span>
-              <span>Sean Rhani Dela Cruz</span>
+
+              {/* Light Mode Switch Rendered Here */}
+              <ThemeToggle />
             </div>
           </div>
         </Reveal>

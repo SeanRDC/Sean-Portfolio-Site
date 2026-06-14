@@ -1,21 +1,47 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&display=swap");
-
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+/* ---- Dark (default) ---- */
 :root {
   --void: #060608;
   --panel-deep: #0c0c14;
-  --glass-fill: rgba(255, 255, 255, 0.06);
-  --glass-fill-hover: rgba(255, 255, 255, 0.09);
-  --glass-fill-strong: rgba(255, 255, 255, 0.12);
-  --edge-light: rgba(255, 255, 255, 0.24);
-  --violet: #7b5cff;
-  --cyan: #4fd2ff;
-  --rose: #ff6fa5;
   --ink: #f4f5fa;
   --ink-muted: #9ca0b4;
   --ink-faint: #5e627a;
+
+  --glass-fill: rgba(255, 255, 255, 0.06);
+  --glass-fill-hover: rgba(255, 255, 255, 0.09);
+  --glass-fill-strong: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-strong: rgba(255, 255, 255, 0.24);
+  --glass-inset: rgba(255, 255, 255, 0.32);
+  --glass-inset-strong: rgba(255, 255, 255, 0.45);
+  --edge-light: rgba(255, 255, 255, 0.24);
+  --edge-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.06) 42%,
+    rgba(255, 255, 255, 0)
+  );
+
+  --vignette: radial-gradient(
+    130% 90% at 50% 0%,
+    transparent 38%,
+    rgba(6, 6, 8, 0.72)
+  );
+  --overlay: rgba(6, 6, 8, 0.72);
+  --mesh-opacity: 1;
+
+  --solid-bg: linear-gradient(135deg, #f4f5fa, #c9ccdb);
+  --solid-fg: #060608;
+  --solid-shadow:
+    0 10px 30px rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  --violet: #7b5cff;
+  --cyan: #4fd2ff;
+  --rose: #ff6fa5;
+
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
@@ -24,8 +50,45 @@
   --shadow-lift: 0 30px 80px rgba(0, 0, 0, 0.55);
 }
 
-* {
-  box-sizing: border-box;
+/* ---- Light ("Frosted Daylight") ---- */
+:root[data-theme="light"] {
+  --void: #e7eaf2;
+  --panel-deep: #f3f5fa;
+  --ink: #15161e;
+  --ink-muted: #555a6b;
+  --ink-faint: #8a8fa1;
+
+  --glass-fill: rgba(255, 255, 255, 0.5);
+  --glass-fill-hover: rgba(255, 255, 255, 0.68);
+  --glass-fill-strong: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(18, 20, 30, 0.1);
+  --glass-border-strong: rgba(18, 20, 30, 0.14);
+  --glass-inset: rgba(255, 255, 255, 0.9);
+  --glass-inset-strong: rgba(255, 255, 255, 0.95);
+  --edge-light: rgba(255, 255, 255, 0.9);
+  --edge-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.25) 42%,
+    rgba(255, 255, 255, 0)
+  );
+
+  --vignette: radial-gradient(
+    130% 90% at 50% 0%,
+    transparent 42%,
+    rgba(231, 234, 242, 0.7)
+  );
+  --overlay: rgba(225, 229, 240, 0.72);
+  --mesh-opacity: 0.62;
+
+  --solid-bg: linear-gradient(135deg, #15161e, #2d3040);
+  --solid-fg: #f4f5fa;
+  --solid-shadow:
+    0 10px 30px rgba(30, 34, 60, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  --shadow-glass: 0 20px 60px rgba(70, 80, 130, 0.16);
+  --shadow-float: 0 12px 36px rgba(70, 80, 130, 0.18);
+  --shadow-lift: 0 30px 80px rgba(70, 80, 130, 0.2);
 }
 
 html,
@@ -41,6 +104,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
 }
 
 @media (pointer: fine) {
@@ -54,27 +120,33 @@ body {
   }
 }
 
-/* ---- Glass material (one recipe) ---- */
 .glass {
   background: var(--glass-fill);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--glass-border);
   box-shadow:
     var(--shadow-glass),
-    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    inset 0 1px 0 var(--glass-inset);
+  transition:
+    background 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.5s ease;
 }
 .glass-strong {
   background: var(--glass-fill-strong);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid var(--edge-light);
+  border: 1px solid var(--glass-border-strong);
   box-shadow:
     var(--shadow-float),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    inset 0 1px 0 var(--glass-inset-strong);
+  transition:
+    background 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.5s ease;
 }
 
-/* edge-light gradient border (top-left bright -> dark) */
 .glass-edge {
   position: relative;
 }
@@ -84,12 +156,7 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.55),
-    rgba(255, 255, 255, 0.06) 42%,
-    rgba(255, 255, 255, 0)
-  );
+  background: var(--edge-gradient);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -98,7 +165,11 @@ body {
   pointer-events: none;
 }
 
-/* ---- LIQUID-REVEAL ---- */
+.mesh-root {
+  opacity: var(--mesh-opacity);
+  transition: opacity 0.5s ease;
+}
+
 .reveal {
   opacity: 0;
   filter: blur(14px);
@@ -115,7 +186,6 @@ body {
   transform: none;
 }
 
-/* ---- GLASS-CURSOR tilt specular ---- */
 .tilt {
   position: relative;
 }
@@ -137,7 +207,6 @@ body {
   opacity: 1;
 }
 
-/* ---- keyframes ---- */
 @keyframes drift-a {
   0%,
   100% {
@@ -178,39 +247,8 @@ body {
       0 0 0 9px rgba(79, 210, 255, 0);
   }
 }
-@keyframes spin-slow {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes float-orb {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  .reveal {
-    transition: opacity 0.4s ease;
-    filter: none;
-    transform: none;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
-/* ---- Lenis Smooth Scroll ---- */
+/* ---- Lenis Smooth Scroll Physics ---- */
 html.lenis,
 html.lenis body {
   height: auto;
