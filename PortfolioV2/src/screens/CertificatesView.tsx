@@ -308,11 +308,12 @@ export default function CertificatesView() {
                       </span>
                     </div>
                   ) : (
-                    // Display the actual certificate image
                     <img
                       src={open.images[activeImgIdx]}
                       alt={`${open.title} Certificate ${activeImgIdx + 1}`}
                       className="max-h-full max-w-full object-contain rounded-[8px]"
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                 </div>
