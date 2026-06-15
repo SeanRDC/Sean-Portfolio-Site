@@ -30,15 +30,15 @@ const certs: Cert[] = [
     glow: violetGlow,
     grad: gradVioletCyan,
     images: [
-      "/certs/Cg1.webp",
-      "/certs/Cg2.webp",
-      "/certs/Cg3.webp",
-      "/certs/Cg4.webp",
-      "/certs/Cg5.webp",
-      "/certs/Cg6.webp",
-      "/certs/Cg7.webp",
-      "/certs/Cg8.webp",
-      "/certs/Cg9.webp",
+      "/certs/cg1.webp",
+      "/certs/cg2.webp",
+      "/certs/cg3.webp",
+      "/certs/cg4.webp",
+      "/certs/cg5.webp",
+      "/certs/cg6.webp",
+      "/certs/cg7.webp",
+      "/certs/cg8.webp",
+      "/certs/cg9.webp",
     ],
   },
   {
@@ -244,75 +244,65 @@ export default function CertificatesView() {
               onOpen={() => setOpen(c)}
             />
           ))}
-
-          {/* Reserved Empty Slot */}
-          <div className="flex h-52 w-full flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed border-white/20 p-6 text-center transition-colors hover:bg-white/5">
-            <Plus className="h-6 w-6 text-ink-faint" strokeWidth={1.5} />
-            <span className="text-sm text-ink-muted">
-              Future credential — reserved slot
-            </span>
-          </div>
         </div>
       </div>
 
-      {/* GSAP Lightbox */}
+      {/* GSAP Lightbox - Redesigned for Maximum Image Clarity */}
       {open && (
         <div
           ref={overlayRef}
-          className="fixed inset-0 z-[90] flex items-center justify-center p-6"
+          className="fixed inset-0 z-[90] flex items-center justify-center p-4 md:p-8 backdrop-blur-[16px] [-webkit-backdrop-filter:blur(16px)]"
           style={{ background: "var(--overlay)" }}
           onClick={() => setOpen(null)}
         >
+          {/* Floating Close Button */}
           <button
             data-cursor
             onClick={() => setOpen(null)}
-            className="glass absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full text-ink hover:text-rose transition-colors"
+            className="glass absolute right-4 top-4 md:right-8 md:top-8 z-[100] flex h-11 w-11 items-center justify-center rounded-full text-ink hover:text-rose transition-colors"
             aria-label="Close"
           >
             <X className="h-5 w-5" strokeWidth={1.75} />
           </button>
 
+          {/* Main Modal Container - Expanded Width */}
           <div
             ref={contentRef}
-            className="glass-strong glass-edge w-full max-w-3xl rounded-[26px] p-2"
+            className="glass-strong glass-edge relative w-full max-w-6xl overflow-hidden rounded-[24px] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div
-              className="flex flex-col gap-4 rounded-[20px] p-6 md:p-8"
-              style={{
-                background: "var(--panel-deep)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
-              }}
+              className="flex h-full max-h-[85vh] flex-col"
+              style={{ background: "var(--panel-deep)" }}
             >
-              {/* Header Info */}
-              <div className="flex items-center gap-5">
+              {/* 1. Sleek, Compact Header */}
+              <div className="flex shrink-0 items-center gap-4 border-b border-white/5 px-6 py-5 md:px-8">
                 <span
-                  className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-[14px]"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[12px]"
                   style={{
                     background: open.grad,
                     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55)",
                   }}
                 >
-                  <Award className="h-6 w-6 text-ink" strokeWidth={1.75} />
+                  <Award className="h-5 w-5 text-ink" strokeWidth={1.75} />
                 </span>
                 <div>
-                  <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
+                  <h2 className="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">
                     {open.title}
                   </h2>
-                  <p className="mt-1 text-sm text-ink-muted">
+                  <p className="text-sm text-ink-muted">
                     {open.issuer} · {open.year}
                   </p>
                 </div>
               </div>
 
-              {/* Image Carousel Viewer */}
-              <div className="relative mt-2 flex h-[50vh] w-full items-center justify-center overflow-hidden rounded-[16px] bg-void border border-white/10 shadow-inner">
+              {/* 2. Edge-to-Edge Image Canvas */}
+              <div className="relative flex min-h-[50vh] flex-1 items-center justify-center overflow-hidden bg-black/20 p-4 md:min-h-[70vh]">
                 <div
                   ref={imgViewerRef}
-                  className="absolute inset-0 flex items-center justify-center p-4"
+                  className="absolute inset-0 flex items-center justify-center p-4 md:p-12"
                 >
                   {open.images[activeImgIdx] === "#" ? (
-                    // Display Placeholder when the URL is "#"
                     <div className="flex flex-col items-center gap-3 text-ink-faint">
                       <ImageIcon
                         className="h-10 w-10 opacity-40"
@@ -329,49 +319,49 @@ export default function CertificatesView() {
                     <img
                       src={open.images[activeImgIdx]}
                       alt={`${open.title} Certificate ${activeImgIdx + 1}`}
-                      className="max-h-full max-w-full object-contain rounded-[8px]"
+                      className="max-h-full max-w-full rounded-[4px] object-contain drop-shadow-2xl"
                       loading="lazy"
                       decoding="async"
                     />
                   )}
                 </div>
 
-                {/* Carousel Navigation Arrows */}
+                {/* 3. Floating Overlay Controls */}
                 {open.images.length > 1 && (
                   <>
                     <button
                       data-cursor
                       onClick={prevImg}
-                      className="glass absolute left-4 flex h-10 w-10 items-center justify-center rounded-full text-ink hover:text-cyan transition-colors z-10"
+                      className="glass absolute left-4 flex h-12 w-12 items-center justify-center rounded-full text-ink hover:scale-110 hover:text-cyan transition-all md:left-8 z-10"
                     >
                       <ChevronLeft
-                        className="h-5 w-5 -ml-0.5"
+                        className="h-6 w-6 -ml-0.5"
                         strokeWidth={2}
                       />
                     </button>
                     <button
                       data-cursor
                       onClick={nextImg}
-                      className="glass absolute right-4 flex h-10 w-10 items-center justify-center rounded-full text-ink hover:text-cyan transition-colors z-10"
+                      className="glass absolute right-4 flex h-12 w-12 items-center justify-center rounded-full text-ink hover:scale-110 hover:text-cyan transition-all md:right-8 z-10"
                     >
                       <ChevronRight
-                        className="h-5 w-5 -mr-0.5"
+                        className="h-6 w-6 -mr-0.5"
                         strokeWidth={2}
                       />
                     </button>
 
-                    {/* Progress Dots */}
-                    <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 z-10">
+                    {/* Progress Dots inside a Glass Pill */}
+                    <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-2.5 backdrop-blur-md z-10">
                       {open.images.map((_, idx) => (
                         <span
                           key={idx}
                           className="h-1.5 rounded-full transition-all duration-300"
                           style={{
-                            width: idx === activeImgIdx ? "16px" : "6px",
+                            width: idx === activeImgIdx ? "20px" : "6px",
                             background:
                               idx === activeImgIdx
                                 ? "var(--cyan)"
-                                : "rgba(255,255,255,0.3)",
+                                : "rgba(255,255,255,0.4)",
                           }}
                         />
                       ))}

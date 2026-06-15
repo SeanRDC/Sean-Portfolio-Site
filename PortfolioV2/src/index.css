@@ -52,43 +52,43 @@
 
 /* ---- Light ("Frosted Daylight") ---- */
 :root[data-theme="light"] {
-  --void: #e7eaf2;
-  --panel-deep: #f3f5fa;
-  --ink: #15161e;
-  --ink-muted: #555a6b;
-  --ink-faint: #8a8fa1;
+  --void: #ffffff;
+  --panel-deep: #f8f9fa;
+  --ink: #101116;
+  --ink-muted: #5c6175;
+  --ink-faint: #9499ab;
 
-  --glass-fill: rgba(255, 255, 255, 0.5);
-  --glass-fill-hover: rgba(255, 255, 255, 0.68);
-  --glass-fill-strong: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(18, 20, 30, 0.1);
-  --glass-border-strong: rgba(18, 20, 30, 0.14);
-  --glass-inset: rgba(255, 255, 255, 0.9);
-  --glass-inset-strong: rgba(255, 255, 255, 0.95);
-  --edge-light: rgba(255, 255, 255, 0.9);
+  --glass-fill: rgba(255, 255, 255, 0.65);
+  --glass-fill-hover: rgba(255, 255, 255, 0.82);
+  --glass-fill-strong: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(16, 18, 28, 0.08);
+  --glass-border-strong: rgba(16, 18, 28, 0.12);
+  --glass-inset: rgba(255, 255, 255, 0.95);
+  --glass-inset-strong: rgba(255, 255, 255, 1);
+  --edge-light: rgba(255, 255, 255, 1);
   --edge-gradient: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(255, 255, 255, 0.25) 42%,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.4) 42%,
     rgba(255, 255, 255, 0)
   );
 
   --vignette: radial-gradient(
     130% 90% at 50% 0%,
-    transparent 42%,
-    rgba(231, 234, 242, 0.7)
+    transparent 45%,
+    rgb(175, 187, 201)
   );
-  --overlay: rgba(225, 229, 240, 0.72);
-  --mesh-opacity: 0.62;
+  --overlay: rgba(255, 255, 255, 0.8);
+  --mesh-opacity: 0.32;
 
-  --solid-bg: linear-gradient(135deg, #15161e, #2d3040);
+  --solid-bg: linear-gradient(135deg, #101116, #252836);
   --solid-fg: #f4f5fa;
   --solid-shadow:
-    0 10px 30px rgba(30, 34, 60, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 10px 30px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
-  --shadow-glass: 0 20px 60px rgba(70, 80, 130, 0.16);
-  --shadow-float: 0 12px 36px rgba(70, 80, 130, 0.18);
-  --shadow-lift: 0 30px 80px rgba(70, 80, 130, 0.2);
+  --shadow-glass: 0 20px 60px rgba(50, 65, 110, 0.08);
+  --shadow-float: 0 12px 36px rgba(50, 65, 110, 0.1);
+  --shadow-lift: 0 30px 80px rgba(50, 65, 110, 0.12);
 }
 
 html,

@@ -55,10 +55,7 @@ export default function MeshBackground() {
       {/* Vignette to keep edges deep and text legible */}
       <div
         className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(130% 90% at 50% 0%, transparent 38%, rgba(6,6,8,0.72))",
-        }}
+        style={{ background: "var(--vignette)" }}
       />
     </div>
   );

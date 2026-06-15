@@ -5,10 +5,27 @@ export default function GlassCursor() {
   const dot = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [isLight, setIsLight] = useState(false); // Track theme state locally
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
     setEnabled(true);
+
+    // --- Theme Observer ---
+    // Checks if light mode is active without touching global CSS variables
+    const checkTheme = () => {
+      setIsLight(
+        document.documentElement.getAttribute("data-theme") === "light",
+      );
+    };
+    checkTheme(); // Run once on mount
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    // ----------------------
 
     let raf = 0;
     let x = window.innerWidth / 2;
@@ -22,6 +39,7 @@ export default function GlassCursor() {
       const t = e.target as HTMLElement | null;
       setHover(!!(t && t.closest("[data-cursor]")));
     };
+
     const loop = () => {
       cx += (x - cx) * 0.18;
       cy += (y - cy) * 0.18;
@@ -33,9 +51,11 @@ export default function GlassCursor() {
 
     window.addEventListener("mousemove", move, { passive: true });
     raf = requestAnimationFrame(loop);
+
     return () => {
       window.removeEventListener("mousemove", move);
       cancelAnimationFrame(raf);
+      observer.disconnect(); // Clean up the observer
     };
   }, []);
 
@@ -48,11 +68,17 @@ export default function GlassCursor() {
       style={{
         width: hover ? "54px" : "20px",
         height: hover ? "54px" : "20px",
-        background: "rgba(255,255,255,0.1)",
         backdropFilter: "blur(3px)",
         WebkitBackdropFilter: "blur(3px)",
-        border: "1px solid rgba(255,255,255,0.45)",
-        mixBlendMode: "screen",
+
+        // Dynamically toggle colors and blend mode based on the React state
+        background: isLight
+          ? "rgba(16, 18, 28, 0.08)"
+          : "rgba(255, 255, 255, 0.1)",
+        border: isLight
+          ? "1px solid rgba(16, 18, 28, 0.25)"
+          : "1px solid rgba(255, 255, 255, 0.45)",
+        mixBlendMode: (isLight ? "multiply" : "screen") as any,
       }}
     />
   );
