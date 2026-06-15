@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowUpRight, Loader2 } from "lucide-react"; // Added Loader2
+import { ArrowUpRight, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -102,7 +102,6 @@ export default function WorkView() {
     }, 600);
   };
 
-  const n = projects.length;
   const containerW = typeof window !== "undefined" ? window.innerWidth : 1280;
   const paneW = clamp(containerW * 0.58, 440, 660);
   const gap = 48;
