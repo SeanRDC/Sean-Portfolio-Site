@@ -13,7 +13,7 @@ export type Cert = {
   year: string;
   glow: string;
   grad: string;
-  images: string[]; // <-- Added images array to support carousels
+  images: string[];
 };
 
 export default function CertPlate({
@@ -31,8 +31,9 @@ export default function CertPlate({
     const el = ref.current;
     if (!el) return;
 
-    const baseShadow =
-      "var(--shadow-glass), inset 0 1px 0 rgba(255,255,255,0.32)";
+    // OPTIMIZATION: Removed the heavy var(--shadow-glass) from the constant scroll animation
+    // Now it only calculates the crisp inner border and your custom colored glow
+    const baseShadow = "inset 0 1px 0 rgba(255,255,255,0.32)";
 
     gsap.fromTo(
       el,
@@ -102,7 +103,12 @@ export default function CertPlate({
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       onClick={onOpen}
-      className="glass glass-edge tilt flex h-52 w-full flex-col justify-between rounded-[22px] p-6 text-left"
+      // OPTIMIZATION:
+      // 1. Removed 'glass' to kill the heavy blur math.
+      // 2. Added 'bg-[var(--glass-fill)] border border-white/10' to keep the translucent color.
+      // 3. Added 'transform-gpu' to force the graphics card to handle the 3D tilt.
+      // 4. Added 'hover:shadow-2xl transition-shadow' to only calculate deep shadows on interaction.
+      className="glass-edge tilt flex h-52 w-full flex-col justify-between rounded-[22px] p-6 text-left transform-gpu bg-[var(--glass-fill)] border border-[var(--glass-border)] shadow-none transition-shadow duration-300 hover:shadow-2xl"
       style={{ transformStyle: "preserve-3d", perspective: "1100px" }}
     >
       <div className="flex items-start justify-between pointer-events-none">

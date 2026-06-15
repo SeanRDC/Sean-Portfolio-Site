@@ -32,7 +32,9 @@ export default function MeshBackground() {
             background:
               "radial-gradient(circle, var(--violet), transparent 62%)",
             opacity: 0.42,
-            animation: "drift-a 26s ease-in-out infinite",
+            animation: "drift-a 60s ease-in-out infinite", // Slowed down from 26s
+            willChange: "transform", // Tells the browser this will move
+            transform: "translateZ(0)", // Forces GPU hardware acceleration
           }}
         />
         <div
@@ -40,7 +42,9 @@ export default function MeshBackground() {
           style={{
             background: "radial-gradient(circle, var(--cyan), transparent 62%)",
             opacity: 0.34,
-            animation: "drift-b 32s ease-in-out infinite",
+            animation: "drift-b 75s ease-in-out infinite", // Slowed down from 32s
+            willChange: "transform",
+            transform: "translateZ(0)",
           }}
         />
         <div
@@ -48,7 +52,9 @@ export default function MeshBackground() {
           style={{
             background: "radial-gradient(circle, var(--rose), transparent 62%)",
             opacity: 0.3,
-            animation: "drift-c 29s ease-in-out infinite",
+            animation: "drift-c 65s ease-in-out infinite", // Slowed down from 29s
+            willChange: "transform",
+            transform: "translateZ(0)",
           }}
         />
       </div>
