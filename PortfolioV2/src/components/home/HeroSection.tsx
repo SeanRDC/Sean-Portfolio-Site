@@ -83,7 +83,7 @@ export default function HeroSection() {
       ref={heroRef}
       className="relative flex min-h-screen items-center px-6 pt-28 md:px-10"
     >
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 md:grid-cols-[auto_1fr]">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 md:grid-cols-[auto_1fr] ">
         <div className="hero-portrait mx-auto md:mx-0">
           <div className="relative h-48 w-48 md:h-60 md:w-60 flex items-center justify-center">
             {/* The 3 Audio-Reactive Layers - uneven, pulsating waves */}
@@ -92,7 +92,7 @@ export default function HeroSection() {
             <div className="aura-ring absolute inset-0 rounded-full bg-gradient-to-tr from-rose/50 via-violet/40 to-transparent blur-[32px] will-change-transform" />
 
             {/* Glass Orb Container */}
-            <div className="glass-strong absolute inset-1 z-10 flex items-center justify-center overflow-hidden rounded-full border border-white/10">
+            <div className="glass-strong absolute inset-1 z-10 flex items-center justify-center overflow-hidden rounded-full border border-white/10 ">
               <div
                 className="h-full w-full opacity-90 transition-colors duration-500"
                 style={{
