@@ -30,15 +30,15 @@ const certs: Cert[] = [
     glow: violetGlow,
     grad: gradVioletCyan,
     images: [
-      "/certs/Cg1.jpg",
-      "/certs/Cg2.jpg",
-      "/certs/Cg3.jpg",
-      "/certs/Cg4.jpg",
-      "/certs/Cg5.jpg",
-      "/certs/Cg6.jpg",
-      "/certs/Cg7.jpg",
-      "/certs/Cg8.jpg",
-      "/certs/Cg9.jpg",
+      "/certs/Cg1.webp",
+      "/certs/Cg2.webp",
+      "/certs/Cg3.webp",
+      "/certs/Cg4.webp",
+      "/certs/Cg5.webp",
+      "/certs/Cg6.webp",
+      "/certs/Cg7.webp",
+      "/certs/Cg8.webp",
+      "/certs/Cg9.webp",
     ],
   },
   {
@@ -63,7 +63,7 @@ const certs: Cert[] = [
     year: "2025",
     glow: cyanGlow,
     grad: gradCyanRose,
-    images: ["/certs/fccrwb.jpg"],
+    images: ["/certs/fccrwb.webp"],
   },
   {
     title: "Relational Database",
@@ -71,7 +71,7 @@ const certs: Cert[] = [
     year: "2026",
     glow: violetGlow,
     grad: gradVioletCyan,
-    images: ["/certs/fccrdb.png"],
+    images: ["/certs/fccrdb.webp"],
   },
   {
     title: "Python Essentials 1 & 2",
@@ -79,7 +79,7 @@ const certs: Cert[] = [
     year: "2024",
     glow: roseGlow,
     grad: gradRoseViolet,
-    images: ["/certs/pe1.jpg", "/certs/pe2.jpg"],
+    images: ["/certs/pe1.webp", "/certs/pe2.webp"],
   },
   {
     title: "JavaScript Essentials 1 & 2",
@@ -87,7 +87,7 @@ const certs: Cert[] = [
     year: "2025",
     glow: cyanGlow,
     grad: gradCyanRose,
-    images: ["/certs/je1.jpg", "/certs/je2.jpg"],
+    images: ["/certs/je1.webp", "/certs/je2.webp"],
   },
   {
     title: "HTML Essentials",
@@ -95,7 +95,7 @@ const certs: Cert[] = [
     year: "2025",
     glow: violetGlow,
     grad: gradVioletCyan,
-    images: ["/certs/he.jpg"],
+    images: ["/certs/he.webp"],
   },
   {
     title: "CSS Essentials",
@@ -103,7 +103,7 @@ const certs: Cert[] = [
     year: "2026",
     glow: roseGlow,
     grad: gradRoseViolet,
-    images: ["/certs/cse.jpg"],
+    images: ["/certs/cse.webp"],
   },
   {
     title: "CCNA: Introduction to Networks",
@@ -111,7 +111,7 @@ const certs: Cert[] = [
     year: "2026",
     glow: cyanGlow,
     grad: gradCyanRose,
-    images: ["/certs/itn.jpg"],
+    images: ["/certs/itn.webp"],
   },
   {
     title: "Learning Git and Github",
@@ -119,7 +119,7 @@ const certs: Cert[] = [
     year: "2025",
     glow: violetGlow,
     grad: gradVioletCyan,
-    images: ["/certs/lgag.jpg"],
+    images: ["/certs/lgag.webp"],
   },
   {
     title: "Git Training",
@@ -127,7 +127,7 @@ const certs: Cert[] = [
     year: "2025",
     glow: roseGlow,
     grad: gradRoseViolet,
-    images: ["/certs/gt.jpg"],
+    images: ["/certs/gt.webp"],
   },
 ];
 
@@ -184,7 +184,13 @@ export default function CertificatesView() {
       gsap.fromTo(
         imgViewerRef.current,
         { opacity: 0, scale: 0.98 },
-        { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.3,
+          ease: "power2.out",
+          force3D: true,
+        },
       );
     }
   }, [activeImgIdx]);
@@ -201,6 +207,18 @@ export default function CertificatesView() {
         (prev) => (prev - 1 + open.images.length) % open.images.length,
       );
   };
+
+  useEffect(() => {
+    if (open && open.images.length > 1) {
+      const nextIdx = (activeImgIdx + 1) % open.images.length;
+      const nextImageUrl = open.images[nextIdx];
+
+      if (nextImageUrl !== "#") {
+        const img = new Image();
+        img.src = nextImageUrl;
+      }
+    }
+  }, [activeImgIdx, open]);
 
   return (
     <div className="px-6 pb-10 pt-32 md:px-10">
