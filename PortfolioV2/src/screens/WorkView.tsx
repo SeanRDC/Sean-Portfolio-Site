@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom"; // <-- FIXED IMPORT
-import { ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowUpRight, Loader2 } from "lucide-react"; // Added Loader2
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -22,10 +22,9 @@ export default function WorkView() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
   );
-  const [transitioning, setTransitioning] = useState<{
-    active: boolean;
-    rect: DOMRect | null;
-  }>({ active: false, rect: null });
+
+  // Replaced complex DOMRect transitioning state with a simple boolean
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useGSAP(() => {
     const measure = () => setIsMobile(window.innerWidth < 768);
@@ -87,28 +86,23 @@ export default function WorkView() {
     return () => window.removeEventListener("resize", measure);
   }, [isMobile]);
 
+  // Clean, simple click handler without GSAP coordinate math
   const handleProjectClick = (
     e: React.MouseEvent<HTMLButtonElement>,
     id: string,
   ) => {
-    if (transitioning.active) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    setTransitioning({ active: true, rect });
+    e.preventDefault();
+    if (isNavigating) return;
 
-    gsap.to(".transition-overlay", {
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      borderRadius: 0,
-      duration: 0.7,
-      ease: "power4.inOut",
-      onComplete: () => navigate(`/project/${id}`),
-    });
+    setIsNavigating(true);
+
+    // Show the blurred loading screen for 600ms before navigating
+    setTimeout(() => {
+      navigate(`/project/${id}`);
+    }, 600);
   };
 
   const n = projects.length;
-  console.log(n);
   const containerW = typeof window !== "undefined" ? window.innerWidth : 1280;
   const paneW = clamp(containerW * 0.58, 440, 660);
   const gap = 48;
@@ -116,17 +110,17 @@ export default function WorkView() {
 
   return (
     <div>
-      {transitioning.active && transitioning.rect && (
+      {/* Sleek Glass Loading Screen */}
+      {isNavigating && (
         <div
-          className="transition-overlay fixed z-[100] bg-panel-deep border border-white/10"
-          style={{
-            top: transitioning.rect.top,
-            left: transitioning.rect.left,
-            width: transitioning.rect.width,
-            height: transitioning.rect.height,
-            borderRadius: "28px",
-          }}
-        />
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center backdrop-blur-md transition-opacity duration-300"
+          style={{ background: "rgba(0,0,0,0.2)" }}
+        >
+          <Loader2 className="h-10 w-10 animate-spin text-cyan mb-4" />
+          <span className="text-xs font-medium uppercase tracking-widest text-ink">
+            Loading Project
+          </span>
+        </div>
       )}
 
       <section

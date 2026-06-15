@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -134,16 +135,23 @@ const certs: Cert[] = [
 export default function CertificatesView() {
   const [open, setOpen] = useState<Cert | null>(null);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+  const [imgLoading, setImgLoading] = useState(true);
 
   // Refs for the GSAP Lightbox Animations
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const imgViewerRef = useRef<HTMLDivElement>(null);
 
-  // Reset Carousel when a new cert is opened
   useEffect(() => {
-    if (open) setActiveImgIdx(0);
+    if (open) {
+      setActiveImgIdx(0);
+      setImgLoading(true);
+    }
   }, [open]);
+
+  useEffect(() => {
+    setImgLoading(true);
+  }, [activeImgIdx]);
 
   // Modal Entrance Animation
   useGSAP(() => {
@@ -316,13 +324,31 @@ export default function CertificatesView() {
                       </span>
                     </div>
                   ) : (
-                    <img
-                      src={open.images[activeImgIdx]}
-                      alt={`${open.title} Certificate ${activeImgIdx + 1}`}
-                      className="max-h-full max-w-full rounded-[4px] object-contain drop-shadow-2xl"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <>
+                      {/* The Loading Spinner */}
+                      {imgLoading && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-20">
+                          <Loader2 className="h-8 w-8 animate-spin text-cyan" />
+                          <span className="text-xs font-medium uppercase tracking-widest text-ink-muted">
+                            Loading Asset
+                          </span>
+                        </div>
+                      )}
+
+                      {/* The Actual Image */}
+                      <img
+                        src={open.images[activeImgIdx]}
+                        alt={`${open.title} Certificate ${activeImgIdx + 1}`}
+                        className={`max-h-full max-w-full rounded-[4px] object-contain drop-shadow-2xl transition-opacity duration-500 ease-out ${
+                          imgLoading
+                            ? "opacity-0 scale-95"
+                            : "opacity-100 scale-100"
+                        }`}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={() => setImgLoading(false)}
+                      />
+                    </>
                   )}
                 </div>
 
