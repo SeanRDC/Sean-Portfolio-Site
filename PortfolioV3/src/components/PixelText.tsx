@@ -18,50 +18,41 @@ export default function PixelText({
   useGSAP(
     () => {
       const chars = containerRef.current?.querySelectorAll(".char-span");
-      if (!chars || chars.length === 0) return;
+      if (!chars) return;
 
-      // Premium scattered layout entry matching the reference style
       gsap.fromTo(
         chars,
-        { opacity: 0, y: 15 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.8,
           delay: delay,
-          stagger: {
-            amount: 0.4,
-            from: "random", // Scattered arrival physics
-          },
-          ease: "power2.out",
+          stagger: 0.02, // The secret to the "fast" agency feel
+          ease: "power3.out",
         },
       );
     },
     { scope: containerRef },
   );
 
-  // Split string into individual letters while preserving spaces
-  const renderWords = () => {
-    return children.split(" ").map((word, wordIdx) => (
-      <span
-        key={wordIdx}
-        className="inline-block whitespace-nowrap mr-[0.25em]"
-      >
-        {word.split("").map((char, charIdx) => (
-          <span
-            key={charIdx}
-            className="char-span inline-block will-change-transform opacity-0"
-          >
-            {char}
-          </span>
-        ))}
-      </span>
-    ));
-  };
-
   return (
     <div ref={containerRef} className={`${className} flex flex-wrap`}>
-      {renderWords()}
+      {children.split(" ").map((word, wordIdx) => (
+        <span
+          key={wordIdx}
+          className="inline-block whitespace-nowrap mr-[0.25em]"
+        >
+          {word.split("").map((char, charIdx) => (
+            <span
+              key={charIdx}
+              className="char-span inline-block will-change-transform opacity-0"
+            >
+              {char}
+            </span>
+          ))}
+        </span>
+      ))}
     </div>
   );
 }

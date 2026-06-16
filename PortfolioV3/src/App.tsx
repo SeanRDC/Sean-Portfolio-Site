@@ -7,11 +7,15 @@ import Lenis from "lenis";
 import MainLayout from "./layouts/MainLayout";
 import HomeView from "./screens/HomeView";
 import ProjectView from "./screens/ProjectView";
-import TransitionLayer from "./components/TransitionLayer"; // <-- The Morph Engine
+import TransitionLayer from "./components/TransitionLayer";
+import Preloader from "./components/Preloader"; // <-- No curly braces
+import { useLoaderStore } from "./utils/loaderStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+  const isComplete = useLoaderStore((state) => state.isComplete);
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -42,9 +46,8 @@ export default function App() {
 
   return (
     <Router>
-      {/* Transition Layer sits completely outside the routing layout */}
+      {!isComplete && <Preloader />} {/* <-- Matches component name */}
       <TransitionLayer />
-
       <MainLayout>
         <Routes>
           <Route path="/" element={<HomeView />} />
