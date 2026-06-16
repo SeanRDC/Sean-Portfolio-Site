@@ -92,7 +92,7 @@ export default function HeroSection() {
             <div className="aura-ring absolute inset-0 rounded-full bg-gradient-to-tr from-rose/50 via-violet/40 to-transparent blur-[32px] will-change-transform" />
 
             {/* Glass Orb Container */}
-            <div className="glass-strong absolute inset-1 z-10 flex items-center justify-center overflow-hidden rounded-full border border-white/10 ">
+            <div className="glass-strong absolute inset-1 z-10 flex items-center justify-center overflow-hidden rounded-full border border-white/10">
               <div
                 className="h-full w-full opacity-90 transition-colors duration-500"
                 style={{
