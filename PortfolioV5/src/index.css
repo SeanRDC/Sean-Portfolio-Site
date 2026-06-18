@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light editorial — alabaster paper, charcoal ink */
+  --paper: #f3efe7;
+  --paper-2: #ebe6db;
+  --stone: #ddd7ca;
+  --stone-deep: #c8c1b2;
+  --ink: #131210;
+  --ink-soft: #2c2a25;
+  --ink-dim: #6f6c63;
+  --ink-faint: #a39e93;
+  --line: #d9d3c6;
+  --line-strong: #bdb6a8;
+  --accent: #1a1916;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--ink); color: var(--paper); }
+
+/* ---- Display type (Archivo, extended width) ---- */
+.t-colossal {
+  font-family: 'Archivo', sans-serif;
+  font-variation-settings: 'wght' 880, 'wdth' 122;
+  letter-spacing: -0.04em;
+  line-height: 0.82;
+}
+.t-display {
+  font-family: 'Archivo', sans-serif;
+  font-variation-settings: 'wght' 760, 'wdth' 116;
+  letter-spacing: -0.022em;
+  line-height: 0.92;
+}
+.t-sub {
+  font-family: 'Archivo', sans-serif;
+  font-variation-settings: 'wght' 680, 'wdth' 110;
+  letter-spacing: 0em;
+}
+.t-label {
+  font-family: 'Archivo', sans-serif;
+  font-variation-settings: 'wght' 600, 'wdth' 106;
+  letter-spacing: 0.04em;
+}
+
+.font-mono-x { font-family: 'Space Mono', monospace; }
+.t-serif { font-family: 'Instrument Serif', serif; letter-spacing: 0; }
+.t-serif-i { font-family: 'Instrument Serif', serif; font-style: italic; letter-spacing: 0; }
+
+/* ---- Keyframes ---- */
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+::-webkit-scrollbar { width: 0; height: 0; }
