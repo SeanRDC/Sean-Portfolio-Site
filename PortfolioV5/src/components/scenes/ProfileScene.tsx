@@ -81,12 +81,15 @@ export default function ProfileScene() {
       className="relative h-[260vh] bg-paper"
     >
       <div className="sticky top-0 flex h-screen w-full items-center overflow-hidden">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 md:grid-cols-12 md:px-10">
+        {/* ADDED pt-24 md:pt-0 so it doesn't hug the top navigation on mobile! */}
+        <div className="mx-auto flex flex-col md:grid w-full max-w-7xl md:grid-cols-12 items-center gap-6 md:gap-12 px-6 md:px-10 pt-24 md:pt-0">
+          
           {/* Portrait Plate */}
-          <div className="md:col-span-5">
-            <div className="relative aspect-[3/4] w-full max-w-md border border-line">
-              <div
-                ref={imgContainerRef}
+          <div className="flex w-full justify-center md:col-span-5 md:block">
+            {/* CHANGED w-[45%] to w-[65%] max-w-[280px] for a much larger, better-proportioned mobile image */}
+            <div className="relative aspect-[3/4] w-[65%] sm:w-[55%] md:w-full max-w-[280px] md:max-w-md border border-line">
+              <div 
+                ref={imgContainerRef} 
                 className="absolute inset-0 overflow-hidden will-change-transform"
               >
                 <img
@@ -95,7 +98,7 @@ export default function ProfileScene() {
                   alt="Sean"
                   className="h-full w-full object-cover will-change-transform"
                 />
-
+                
                 <div
                   className="absolute inset-0"
                   style={{
@@ -103,15 +106,12 @@ export default function ProfileScene() {
                       "linear-gradient(180deg, transparent 55%, rgba(19,18,16,0.18) 100%)",
                   }}
                 />
-
-                <div
-                  ref={metaRef}
-                  className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5"
-                >
-                  <span className="t-label text-[12px] uppercase tracking-[0.2em] text-ink">
+                
+                <div ref={metaRef} className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-5">
+                  <span className="t-label text-[10px] md:text-[12px] uppercase tracking-[0.2em] text-ink">
                     sean
                   </span>
-                  <span className="font-mono-x text-[10px] uppercase text-ink-dim">
+                  <span className="font-mono-x text-[8px] md:text-[10px] uppercase text-ink-dim">
                     Portrait / 2024
                   </span>
                 </div>
@@ -124,8 +124,8 @@ export default function ProfileScene() {
           </div>
 
           {/* Word-by-Word Intro */}
-          <div className="md:col-span-7 md:pl-6">
-            <div className="mb-8 flex items-center gap-4">
+          <div className="w-full md:col-span-7 md:pl-6">
+            <div className="mb-4 md:mb-8 flex items-center gap-4">
               <span className="font-mono-x text-[11px] uppercase tracking-[0.4em] text-ink-soft">
                 The Introduction
               </span>
@@ -149,7 +149,7 @@ export default function ProfileScene() {
               })}
             </p>
             <div
-              className="mt-12 flex flex-wrap gap-x-10 gap-y-4"
+              className="mt-8 md:mt-12 flex flex-wrap gap-x-10 gap-y-4"
               style={{ opacity: clamp01((progress - 0.8) / 0.12) }}
             >
               {[

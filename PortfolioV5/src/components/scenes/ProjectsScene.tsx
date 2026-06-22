@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import StoneCanvas from "../StoneCanvas";
+import { useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,7 +44,12 @@ const PROJECTS: Project[] = [
     kind: "Modular E-Commerce Architecture",
     blurb:
       "A performance-focused storefront engine utilizing a custom headless modular system. Currently under development, the architecture emphasizes low-latency state management and grid-responsive UI components designed for high-fidelity product visualization.",
-    meta: ["React", "Headless CMS", "State Management", "Performance Optimization"],
+    meta: [
+      "React",
+      "Headless CMS",
+      "State Management",
+      "Performance Optimization",
+    ],
     seed: 0.58,
     tint: 0.4,
   },
@@ -118,7 +124,9 @@ export default function ProjectsScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [isListView, setIsListView] = useState(false);
+  const [isListView, setIsListView] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
 
   useGSAP(
     () => {
@@ -164,6 +172,16 @@ export default function ProjectsScene() {
       ScrollTrigger.refresh();
     }, 0);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsListView(true);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <section
@@ -268,7 +286,7 @@ export default function ProjectsScene() {
         </div>
       )}
 
-      <div className="pointer-events-none fixed inset-x-0 bottom-12 z-[100] flex justify-center md:bottom-24">
+      <div className="pointer-events-none fixed inset-x-0 bottom-12 z-[100] hidden md:flex justify-center md:bottom-24">
         <div ref={btnRef} className="pointer-events-auto invisible opacity-0">
           <button
             onClick={handleToggle}

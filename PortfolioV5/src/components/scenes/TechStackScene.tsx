@@ -138,23 +138,23 @@ export default function TechStackScene() {
       style={{ height: "300vh" }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden border-y border-line">
-        <div className="mx-auto grid h-full max-w-7xl grid-cols-1 md:grid-cols-2">
-          
+        <div className="mx-auto flex h-full max-w-7xl flex-col md:grid md:grid-cols-2">
           {/* Sticky Heading */}
-          <div className="relative flex flex-col justify-center border-line px-6 md:border-r md:px-10">
-            <div className="font-mono-x mb-6 text-[11px] uppercase tracking-[0.4em] text-ink-dim">
+          {/* CHANGED: Swapped py-6 for pt-32 pb-8 to push the text down on mobile! md:py-0 resets it for desktop */}
+          <div className="relative flex flex-col justify-center pt-32 pb-8 md:pt-0 md:pb-0 border-b md:border-b-0 border-line px-6 md:border-r md:px-10 shrink-0">
+            <div className="font-mono-x mb-2 md:mb-6 text-[11px] uppercase tracking-[0.4em] text-ink-dim">
               03 - Capability
             </div>
-            <h2 className="t-colossal text-[clamp(56px,11vw,150px)] leading-[0.82] text-ink">
+            <h2 className="t-colossal text-[clamp(46px,11vw,150px)] leading-[0.82] text-ink">
               TECH
-              <br />
-              STACK
+              <br className="hidden md:block" />
+              <span className="md:hidden"> </span>STACK
             </h2>
-            <p className="mt-8 max-w-xs font-body text-[14px] font-light leading-relaxed text-ink-soft">
+            <p className="mt-4 md:mt-8 max-w-xs font-body text-[12px] md:text-[14px] font-light leading-relaxed text-ink-soft hidden md:block">
               One continuous system - from the database layer to the DOM, from
               the circuit to the chassis.
             </p>
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-6 md:mt-8 flex items-center gap-3">
               <div className="h-px w-24 bg-line-strong">
                 <div
                   className="h-full bg-ink"
@@ -168,7 +168,7 @@ export default function TechStackScene() {
           </div>
 
           {/* Scrolling Categories List */}
-          <div className="relative overflow-hidden px-6 md:px-10">
+          <div className="relative flex-1 overflow-hidden px-6 md:px-10">
             <div
               className="absolute inset-x-6 md:inset-x-10"
               style={{
@@ -180,37 +180,35 @@ export default function TechStackScene() {
               {STACK.map((cat, i) => {
                 const center = (i + 0.5) / STACK.length;
                 const near = 1 - clamp01(Math.abs(progress - center) / 0.18);
-                
+
                 return (
                   <div
                     key={cat.name}
-                    className="flex flex-col gap-5 border-b border-line py-8"
+                    className="flex flex-col gap-4 border-b border-line py-6 md:py-8"
                     style={{ opacity: 0.35 + near * 0.65 }}
                   >
-                    {/* Category Title Header */}
-                    <div className="flex items-center gap-6">
-                      <span className="font-mono-x w-8 text-[12px] text-ink-faint">
+                    <div className="flex items-center gap-4 md:gap-6">
+                      <span className="font-mono-x w-6 md:w-8 text-[10px] md:text-[12px] text-ink-faint">
                         0{i + 1}
                       </span>
                       <div className="flex-1">
-                        <div className="t-display text-[clamp(26px,4vw,42px)] leading-none text-ink">
+                        <div className="t-display text-[clamp(22px,4vw,42px)] leading-none text-ink">
                           {cat.name}
                         </div>
-                        <div className="mt-2 font-mono-x text-[11px] uppercase tracking-wider text-ink-dim">
+                        <div className="mt-1 md:mt-2 font-mono-x text-[9px] md:text-[11px] uppercase tracking-wider text-ink-dim">
                           {cat.role}
                         </div>
                       </div>
                     </div>
 
-                    {/* Badge Wrap Layout */}
-                    <div className="pl-14 flex flex-wrap gap-2.5">
+                    <div className="pl-10 md:pl-14 flex flex-wrap gap-2">
                       {cat.badges.map((url, j) => (
-                        <img 
-                          key={j} 
-                          src={url} 
-                          alt="Tech Badge" 
+                        <img
+                          key={j}
+                          src={url}
+                          alt="Tech Badge"
                           draggable={false}
-                          className="h-[26px] md:h-[28px] w-auto object-contain rounded-sm"
+                          className="h-[20px] md:h-[28px] w-auto object-contain rounded-sm"
                         />
                       ))}
                     </div>
@@ -218,11 +216,10 @@ export default function TechStackScene() {
                 );
               })}
             </div>
-            
-            {/* Center reading line & fading gradients */}
+
             <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-paper to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-paper to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-16 md:h-28 bg-gradient-to-b from-paper to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 md:h-28 bg-gradient-to-t from-paper to-transparent" />
           </div>
         </div>
       </div>
