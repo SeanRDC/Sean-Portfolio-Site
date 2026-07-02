@@ -21,24 +21,35 @@ export default function CertificatesArchive() {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "+=300%",
-          scrub: 1,
-          pin: true,
-        },
+      // 1. GSAP matchMedia ensures this heavy animation ONLY runs on Desktop (1024px and up)
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 1024px)", () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top top",
+            end: "+=300%",
+            scrub: 1,
+            pin: true,
+          },
+        });
+
+        // 2. force3D: true offloads the animation math to the GPU to stop lag
+        tl.to(
+          ".scroll-left",
+          { xPercent: -50, ease: "none", force3D: true },
+          0,
+        );
+        tl.fromTo(
+          ".scroll-right",
+          { xPercent: -50 },
+          { xPercent: 0, ease: "none", force3D: true },
+          0,
+        );
+
+        return () => tl.kill();
       });
-
-      tl.to(".scroll-left", { xPercent: -50, ease: "none" }, 0);
-
-      tl.fromTo(
-        ".scroll-right",
-        { xPercent: -50 },
-        { xPercent: 0, ease: "none" },
-        0,
-      );
     },
     { scope: containerRef },
   );
@@ -46,11 +57,12 @@ export default function CertificatesArchive() {
   return (
     <div
       ref={containerRef}
-      className="h-screen w-full bg-paper font-mono-x text-ink overflow-hidden"
+      // Changed to min-h-screen for mobile scrolling, locked to h-screen on lg
+      className="min-h-screen lg:h-screen w-full bg-paper font-mono-x text-ink lg:overflow-hidden"
     >
-      {/* ── THE SPLIT LAYOUT GRID ── */}
-      <div className="grid h-full w-full grid-cols-1 lg:grid-cols-[340px_1fr]">
-        <aside className="relative z-20 flex h-full w-full flex-col justify-between border-r border-line bg-paper px-8 py-10">
+      <div className="flex flex-col lg:grid lg:h-full w-full lg:grid-cols-[340px_1fr]">
+        {/* ── SIDEBAR ── */}
+        <aside className="relative z-20 flex w-full flex-col justify-between border-b lg:border-b-0 lg:border-r border-line bg-paper px-6 py-8 lg:px-8 lg:py-10 lg:h-full">
           <div className="space-y-12">
             <Link
               to="/"
@@ -84,39 +96,57 @@ export default function CertificatesArchive() {
             </div>
           </div>
 
-          <div className="flex flex-col -ml-1">
+          <div className="flex flex-col -ml-1 mt-12 lg:mt-0">
             <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink">
               Archive
             </h1>
-            <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">
+            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">
               Archive
             </h1>
-            <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">
+            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">
               Archive
             </h1>
-            <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">
+            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">
               Archive
             </h1>
-            <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">
+            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">
               Archive
             </h1>
           </div>
         </aside>
 
-        <section className="relative flex h-full w-full flex-col justify-center gap-8 overflow-hidden bg-paper/50 py-10 pl-8">
-          <div className="scroll-left flex w-max gap-8">
+        {/* ── MOBILE VIEW (Flat Vertical Newsfeed) ── */}
+        <section className="flex lg:hidden w-full flex-col gap-8 bg-paper/50 px-6 py-10">
+          {TILES.map((t, i) => (
+            <ArchiveCard key={`mob-${i}`} tile={t} index={i} />
+          ))}
+        </section>
+
+        {/* ── DESKTOP VIEW (Pinned Horizontal Scrolling Grid) ── */}
+        {/* added will-change-transform and translateZ(0) to force hardware acceleration */}
+        <section className="relative hidden lg:flex h-full w-full flex-col justify-center gap-8 overflow-hidden bg-paper/50 py-10 pl-8">
+          <div
+            className="scroll-left flex w-max gap-8 will-change-transform"
+            style={{ transform: "translateZ(0)" }}
+          >
             {row1Items.map((t, i) => (
               <ArchiveCard key={`r1-${i}`} tile={t} index={i} />
             ))}
           </div>
 
-          <div className="scroll-right flex w-max gap-8">
+          <div
+            className="scroll-right flex w-max gap-8 will-change-transform"
+            style={{ transform: "translateZ(0)" }}
+          >
             {row2Items.map((t, i) => (
               <ArchiveCard key={`r2-${i}`} tile={t} index={i} />
             ))}
           </div>
 
-          <div className="scroll-left flex w-max gap-8">
+          <div
+            className="scroll-left flex w-max gap-8 will-change-transform"
+            style={{ transform: "translateZ(0)" }}
+          >
             {row3Items.map((t, i) => (
               <ArchiveCard key={`r3-${i}`} tile={t} index={i} />
             ))}
@@ -133,7 +163,8 @@ function ArchiveCard({ tile, index }: { tile: Tile; index: number }) {
       href={tile.link || "#"}
       target={tile.link ? "_blank" : "_self"}
       rel="noopener noreferrer"
-      className="group block shrink-0 w-[240px] md:w-[280px] cursor-pointer"
+      // Added w-full so it spans the whole screen on mobile, but stays 280px on desktop
+      className="group block shrink-0 w-full lg:w-[280px] cursor-pointer"
     >
       <div
         className="relative mb-4 aspect-[4/3] w-full overflow-hidden border border-line bg-ink"
