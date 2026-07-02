@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sean Dela Cruz</title>
+
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-397K7WC5KH"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      // Prevent default page view so React Router can handle it manually
+      gtag("config", "G-397K7WC5KH", { send_page_view: false });
+    </script>
   </head>
   <body>
     <div id="root"></div>
