@@ -1,4 +1,4 @@
-import { useRef} from "react";
+import { useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -203,17 +203,11 @@ export default function RingScene() {
     if (returnBtnRef.current) {
       if (p > 0.02 && p < 0.98) {
         returnBtnRef.current.style.opacity = "1";
-        returnBtnRef.current.style.transform = "translateY(0) translateX(-50%)";
-        if (window.innerWidth >= 768)
-          returnBtnRef.current.style.transform = "translateY(0) translateX(0)";
+        returnBtnRef.current.style.transform = "translateY(0px)";
         returnBtnRef.current.style.pointerEvents = "auto";
       } else {
         returnBtnRef.current.style.opacity = "0";
-        returnBtnRef.current.style.transform =
-          "translateY(2rem) translateX(-50%)";
-        if (window.innerWidth >= 768)
-          returnBtnRef.current.style.transform =
-            "translateY(2rem) translateX(0)";
+        returnBtnRef.current.style.transform = "translateY(2rem)";
         returnBtnRef.current.style.pointerEvents = "none";
       }
     }
@@ -223,9 +217,7 @@ export default function RingScene() {
     () => {
       let mm = gsap.matchMedia();
 
-      // DESKTOP: Native ScrollTrigger
       mm.add("(min-width: 768px)", () => {
-        // If we ARE NOT returning from the archive, initialize normally
         if (!location.state?.returnToRing) updateRing(0);
 
         ScrollTrigger.create({
@@ -243,33 +235,48 @@ export default function RingScene() {
 
       // --- REVERSE ANIMATION IF RETURNING FROM ARCHIVE ---
       if (location.state?.returnToRing && returnOverlayRef.current) {
-        // 1. Instantly calculate the math for the 50% point to prevent lag
         updateRing(0.5);
 
-        // 2. Erase the return state so it doesn't run twice if the user refreshes
         window.history.replaceState({}, document.title);
 
         requestAnimationFrame(() => {
-          // 3. Jump the browser scroll instantly to the exact middle of the 360 Scene
-          let targetY = 0;
-          const st = ScrollTrigger.getAll().find(
-            (s) => s.trigger === sectionRef.current,
-          );
-          if (st) {
-            targetY = st.start + (st.end - st.start) / 2;
-            window.scrollTo({ top: targetY, behavior: "instant" });
+          if (window.innerWidth >= 768) {
+            const st = ScrollTrigger.getAll().find(
+              (s) => s.trigger === sectionRef.current,
+            );
+            if (st) {
+              window.scrollTo({
+                top: st.start + (st.end - st.start) / 2,
+                behavior: "instant",
+              });
+            }
+          } else {
+            if (sectionRef.current) {
+              const y =
+                sectionRef.current.getBoundingClientRect().top + window.scrollY;
+              window.scrollTo({ top: y, behavior: "instant" });
+            }
           }
 
-          // 4. Shrink the black hole back into the exact coordinates of the Back button
-          const cx = location.state.cx || window.innerWidth / 2;
-          const cy = location.state.cy || window.innerHeight / 2;
+          let cx = window.innerWidth / 2;
+          let cy = window.innerHeight - 100;
+          if (returnBtnRef.current) {
+            const rect = returnBtnRef.current.getBoundingClientRect();
+            cx = rect.left + rect.width / 2;
+            cy = rect.top + rect.height / 2;
+          }
 
-          gsap.to(returnOverlayRef.current, {
-            clipPath: `circle(0px at ${cx}px ${cy}px)`,
-            duration: 1.2,
-            ease: "power3.inOut",
-            delay: 0.1, // Tiny delay to ensure browser paints the scroll jump first
-          });
+          // Updated to 200vmax here as well!
+          gsap.fromTo(
+            returnOverlayRef.current,
+            { clipPath: `circle(200vmax at ${cx}px ${cy}px)` },
+            {
+              clipPath: `circle(0px at ${cx}px ${cy}px)`,
+              duration: 1.2,
+              ease: "power3.inOut",
+              delay: 0.1,
+            },
+          );
         });
       }
 
@@ -278,13 +285,11 @@ export default function RingScene() {
     { scope: sectionRef },
   );
 
-  // --- SEAMLESS FULLSCREEN BUTTON TRANSITION OUT ---
   const handleNavigate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const btn = e.currentTarget;
     const rect = btn.getBoundingClientRect();
 
-    // Grab the exact center of this specific button
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
@@ -293,12 +298,12 @@ export default function RingScene() {
     overlay.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
     document.body.appendChild(overlay);
 
+    // Updated to 200vmax for full mobile coverage
     gsap.to(overlay, {
-      clipPath: `circle(150vw at ${cx}px ${cy}px)`,
+      clipPath: `circle(200vmax at ${cx}px ${cy}px)`,
       duration: 1.2,
       ease: "power3.inOut",
       onComplete: () => {
-        // We pass 'cx' and 'cy' so the Archive page knows where to shrink from
         navigate("/certificates-archive", { state: { cx, cy } });
         setTimeout(() => overlay.remove(), 100);
       },
@@ -311,13 +316,13 @@ export default function RingScene() {
       ref={sectionRef}
       className="relative h-[100vh] md:h-[800vh] bg-paper"
     >
-      {/* ── RETURN OVERLAY (Starts fully black if returning from archive) ── */}
+      {/* ── RETURN OVERLAY ── */}
       <div
         ref={returnOverlayRef}
         className="fixed inset-0 bg-ink z-[9999999] pointer-events-none"
         style={{
           display: location.state?.returnToRing ? "block" : "none",
-          clipPath: `circle(150vw at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)`,
+          clipPath: `circle(200vmax at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)`,
         }}
       />
 
@@ -334,7 +339,6 @@ export default function RingScene() {
             className="absolute inset-0"
             style={{ transformStyle: "preserve-3d" }}
           >
-            {/* ── Dynamic Phrase ── */}
             <div
               ref={textContainerRef}
               className="absolute left-1/2 top-1/2 z-0 w-[min(640px,86vw)]"
@@ -358,7 +362,6 @@ export default function RingScene() {
               </div>
             </div>
 
-            {/* ── The 360 Image Sequence ── */}
             <div
               className="absolute inset-0 hidden md:block"
               style={{ transformStyle: "preserve-3d" }}
@@ -395,7 +398,6 @@ export default function RingScene() {
           </div>
         </div>
 
-        {/* HUD Progress Bar */}
         <div className="pointer-events-none absolute inset-x-10 bottom-8 z-50 hidden md:flex items-center gap-4">
           <span className="font-mono-x text-[10px] uppercase tracking-[0.3em] text-ink-dim">
             Sequence Active
@@ -415,34 +417,35 @@ export default function RingScene() {
           </span>
         </div>
 
-        {/* ── CONTEXTUAL REDIRECT BUTTON ── */}
-        <div
-          ref={returnBtnRef}
-          className="absolute bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100] transition-all duration-700 ease-out opacity-0 pointer-events-none"
-        >
-          <button
-            onClick={handleNavigate}
-            className="group block w-[190px] h-[40px] bg-ink cursor-pointer outline-none border-none p-0"
-            style={{
-              clipPath:
-                "polygon(0% 0%, calc(100% - 10px) 0%, 100% 10px, 100% 100%, 0% 100%)",
-            }}
+        <div className="absolute bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100]">
+          <div
+            ref={returnBtnRef}
+            className="transition-transform duration-700 ease-out opacity-0 pointer-events-none translate-y-8"
           >
-            <div className="relative flex h-full items-center justify-between px-5 font-mono-x text-[10px] font-bold uppercase tracking-[0.2em] text-paper">
-              <span>View Archive</span>
-              <div className="transition-transform duration-500 group-hover:rotate-90">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 75.86 61.58"
-                  width="10"
-                  height="10"
-                  fill="currentColor"
-                >
-                  <path d="m43.32 30.13 32.54-19.09-13.57-7.29-26.5 18.92-1.35.14L6.84 0 2.85 4.96l23.71 25.79L0 50.99l3.1 10.59 31.88-22.73L59.8 59.79l5.93-4.26-8.22-13.66z"></path>
-                </svg>
+            <button
+              onClick={handleNavigate}
+              className="group block w-[190px] h-[40px] bg-ink cursor-pointer outline-none border-none p-0"
+              style={{
+                clipPath:
+                  "polygon(0% 0%, calc(100% - 10px) 0%, 100% 10px, 100% 100%, 0% 100%)",
+              }}
+            >
+              <div className="relative flex h-full items-center justify-between px-5 font-mono-x text-[10px] font-bold uppercase tracking-[0.2em] text-paper">
+                <span>View Archive</span>
+                <div className="transition-transform duration-500 group-hover:rotate-90">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 75.86 61.58"
+                    width="10"
+                    height="10"
+                    fill="currentColor"
+                  >
+                    <path d="m43.32 30.13 32.54-19.09-13.57-7.29-26.5 18.92-1.35.14L6.84 0 2.85 4.96l23.71 25.79L0 50.99l3.1 10.59 31.88-22.73L59.8 59.79l5.93-4.26-8.22-13.66z"></path>
+                  </svg>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
       </div>
     </section>
