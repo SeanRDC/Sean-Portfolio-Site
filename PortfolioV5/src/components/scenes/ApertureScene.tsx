@@ -32,6 +32,13 @@ export default function ApertureScene() {
   const planeFade = progress < 0.66 ? 1 : clamp01(1 - (progress - 0.66) / 0.3);
   const uiFade = 1 - clamp01(progress / 0.32);
 
+  // Overall container zoom to simulate approaching the text
+  const textZoomScale = 0.85 + clamp01((progress - 0.35) / 0.6) * 0.25;
+  
+  // Split the greeting into an array of characters
+  const greeting = "Hi there!";
+  const chars = greeting.split("");
+
   return (
     <section id="aperture" ref={sectionRef} className="relative h-[240vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-paper">
@@ -51,11 +58,54 @@ export default function ApertureScene() {
                 "radial-gradient(circle at 50% 47%, rgba(19,18,16,0.32) 0%, rgba(19,18,16,0.05) 30%, transparent 55%)",
             }}
           />
+          
+          {/* --- NEW "BUILDING" HI THERE TEXT --- */}
+          <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{
+              transform: `scale(${textZoomScale})`,
+              willChange: "transform",
+              perspective: "1000px" // Adds 3D depth to the flip animation
+            }}
+          >
+            <h2 className="t-colossal text-[clamp(50px,10vw,160px)] text-paper drop-shadow-2xl m-0 flex">
+              {chars.map((char, i) => {
+                // 1. Calculate a staggered start time for each letter
+                const start = 0.35 + (i / chars.length) * 0.2; 
+                // 2. Map current progress to this letter's specific animation window (lasts 0.15)
+                const charProgress = clamp01((progress - start) / 0.15);
+                
+                // 3. Apply an ease-out cubic curve so the letters snap into place smoothly
+                const easeOut = 1 - Math.pow(1 - charProgress, 3);
+
+                // 4. Calculate individual physical properties
+                const opacity = charProgress;
+                const y = (1 - easeOut) * 100; // Fly up from 100px below
+                const rotateX = (1 - easeOut) * -90; // Flip 90 degrees in 3D space
+
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      opacity,
+                      transform: `translateY(${y}px) rotateX(${rotateX}deg)`,
+                      display: "inline-block", // Required for transform math
+                      whiteSpace: "pre", // Ensures the space character doesn't collapse
+                      willChange: "transform, opacity",
+                      transformOrigin: "bottom center"
+                    }}
+                  >
+                    {char}
+                  </span>
+                );
+              })}
+            </h2>
+          </div>
         </div>
 
         {/* alabaster plane with hollow S - this dollies forward */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none"
           style={{
             transform: `scale(${scale})`,
             opacity: planeFade,
@@ -64,7 +114,7 @@ export default function ApertureScene() {
           }}
         >
           <svg
-            className="h-full w-full"
+            className="h-full w-full pointer-events-auto"
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid slice"
           >
