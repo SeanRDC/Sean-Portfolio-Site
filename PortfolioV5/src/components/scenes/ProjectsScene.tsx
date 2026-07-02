@@ -14,6 +14,7 @@ type Project = {
   meta: string[];
   image: string;
   gallery: string[];
+  year?: string;
 };
 
 const PROJECTS: Project[] = [
@@ -24,12 +25,13 @@ const PROJECTS: Project[] = [
     blurb:
       "A bespoke jewelry storefront with a real-time custom builder - configure metal, stone and setting live - backed by a points-based loyalty engine and headless checkout.",
     meta: ["MERN", "Custom Builder", "Loyalty Engine", "Stripe"],
-    image: "../public/images/beaded-cover.webp",
+    image: "/images/beaded-cover.webp",
     gallery: [
-      "../public/images/beaded-1.webp",
-      "../public/images/beaded-2.webp",
-      "../public/images/beaded-3.webp",
+      "/images/beaded-1.webp",
+      "/images/beaded-2.webp",
+      "/images/beaded-3.webp",
     ],
+    year: "2026",
   },
   {
     n: "02",
@@ -38,12 +40,13 @@ const PROJECTS: Project[] = [
     blurb:
       "A comprehensive digital herbarium featuring custom taxonomical filters and micro-animations. Each entry uses fluid UI transitions to render petal textures and growth patterns.",
     meta: ["React", "Custom Components", "Realtime", "Design System"],
-    image: "../public/images/flower-cover.webp",
+    image: "/images/flower-cover.webp",
     gallery: [
-      "../public/images/flower-1.webp",
-      "../public/images/flower-2.webp",
-      "../public/images/flower-3.webp",
+      "/images/flower-1.webp",
+      "/images/flower-2.webp",
+      "/images/flower-3.webp",
     ],
+    year: "2025",
   },
   {
     n: "03",
@@ -57,16 +60,16 @@ const PROJECTS: Project[] = [
       "State Management",
       "Performance Optimization",
     ],
-    image: "../public/images/pixel-cover.webp",
+    image: "/images/pixel-cover.webp",
     gallery: [
-      "../public/images/pixel-1.webp",
-      "../public/images/pixel-2.webp",
-      "../public/images/pixel-3.webp",
+      "/images/pixel-1.webp",
+      "/images/pixel-2.webp",
+      "/images/pixel-3.webp",
     ],
+    year: "2026",
   },
 ];
 
-// --- GALLERY VIEW COMPONENT ---
 const GalleryContent = ({
   p,
   N,
@@ -142,7 +145,6 @@ export default function ProjectsScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
 
-  // Custom Cursors
   const previewRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const xMovePreview = useRef<gsap.QuickToFunc | null>(null);
@@ -150,14 +152,12 @@ export default function ProjectsScene() {
   const xMoveCursor = useRef<gsap.QuickToFunc | null>(null);
   const yMoveCursor = useRef<gsap.QuickToFunc | null>(null);
 
-  // Transition & Overlay Refs
   const titleRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
   const pageFadeRef = useRef<HTMLDivElement>(null);
   const flyingTitleRef = useRef<HTMLHeadingElement>(null);
   const detailOverlayRef = useRef<HTMLElement>(null);
   const realDetailTitleWrapRef = useRef<HTMLDivElement>(null);
 
-  // Scroll Gallery Refs
   const thumbsWrapRef = useRef<HTMLDivElement>(null);
   const thumbsInnerRef = useRef<HTMLDivElement>(null);
   const thumbImgRefs = useRef<(HTMLImageElement | null)[]>([]);
@@ -172,7 +172,6 @@ export default function ProjectsScene() {
     () => typeof window !== "undefined" && window.innerWidth < 768,
   );
 
-  // Base Animations
   useGSAP(
     () => {
       if (previewRef.current && cursorRef.current) {
@@ -237,7 +236,7 @@ export default function ProjectsScene() {
     { scope: sectionRef, dependencies: [isListView] },
   );
 
-  // --- SEAMLESS TRANSITION IN (Anti-Snapping) ---
+  // --- SEAMLESS TRANSITION IN ---
   const openProject = (e: React.MouseEvent, p: Project) => {
     e.preventDefault();
     handleMouseLeave();
@@ -252,7 +251,6 @@ export default function ProjectsScene() {
     )
       return;
 
-    // Snapshot exact starting typography styles
     const startRect = sourceTitle.getBoundingClientRect();
     const startCs = getComputedStyle(sourceTitle);
 
@@ -268,25 +266,21 @@ export default function ProjectsScene() {
 
     detailOverlayRef.current.style.display = "block";
 
-    // Snapshot target typography styles
     const targetRect = targetTitle.getBoundingClientRect();
     const targetCs = getComputedStyle(targetTitle);
 
-    // Setup the flying clone
+    // Apply exact visual classes to the flying clone to avoid snapping
+    flyingTitleRef.current.className = sourceTitle.className + " fixed z-[999999] pointer-events-none m-0 whitespace-nowrap";
     flyingTitleRef.current.textContent = p.title;
+
     gsap.set(flyingTitleRef.current, {
       left: startRect.left,
       top: startRect.top,
       fontSize: startCs.fontSize,
-      lineHeight: startCs.lineHeight,
-      letterSpacing: startCs.letterSpacing,
-      fontWeight: startCs.fontWeight,
       color: startCs.color,
-      margin: 0,
       opacity: 1,
       x: 0,
       y: 0,
-      transformOrigin: "left top",
     });
 
     sourceTitle.style.visibility = "hidden";
@@ -299,16 +293,13 @@ export default function ProjectsScene() {
       0,
     );
 
-    // Morph EVERYTHING to the target
+    // Morph only position, size, and color to prevent violent snaps
     tl.to(
       flyingTitleRef.current,
       {
         left: targetRect.left,
         top: targetRect.top,
         fontSize: targetCs.fontSize,
-        lineHeight: targetCs.lineHeight,
-        letterSpacing: targetCs.letterSpacing,
-        fontWeight: targetCs.fontWeight,
         color: targetCs.color,
         duration: 1,
         ease: "power3.inOut",
@@ -327,7 +318,6 @@ export default function ProjectsScene() {
       1.2,
     );
 
-    // Initialize Scroll QuickTo
     if (thumbsInnerRef.current) {
       gsap.set(thumbsInnerRef.current, { y: 0 });
       qGalleryY.current = gsap.quickTo(thumbsInnerRef.current, "y", {
@@ -369,11 +359,7 @@ export default function ProjectsScene() {
         left: dtRect.left,
         top: dtRect.top,
         fontSize: dtCs.fontSize,
-        lineHeight: dtCs.lineHeight,
-        letterSpacing: dtCs.letterSpacing,
-        fontWeight: dtCs.fontWeight,
         color: dtCs.color,
-        margin: 0,
         opacity: 1,
         x: 0,
         y: 0,
@@ -392,9 +378,6 @@ export default function ProjectsScene() {
         left: itemRect.left,
         top: itemRect.top,
         fontSize: itemCs.fontSize,
-        lineHeight: itemCs.lineHeight,
-        letterSpacing: itemCs.letterSpacing,
-        fontWeight: itemCs.fontWeight,
         color: itemCs.color,
         duration: 0.9,
         ease: "power3.inOut",
@@ -413,37 +396,64 @@ export default function ProjectsScene() {
       gsap.set(flyingTitleRef.current, { opacity: 0 });
       setSelectedProject(null);
       document.body.style.overflow = "";
+      detailOverlayRef.current!.style.display = "none";
     });
   };
 
-  // --- LUKE'S CUSTOM SCROLL GALLERY LOGIC ---
+  // --- CUSTOM SCROLL GALLERY LOGIC (Desktop & Mobile) ---
   useEffect(() => {
     const el = detailOverlayRef.current;
-    if (!el || !selectedProject || window.innerWidth < 1024) return;
+    if (!el || !selectedProject) return;
 
+    // Handles Mouse Wheel
     const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
+      if (!selectedProject) return;
+      e.preventDefault(); 
       const inner = thumbsInnerRef.current;
       const wrap = thumbsWrapRef.current;
       if (!inner || !wrap) return;
 
       const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
-      const delta =
-        Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-      galleryY.current = Math.max(
-        -maxScroll,
-        Math.min(0, galleryY.current - delta),
-      );
+      galleryY.current = Math.max(-maxScroll, Math.min(0, galleryY.current - e.deltaY));
+      if (qGalleryY.current) qGalleryY.current(galleryY.current);
+    };
 
+    // Handles Mobile Touch Swiping
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      if (!selectedProject) return;
+      touchStartY = e.touches[0].clientY;
+    };
+    
+    const onTouchMove = (e: TouchEvent) => {
+      if (!selectedProject) return;
+      e.preventDefault();
+      const inner = thumbsInnerRef.current;
+      const wrap = thumbsWrapRef.current;
+      if (!inner || !wrap) return;
+
+      const y = e.touches[0].clientY;
+      const delta = touchStartY - y;
+      touchStartY = y;
+
+      const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
+      galleryY.current = Math.max(-maxScroll, Math.min(0, galleryY.current - delta));
       if (qGalleryY.current) qGalleryY.current(galleryY.current);
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
   }, [selectedProject]);
 
   useEffect(() => {
-    if (!selectedProject || window.innerWidth < 1024) return;
+    if (!selectedProject) return;
     let rafId: number;
 
     const updateActive = () => {
@@ -464,7 +474,6 @@ export default function ProjectsScene() {
             closestIdx = i;
           }
 
-          // Mathematical scaling based on distance from center
           const distNorm = Math.min(1, dist / (wrapRect.height * 0.45));
           const t = 1 - distNorm;
           const scale = 0.8 + t * t * t * 0.2;
@@ -485,7 +494,6 @@ export default function ProjectsScene() {
     return () => cancelAnimationFrame(rafId);
   }, [selectedProject]);
 
-  // Mouse Interactivity
   const handleMouseMove = (e: React.MouseEvent) => {
     if (
       xMovePreview.current &&
@@ -594,8 +602,10 @@ export default function ProjectsScene() {
                     </span>
                     <div>
                       <h2
-                        ref={(el) => (titleRefs.current[`list-${p.n}`] = el)}
-                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] text-ink transition-transform group-hover:translate-x-3 duration-500 ease-out w-fit origin-left m-0"
+                        ref={(el) => {
+                          titleRefs.current[`list-${p.n}`] = el;
+                        }}
+                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-transform group-hover:translate-x-3 duration-500 ease-out w-fit origin-left m-0"
                       >
                         {p.title}
                       </h2>
@@ -645,9 +655,9 @@ export default function ProjectsScene() {
                     p={p}
                     N={N}
                     onNavigate={openProject}
-                    titleRef={(el) =>
-                      (titleRefs.current[`gallery-${p.n}`] = el)
-                    }
+                    titleRef={(el) => {
+                      titleRefs.current[`gallery-${p.n}`] = el;
+                    }}
                   />
                 </article>
               ))}
@@ -691,50 +701,53 @@ export default function ProjectsScene() {
         </div>
       </section>
 
-      {/* 2. FLYING TRANSITION OVERLAYS */}
+      {/* 2. FLYING TRANSITION OVERLAYS (Max Z-Index) */}
       <div
         ref={pageFadeRef}
-        className="fixed inset-0 bg-[#0a0a0a] z-[30012] opacity-0 pointer-events-none"
+        className="fixed inset-0 bg-[#0a0a0a] z-[999990] opacity-0 pointer-events-none"
       />
       <h1
         ref={flyingTitleRef}
-        className="fixed z-[30030] whitespace-nowrap opacity-0 pointer-events-none m-0"
+        className="fixed z-[999999] pointer-events-none m-0 whitespace-nowrap"
       />
 
       {/* 3. CASE STUDY OVERLAY (Connected Black Background) */}
       <section
         ref={detailOverlayRef}
         style={{ display: "none" }}
-        className="fixed inset-0 z-[30015] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 invisible overflow-y-auto lg:overflow-hidden"
+        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-hidden"
       >
-        {selectedProject && (
-          <div className="w-full h-full max-w-[1800px] mx-auto flex flex-col lg:flex-row">
-            {/* LEFT COLUMN: Text Info */}
-            <div className="lg:w-[45%] h-full flex flex-col justify-center px-6 py-24 lg:p-20 relative shrink-0">
-              <header className="absolute top-8 left-6 lg:top-12 lg:left-20 detail-animate-in z-20">
-                <button
-                  onClick={closeProject}
-                  className="group flex w-fit items-center gap-3 font-mono-x text-[11px] uppercase tracking-[0.2em] text-[#888] transition-colors hover:text-[#f5f5f5] cursor-pointer bg-transparent border-none p-0"
-                >
-                  <svg
-                    className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="17" y1="17" x2="7" y2="7"></line>
-                    <polyline points="7 17 7 7 17 7"></polyline>
-                  </svg>
-                  Back
-                </button>
-              </header>
+        {/* ABSOLUTE BACK BUTTON (Prevents Stacking Issues) */}
+        <header className="absolute top-8 left-6 md:top-12 md:left-12 detail-animate-in z-[999999]">
+          <button
+            onClick={closeProject}
+            className="group flex w-fit items-center gap-3 font-mono-x text-[11px] uppercase tracking-[0.2em] text-[#888] transition-colors hover:text-[#f5f5f5] cursor-pointer bg-transparent border-none p-0"
+          >
+            <svg
+              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="17" y1="17" x2="7" y2="7"></line>
+              <polyline points="7 17 7 7 17 7"></polyline>
+            </svg>
+            Back
+          </button>
+        </header>
 
+        {selectedProject && (
+          <div className="w-full h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative">
+            
+            {/* LEFT COLUMN: Text Info */}
+            <div className="md:w-5/12 h-full flex flex-col justify-center px-8 md:px-16 pt-32 md:pt-0 relative shrink-0 z-[50010]">
               <div className="flex items-baseline gap-5 mb-8">
                 <div ref={realDetailTitleWrapRef} className="opacity-0">
-                  <h1 className="t-display text-[clamp(48px,6vw,80px)] leading-[0.85] tracking-tight m-0 w-fit">
+                  {/* IDENTICAL CLASSES AS THE LIST TITLE TO PREVENT SNAPPING */}
+                  <h1 className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5]">
                     {selectedProject.title}
                   </h1>
                 </div>
@@ -755,26 +768,14 @@ export default function ProjectsScene() {
                   </span>
                 ))}
               </div>
-
-              {/* Mobile Native Fallback Images */}
-              <div className="lg:hidden flex flex-col gap-6 mt-16 detail-animate-in">
-                {selectedProject.gallery.map((img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt="Preview"
-                    className="w-full rounded-md border border-[#222]"
-                  />
-                ))}
-              </div>
             </div>
 
-            {/* RIGHT COLUMN: Custom Scroll Gallery (Desktop Only) */}
-            <div className="hidden lg:flex w-[55%] h-full relative detail-animate-in">
+            {/* RIGHT COLUMN: Custom Scroll Gallery */}
+            <div className="flex-1 h-full flex relative detail-animate-in bg-[#0f0f0f]">
               {/* Draggable Thumbnails List */}
               <div
                 ref={thumbsWrapRef}
-                className="w-[140px] h-full overflow-hidden flex-shrink-0 relative z-10 border-l border-[#222]"
+                className="w-[100px] md:w-[140px] h-full overflow-hidden flex-shrink-0 relative z-20 border-l border-[#222]"
               >
                 <div
                   ref={thumbsInnerRef}
@@ -790,7 +791,6 @@ export default function ProjectsScene() {
                       alt="Thumbnail"
                       className="w-full aspect-[4/3] object-cover rounded-md border border-[#333] origin-center transition-transform cursor-pointer"
                       onClick={() => {
-                        // Smoothly scroll the container to center this clicked thumbnail
                         if (
                           qGalleryY.current &&
                           thumbsWrapRef.current &&
@@ -813,14 +813,18 @@ export default function ProjectsScene() {
               </div>
 
               {/* Main Active Image Display */}
-              <div className="flex-1 h-full p-12 flex items-center justify-center relative bg-[#111]">
+              <div className="flex-1 h-full p-8 md:p-12 flex items-center justify-center relative bg-[#050505]">
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}
                     src={img}
                     alt="Main Preview"
                     className={`absolute max-w-[85%] max-h-[85%] object-contain transition-all duration-700 ease-out
-                      ${i === activeGalleryIdx ? "opacity-100 scale-100 blur-none" : "opacity-0 scale-95 blur-md pointer-events-none"}`}
+                      ${
+                        i === activeGalleryIdx
+                          ? "opacity-100 scale-100 blur-none"
+                          : "opacity-0 scale-95 blur-md pointer-events-none"
+                      }`}
                   />
                 ))}
               </div>
