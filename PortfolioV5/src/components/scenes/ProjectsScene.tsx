@@ -252,7 +252,7 @@ export default function ProjectsScene() {
       return;
 
     const startRect = sourceTitle.getBoundingClientRect();
-    const startCs = getComputedStyle(sourceTitle);
+    const startCs = window.getComputedStyle(sourceTitle);
 
     flushSync(() => {
       setSelectedProject(p);
@@ -265,26 +265,31 @@ export default function ProjectsScene() {
     if (!targetTitleWrap || !targetTitle) return;
 
     detailOverlayRef.current.style.display = "block";
+    void detailOverlayRef.current.offsetHeight;
 
     const targetRect = targetTitle.getBoundingClientRect();
-    const targetCs = getComputedStyle(targetTitle);
+    const targetCs = window.getComputedStyle(targetTitle);
 
-    // Apply exact visual classes to the flying clone to avoid snapping
-    flyingTitleRef.current.className = sourceTitle.className + " fixed z-[999999] pointer-events-none m-0 whitespace-nowrap";
+    // Apply exact content and start styles (removed font family/weight to prevent JS snapping)
     flyingTitleRef.current.textContent = p.title;
-
     gsap.set(flyingTitleRef.current, {
       left: startRect.left,
       top: startRect.top,
       fontSize: startCs.fontSize,
+      lineHeight: startCs.lineHeight,
+      letterSpacing: startCs.letterSpacing,
       color: startCs.color,
+      margin: 0,
       opacity: 1,
       x: 0,
       y: 0,
+      transformOrigin: "left top",
     });
 
     sourceTitle.style.visibility = "hidden";
     document.body.style.overflow = "hidden";
+
+    window.dispatchEvent(new CustomEvent("projectOpen"));
 
     const tl = gsap.timeline();
     tl.to(
@@ -293,13 +298,15 @@ export default function ProjectsScene() {
       0,
     );
 
-    // Morph only position, size, and color to prevent violent snaps
+    // Morph strictly layout values to the target
     tl.to(
       flyingTitleRef.current,
       {
         left: targetRect.left,
         top: targetRect.top,
         fontSize: targetCs.fontSize,
+        lineHeight: targetCs.lineHeight,
+        letterSpacing: targetCs.letterSpacing,
         color: targetCs.color,
         duration: 1,
         ease: "power3.inOut",
@@ -343,6 +350,8 @@ export default function ProjectsScene() {
     )
       return;
 
+    window.dispatchEvent(new CustomEvent("projectClose"));
+
     const tl = gsap.timeline();
     tl.to(
       ".detail-animate-in",
@@ -354,12 +363,16 @@ export default function ProjectsScene() {
     const targetTitle = targetTitleWrap?.querySelector("h1");
     if (targetTitleWrap && targetTitle) {
       const dtRect = targetTitle.getBoundingClientRect();
-      const dtCs = getComputedStyle(targetTitle);
+      const dtCs = window.getComputedStyle(targetTitle);
+
       gsap.set(flyingTitleRef.current, {
         left: dtRect.left,
         top: dtRect.top,
         fontSize: dtCs.fontSize,
+        lineHeight: dtCs.lineHeight,
+        letterSpacing: dtCs.letterSpacing,
         color: dtCs.color,
+        margin: 0,
         opacity: 1,
         x: 0,
         y: 0,
@@ -370,7 +383,7 @@ export default function ProjectsScene() {
     tl.to(detailOverlayRef.current, { autoAlpha: 0, duration: 0.4 }, 0.2);
 
     const itemRect = sourceTitle.getBoundingClientRect();
-    const itemCs = getComputedStyle(sourceTitle);
+    const itemCs = window.getComputedStyle(sourceTitle);
 
     tl.to(
       flyingTitleRef.current,
@@ -378,6 +391,8 @@ export default function ProjectsScene() {
         left: itemRect.left,
         top: itemRect.top,
         fontSize: itemCs.fontSize,
+        lineHeight: itemCs.lineHeight,
+        letterSpacing: itemCs.letterSpacing,
         color: itemCs.color,
         duration: 0.9,
         ease: "power3.inOut",
@@ -400,51 +415,62 @@ export default function ProjectsScene() {
     });
   };
 
-  // --- CUSTOM SCROLL GALLERY LOGIC (Desktop & Mobile) ---
+  // Connects the Nav Back button to this file
+  useEffect(() => {
+    const handleTriggerClose = () => {
+      if (selectedProject) closeProject();
+    };
+    window.addEventListener("triggerCloseProject", handleTriggerClose);
+    return () =>
+      window.removeEventListener("triggerCloseProject", handleTriggerClose);
+  }, [selectedProject, isListView]);
+
+  // --- CUSTOM SCROLL GALLERY LOGIC ---
   useEffect(() => {
     const el = detailOverlayRef.current;
-    if (!el || !selectedProject) return;
+    if (!el || !selectedProject || window.innerWidth < 1024) return;
 
-    // Handles Mouse Wheel
     const onWheel = (e: WheelEvent) => {
-      if (!selectedProject) return;
-      e.preventDefault(); 
-      const inner = thumbsInnerRef.current;
-      const wrap = thumbsWrapRef.current;
-      if (!inner || !wrap) return;
-
-      const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
-      galleryY.current = Math.max(-maxScroll, Math.min(0, galleryY.current - e.deltaY));
-      if (qGalleryY.current) qGalleryY.current(galleryY.current);
-    };
-
-    // Handles Mobile Touch Swiping
-    let touchStartY = 0;
-    const onTouchStart = (e: TouchEvent) => {
-      if (!selectedProject) return;
-      touchStartY = e.touches[0].clientY;
-    };
-    
-    const onTouchMove = (e: TouchEvent) => {
-      if (!selectedProject) return;
       e.preventDefault();
       const inner = thumbsInnerRef.current;
       const wrap = thumbsWrapRef.current;
       if (!inner || !wrap) return;
 
-      const y = e.touches[0].clientY;
-      const delta = touchStartY - y;
-      touchStartY = y;
-
       const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
-      galleryY.current = Math.max(-maxScroll, Math.min(0, galleryY.current - delta));
+      const delta =
+        Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      galleryY.current = Math.max(
+        -maxScroll,
+        Math.min(0, galleryY.current - delta),
+      );
+
+      if (qGalleryY.current) qGalleryY.current(galleryY.current);
+    };
+
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const inner = thumbsInnerRef.current;
+      const wrap = thumbsWrapRef.current;
+      if (!inner || !wrap) return;
+
+      const delta = touchStartY - e.touches[0].clientY;
+      touchStartY = e.touches[0].clientY;
+      const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
+      galleryY.current = Math.max(
+        -maxScroll,
+        Math.min(0, galleryY.current - delta),
+      );
       if (qGalleryY.current) qGalleryY.current(galleryY.current);
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
-    
+
     return () => {
       el.removeEventListener("wheel", onWheel);
       el.removeEventListener("touchstart", onTouchStart);
@@ -453,7 +479,7 @@ export default function ProjectsScene() {
   }, [selectedProject]);
 
   useEffect(() => {
-    if (!selectedProject) return;
+    if (!selectedProject || window.innerWidth < 1024) return;
     let rafId: number;
 
     const updateActive = () => {
@@ -605,7 +631,7 @@ export default function ProjectsScene() {
                         ref={(el) => {
                           titleRefs.current[`list-${p.n}`] = el;
                         }}
-                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-transform group-hover:translate-x-3 duration-500 ease-out w-fit origin-left m-0"
+                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-all duration-500 ease-out w-fit origin-left m-0 group-hover:translate-x-4 group-hover:opacity-70"
                       >
                         {p.title}
                       </h2>
@@ -616,7 +642,7 @@ export default function ProjectsScene() {
                   </div>
                   <div className="mt-8 flex w-full flex-col md:mt-0 md:w-1/2 md:flex-row md:items-center md:justify-between md:pl-10 pointer-events-none">
                     <div className="max-w-sm">
-                      <p className="font-body text-[14px] font-light leading-relaxed text-ink-soft line-clamp-2 transition-all group-hover:line-clamp-none">
+                      <p className="font-body text-[14px] font-light leading-relaxed text-ink-soft line-clamp-2">
                         {p.blurb}
                       </p>
                       <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
@@ -701,14 +727,16 @@ export default function ProjectsScene() {
         </div>
       </section>
 
-      {/* 2. FLYING TRANSITION OVERLAYS (Max Z-Index) */}
+      {/* 2. FLYING TRANSITION OVERLAYS */}
       <div
         ref={pageFadeRef}
         className="fixed inset-0 bg-[#0a0a0a] z-[999990] opacity-0 pointer-events-none"
       />
+
+      {/* THE FLYING CLONE - ALWAYS SHARES THE EXACT SAME t-colossal CSS CLASS TO PREVENT SNAPPING */}
       <h1
         ref={flyingTitleRef}
-        className="fixed z-[999999] pointer-events-none m-0 whitespace-nowrap"
+        className="t-colossal fixed z-[999999] pointer-events-none m-0 whitespace-nowrap opacity-0"
       />
 
       {/* 3. CASE STUDY OVERLAY (Connected Black Background) */}
@@ -717,37 +745,13 @@ export default function ProjectsScene() {
         style={{ display: "none" }}
         className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-hidden"
       >
-        {/* ABSOLUTE BACK BUTTON (Prevents Stacking Issues) */}
-        <header className="absolute top-8 left-6 md:top-12 md:left-12 detail-animate-in z-[999999]">
-          <button
-            onClick={closeProject}
-            className="group flex w-fit items-center gap-3 font-mono-x text-[11px] uppercase tracking-[0.2em] text-[#888] transition-colors hover:text-[#f5f5f5] cursor-pointer bg-transparent border-none p-0"
-          >
-            <svg
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="17" y1="17" x2="7" y2="7"></line>
-              <polyline points="7 17 7 7 17 7"></polyline>
-            </svg>
-            Back
-          </button>
-        </header>
-
         {selectedProject && (
-          <div className="w-full h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative">
-            
+          <div className="w-full h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative pt-24 md:pt-0">
             {/* LEFT COLUMN: Text Info */}
-            <div className="md:w-5/12 h-full flex flex-col justify-center px-8 md:px-16 pt-32 md:pt-0 relative shrink-0 z-[50010]">
+            <div className="md:w-5/12 h-full flex flex-col justify-center px-8 md:px-16 relative shrink-0 z-[50010]">
               <div className="flex items-baseline gap-5 mb-8">
                 <div ref={realDetailTitleWrapRef} className="opacity-0">
-                  {/* IDENTICAL CLASSES AS THE LIST TITLE TO PREVENT SNAPPING */}
-                  <h1 className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5]">
+                  <h1 className="t-colossal text-[clamp(42px,5.5vw,110px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5]">
                     {selectedProject.title}
                   </h1>
                 </div>
@@ -768,11 +772,21 @@ export default function ProjectsScene() {
                   </span>
                 ))}
               </div>
+              {/* Mobile Native Fallback Images */}
+              <div className="md:hidden flex flex-col gap-6 mt-16 detail-animate-in pb-24 h-full overflow-y-auto">
+                {selectedProject.gallery.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt="Preview"
+                    className="w-full rounded-md border border-[#222]"
+                  />
+                ))}
+              </div>
             </div>
 
             {/* RIGHT COLUMN: Custom Scroll Gallery */}
-            <div className="flex-1 h-full flex relative detail-animate-in bg-[#0f0f0f]">
-              {/* Draggable Thumbnails List */}
+            <div className="hidden md:flex flex-1 h-full relative detail-animate-in bg-[#0f0f0f]">
               <div
                 ref={thumbsWrapRef}
                 className="w-[100px] md:w-[140px] h-full overflow-hidden flex-shrink-0 relative z-20 border-l border-[#222]"
@@ -811,20 +825,13 @@ export default function ProjectsScene() {
                   ))}
                 </div>
               </div>
-
-              {/* Main Active Image Display */}
               <div className="flex-1 h-full p-8 md:p-12 flex items-center justify-center relative bg-[#050505]">
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}
                     src={img}
                     alt="Main Preview"
-                    className={`absolute max-w-[85%] max-h-[85%] object-contain transition-all duration-700 ease-out
-                      ${
-                        i === activeGalleryIdx
-                          ? "opacity-100 scale-100 blur-none"
-                          : "opacity-0 scale-95 blur-md pointer-events-none"
-                      }`}
+                    className={`absolute max-w-[85%] max-h-[85%] object-contain transition-all duration-700 ease-out ${i === activeGalleryIdx ? "opacity-100 scale-100 blur-none" : "opacity-0 scale-95 blur-md pointer-events-none"}`}
                   />
                 ))}
               </div>
