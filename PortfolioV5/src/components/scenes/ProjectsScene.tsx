@@ -27,9 +27,9 @@ const PROJECTS: Project[] = [
     meta: ["MERN", "Custom Builder", "Loyalty Engine", "Stripe"],
     image: "/images/beaded-cover.webp",
     gallery: [
-      "/images/beaded-1.webp",
-      "/images/beaded-2.webp",
-      "/images/beaded-3.webp",
+      "/mockups/beaded-1.webp",
+      "/mockups/beaded-2.webp",
+      "/mockups/beaded-3.webp",
     ],
     year: "2026",
   },
@@ -42,9 +42,9 @@ const PROJECTS: Project[] = [
     meta: ["React", "Custom Components", "Realtime", "Design System"],
     image: "/images/flower-cover.webp",
     gallery: [
-      "/images/flower-1.webp",
-      "/images/flower-2.webp",
-      "/images/flower-3.webp",
+      "/mockups/flower-1.webp",
+      "/mockups/flower-2.webp",
+      "/mockups/flower-3.webp",
     ],
     year: "2025",
   },
@@ -62,9 +62,9 @@ const PROJECTS: Project[] = [
     ],
     image: "/images/pixel-cover.webp",
     gallery: [
-      "/images/pixel-1.webp",
-      "/images/pixel-2.webp",
-      "/images/pixel-3.webp",
+      "/mockups/pixel-1.webp",
+      "/mockups/pixel-2.webp",
+      "/mockups/pixel-3.webp",
     ],
     year: "2026",
   },
@@ -711,17 +711,21 @@ export default function ProjectsScene() {
           </div>
         )}
 
-        <div className="pointer-events-none fixed inset-x-0 bottom-12 z-[100] hidden md:flex justify-center md:bottom-24">
+        <div className="pointer-events-none fixed bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100]">
           <div ref={btnRef} className="pointer-events-auto invisible opacity-0">
             <button
               onClick={handleToggle}
-              className="flex items-center gap-3 bg-paper/90 backdrop-blur-md border border-line-strong px-5 py-2.5 font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink transition-all hover:bg-ink hover:text-paper hover:shadow-lg"
+              className="group block w-[190px] h-[40px] bg-ink cursor-pointer border-none p-0 outline-none"
+              style={{ clipPath: "polygon(0% 0%, calc(100% - 10px) 0%, 100% 10px, 100% 100%, 0% 100%)" }}
             >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-40"></span>
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current"></span>
-              </span>
-              {isListView ? "Switch to Gallery" : "Switch to List View"}
+              <div className="relative flex h-full items-center justify-between px-5 font-mono-x text-[10px] font-bold uppercase tracking-[0.2em] text-paper">
+                <span>{isListView ? "Gallery View" : "List View"}</span>
+                <div className="transition-transform duration-500 group-hover:rotate-90">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75.86 61.58" width="10" height="10" fill="currentColor">
+                    <path d="m43.32 30.13 32.54-19.09-13.57-7.29-26.5 18.92-1.35.14L6.84 0 2.85 4.96l23.71 25.79L0 50.99l13.1 10.59 31.88-22.73 L59.8 59.79 l15.93-4.26 -8.22-13.66z" />
+                  </svg>
+                </div>
+              </div>
             </button>
           </div>
         </div>
