@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -117,15 +117,31 @@ export default function TechStackScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
 
+  // Track if we are on a desktop screen to handle responsive logic safely
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 768,
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useGSAP(
     () => {
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => setProgress(self.progress),
+      // Only run the ScrollTrigger logic on md screens (768px) and up
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 768px)", () => {
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => setProgress(self.progress),
+        });
       });
+      return () => mm.revert();
     },
     { scope: sectionRef },
   );
@@ -135,12 +151,16 @@ export default function TechStackScene() {
       id="stack"
       ref={sectionRef}
       className="relative bg-paper"
-      style={{ height: "300vh" }}
+      style={{ height: isDesktop ? "300vh" : "auto" }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden border-y border-line">
+      {/* On desktop: sticky, h-screen, hides overflow for GSAP scrubbing
+        On mobile: relative, normal document flow 
+      */}
+      <div
+        className={`w-full border-y border-line ${isDesktop ? "sticky top-0 h-screen overflow-hidden" : "relative min-h-screen"}`}
+      >
         <div className="mx-auto flex h-full max-w-7xl flex-col md:grid md:grid-cols-2">
           {/* Sticky Heading */}
-          {/* CHANGED: Swapped py-6 for pt-32 pb-8 to push the text down on mobile! md:py-0 resets it for desktop */}
           <div className="relative flex flex-col justify-center pt-32 pb-8 md:pt-0 md:pb-0 border-b md:border-b-0 border-line px-6 md:border-r md:px-10 shrink-0">
             <div className="font-mono-x mb-2 md:mb-6 text-[11px] uppercase tracking-[0.4em] text-ink-dim">
               03 - Capability
@@ -154,7 +174,9 @@ export default function TechStackScene() {
               One continuous system - from the database layer to the DOM, from
               the circuit to the chassis.
             </p>
-            <div className="mt-6 md:mt-8 flex items-center gap-3">
+
+            {/* Hidden on mobile since there is no scrubbing timeline to track */}
+            <div className="mt-6 md:mt-8 items-center gap-3 hidden md:flex">
               <div className="h-px w-24 bg-line-strong">
                 <div
                   className="h-full bg-ink"
@@ -167,15 +189,23 @@ export default function TechStackScene() {
             </div>
           </div>
 
-          {/* Scrolling Categories List */}
-          <div className="relative flex-1 overflow-hidden px-6 md:px-10">
+          {/* Categories List */}
+          <div
+            className={`relative flex-1 ${isDesktop ? "overflow-hidden px-10" : "px-6 pb-20"}`}
+          >
             <div
-              className="absolute inset-x-6 md:inset-x-10"
-              style={{
-                top: "50%",
-                transform: `translateY(calc(-${progress * 100}% + 26vh))`,
-                willChange: "transform",
-              }}
+              className={
+                isDesktop ? "absolute inset-x-10" : "relative w-full pt-8"
+              }
+              style={
+                isDesktop
+                  ? {
+                      top: "50%",
+                      transform: `translateY(calc(-${progress * 100}% + 26vh))`,
+                      willChange: "transform",
+                    }
+                  : {} // No inline styles on mobile, let natural scroll take over
+              }
             >
               {STACK.map((cat, i) => {
                 const center = (i + 0.5) / STACK.length;
@@ -185,7 +215,8 @@ export default function TechStackScene() {
                   <div
                     key={cat.name}
                     className="flex flex-col gap-4 border-b border-line py-6 md:py-8"
-                    style={{ opacity: 0.35 + near * 0.65 }}
+                    // Highlight effect only runs on Desktop during scrub
+                    style={{ opacity: isDesktop ? 0.35 + near * 0.65 : 1 }}
                   >
                     <div className="flex items-center gap-4 md:gap-6">
                       <span className="font-mono-x w-6 md:w-8 text-[10px] md:text-[12px] text-ink-faint">
@@ -217,9 +248,10 @@ export default function TechStackScene() {
               })}
             </div>
 
-            <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-16 md:h-28 bg-gradient-to-b from-paper to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 md:h-28 bg-gradient-to-t from-paper to-transparent" />
+            {/* Desktop Fade Gradients (Hidden on Mobile) */}
+            <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-transparent hidden md:block" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-paper to-transparent hidden md:block" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-paper to-transparent hidden md:block" />
           </div>
         </div>
       </div>
