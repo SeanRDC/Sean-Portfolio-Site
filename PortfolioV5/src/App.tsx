@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import SmoothScroll from "./components/SmoothScroll";
-import Preloader from "./components/Preloader"; // Ensure path is correct
+import Preloader from "./components/Preloader";
 import "./index.css";
 
 export default function App() {

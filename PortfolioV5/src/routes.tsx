@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import HomeView from "./screens/HomeView";
 import CertificatesArchive from "./screens/certificatesArchive";
 
+
 export default function AppRoutes() {
   return (
     <Routes>
