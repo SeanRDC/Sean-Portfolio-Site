@@ -1,8 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { TILES } from "../data/certificates";
 import type { Tile } from "../data/certificates";
 
@@ -10,6 +10,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function CertificatesArchive() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const pageFadeRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const row1 = TILES.slice(0, 6);
   const row2 = TILES.slice(6, 12);
@@ -21,11 +24,42 @@ export default function CertificatesArchive() {
 
   useGSAP(
     () => {
-      // 1. GSAP matchMedia ensures this heavy animation ONLY runs on Desktop (1024px and up)
-      const mm = gsap.matchMedia();
+      // 1. SEAMLESS ENTRY: Shrink the black hole back into the original button coordinates!
+      const cx = location.state?.cx || window.innerWidth / 2;
+      const cy = location.state?.cy || window.innerHeight / 2;
 
+      const entryTl = gsap.timeline();
+
+      entryTl.to(pageFadeRef.current, {
+        clipPath: `circle(0px at ${cx}px ${cy}px)`,
+        duration: 1.2,
+        ease: "power3.inOut",
+      });
+
+      // Stagger in the UI smoothly
+      entryTl.fromTo(
+        ".sidebar-item",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" },
+        0.4,
+      );
+      entryTl.fromTo(
+        ".archive-row",
+        { opacity: 0, x: 60 },
+        { opacity: 1, x: 0, duration: 1.2, stagger: 0.15, ease: "power3.out" },
+        0.4,
+      );
+      entryTl.fromTo(
+        ".mob-card",
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" },
+        0.4,
+      );
+
+      // 2. DESKTOP SCROLL LOGIC
+      const mm = gsap.matchMedia();
       mm.add("(min-width: 1024px)", () => {
-        const tl = gsap.timeline({
+        const scrollTl = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
@@ -35,38 +69,71 @@ export default function CertificatesArchive() {
           },
         });
 
-        // 2. force3D: true offloads the animation math to the GPU to stop lag
-        tl.to(
+        scrollTl.to(
           ".scroll-left",
           { xPercent: -50, ease: "none", force3D: true },
           0,
         );
-        tl.fromTo(
+        scrollTl.fromTo(
           ".scroll-right",
           { xPercent: -50 },
           { xPercent: 0, ease: "none", force3D: true },
           0,
         );
-
-        return () => tl.kill();
       });
+
+      return () => mm.revert();
     },
     { scope: containerRef },
   );
 
+  // --- SEAMLESS EXIT BACK TO RING SCENE ---
+  const handleBack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+
+    // Grab the exact center of the "Back" button
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const overlay = document.createElement("div");
+    overlay.className = "fixed inset-0 z-[9999999] bg-ink pointer-events-none";
+    overlay.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
+    document.body.appendChild(overlay);
+
+    gsap.to(overlay, {
+      clipPath: `circle(150vw at ${cx}px ${cy}px)`,
+      duration: 1.2,
+      ease: "power3.inOut",
+      onComplete: () => {
+        // Send state to Ring Scene so it knows to reverse the animation!
+        navigate("/#ring", { state: { returnToRing: true, cx, cy } });
+        setTimeout(() => overlay.remove(), 100);
+      },
+    });
+  };
+
   return (
     <div
       ref={containerRef}
-      // Changed to min-h-screen for mobile scrolling, locked to h-screen on lg
-      className="min-h-screen lg:h-screen w-full bg-paper font-mono-x text-ink lg:overflow-hidden"
+      className="min-h-screen lg:h-screen w-full bg-paper font-mono-x text-ink lg:overflow-hidden relative"
     >
+      {/* OVERLAY STARTS FULLY COVERING THE SCREEN (150vw radius) */}
+      <div
+        ref={pageFadeRef}
+        className="fixed inset-0 bg-ink z-[9999999] pointer-events-none"
+        style={{
+          clipPath: `circle(150vw at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)`,
+        }}
+      />
+
       <div className="flex flex-col lg:grid lg:h-full w-full lg:grid-cols-[340px_1fr]">
-        {/* ── SIDEBAR ── */}
         <aside className="relative z-20 flex w-full flex-col justify-between border-b lg:border-b-0 lg:border-r border-line bg-paper px-6 py-8 lg:px-8 lg:py-10 lg:h-full">
           <div className="space-y-12">
-            <Link
-              to="/"
-              className="group flex w-fit items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-ink-dim transition-colors hover:text-ink"
+            <button
+              onClick={handleBack}
+              className="sidebar-item group flex w-fit items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-ink-dim transition-colors hover:text-ink cursor-pointer bg-transparent border-none p-0 outline-none"
             >
               <svg
                 className="h-3 w-3 transition-transform duration-300 group-hover:-translate-x-1"
@@ -82,9 +149,9 @@ export default function CertificatesArchive() {
                 />
               </svg>
               Back to Sequence
-            </Link>
+            </button>
 
-            <div className="[&_p]:mb-5 [&_p]:text-[9px] [&_p]:uppercase [&_p]:leading-relaxed [&_p]:tracking-[0.15em] [&_p]:text-ink-dim">
+            <div className="sidebar-item [&_p]:mb-5 [&_p]:text-[9px] [&_p]:uppercase [&_p]:leading-relaxed [&_p]:tracking-[0.15em] [&_p]:text-ink-dim">
               <p className="font-bold text-ink">
                 More than credentials-these are milestones:
               </p>
@@ -97,54 +164,51 @@ export default function CertificatesArchive() {
           </div>
 
           <div className="flex flex-col -ml-1 mt-12 lg:mt-0">
-            <h1 className="t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink">
+            <h1 className="sidebar-item t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink">
               Archive
             </h1>
-            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">
+            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">
               Archive
             </h1>
-            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">
+            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">
               Archive
             </h1>
-            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">
+            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">
               Archive
             </h1>
-            <h1 className="t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">
+            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">
               Archive
             </h1>
           </div>
         </aside>
 
-        {/* ── MOBILE VIEW (Flat Vertical Newsfeed) ── */}
         <section className="flex lg:hidden w-full flex-col gap-8 bg-paper/50 px-6 py-10">
           {TILES.map((t, i) => (
-            <ArchiveCard key={`mob-${i}`} tile={t} index={i} />
+            <div key={`mob-${i}`} className="mob-card">
+              <ArchiveCard tile={t} index={i} />
+            </div>
           ))}
         </section>
 
-        {/* ── DESKTOP VIEW (Pinned Horizontal Scrolling Grid) ── */}
-        {/* added will-change-transform and translateZ(0) to force hardware acceleration */}
         <section className="relative hidden lg:flex h-full w-full flex-col justify-center gap-8 overflow-hidden bg-paper/50 py-10 pl-8">
           <div
-            className="scroll-left flex w-max gap-8 will-change-transform"
+            className="archive-row scroll-left flex w-max gap-8 will-change-transform"
             style={{ transform: "translateZ(0)" }}
           >
             {row1Items.map((t, i) => (
               <ArchiveCard key={`r1-${i}`} tile={t} index={i} />
             ))}
           </div>
-
           <div
-            className="scroll-right flex w-max gap-8 will-change-transform"
+            className="archive-row scroll-right flex w-max gap-8 will-change-transform"
             style={{ transform: "translateZ(0)" }}
           >
             {row2Items.map((t, i) => (
               <ArchiveCard key={`r2-${i}`} tile={t} index={i} />
             ))}
           </div>
-
           <div
-            className="scroll-left flex w-max gap-8 will-change-transform"
+            className="archive-row scroll-left flex w-max gap-8 will-change-transform"
             style={{ transform: "translateZ(0)" }}
           >
             {row3Items.map((t, i) => (
@@ -163,7 +227,6 @@ function ArchiveCard({ tile, index }: { tile: Tile; index: number }) {
       href={tile.link || "#"}
       target={tile.link ? "_blank" : "_self"}
       rel="noopener noreferrer"
-      // Added w-full so it spans the whole screen on mobile, but stays 280px on desktop
       className="group block shrink-0 w-full lg:w-[280px] cursor-pointer"
     >
       <div
@@ -192,7 +255,6 @@ function ArchiveCard({ tile, index }: { tile: Tile; index: number }) {
             />
           </svg>
         </div>
-
         <img
           src={tile.image}
           alt={tile.label}
@@ -203,8 +265,6 @@ function ArchiveCard({ tile, index }: { tile: Tile; index: number }) {
           className="h-full w-full object-cover opacity-80 grayscale transition-all duration-700 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
         />
       </div>
-
-      {/* ── DATA FOOTER ── */}
       <div className="flex items-start justify-between border-t border-line pt-3 transition-colors duration-500 group-hover:border-ink">
         <div className="pr-4">
           <div className="mb-1 text-[9px] uppercase tracking-[0.2em] text-ink-dim transition-colors duration-500 group-hover:text-ink/80">
