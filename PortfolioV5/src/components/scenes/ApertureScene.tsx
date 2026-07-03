@@ -164,8 +164,8 @@ export default function ApertureScene() {
             <div className="text-ink-faint">Smooth - Hollow - S</div>
           </div>
           <div className="absolute right-6 top-24 text-right font-mono-x text-[10px] uppercase leading-relaxed text-ink-dim md:right-10">
-            <div>Full-Stack &amp; Mechatronics</div>
-            <div className="text-ink-faint">Portfolio MMXXVI</div>
+            <div>Full-Stack &amp; Design</div>
+            <div className="text-ink-faint">Portfolio V4</div>
           </div>
           <div className="absolute inset-x-0 bottom-12 flex flex-col items-center gap-3">
             <span className="t-label text-[12px] uppercase tracking-[0.4em] text-ink-soft">

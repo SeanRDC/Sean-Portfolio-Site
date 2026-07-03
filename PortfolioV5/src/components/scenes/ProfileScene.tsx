@@ -15,11 +15,9 @@ export default function ProfileScene() {
   const imgRef = useRef<HTMLImageElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
 
-  // New DOM Refs to bypass React State
   const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const statsRef = useRef<HTMLDivElement>(null);
 
-  // Track viewport size to seamlessly toggle between Pinning (Desktop) and Flowing (Mobile)
   const [isDesktop, setIsDesktop] = useState(
     () => typeof window !== "undefined" && window.innerWidth >= 768,
   );
@@ -36,32 +34,29 @@ export default function ProfileScene() {
 
       // --- DESKTOP LOGIC (Scrubbing & Pinning) ---
       mm.add("(min-width: 768px)", () => {
-        // 1. TEXT & STATS TIMELINE (Instant Scrub)
+        // 1. TEXT & STATS TIMELINE
         const textTl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: true, // Instant scrub for text
+            scrub: true,
           },
         });
 
-        // Create a 1-second master track to place animations at exact percentages
         textTl.to({}, { duration: 1 });
 
-        // Stagger the text colors from 0.08 to 0.82 progress
         textTl.to(
           wordsRef.current,
           {
-            color: "rgba(19,18,16,1)", // Solid ink color
-            stagger: 0.74 / WORDS.length, // Distribute evenly
+            color: "rgba(19,18,16,1)",
+            stagger: 0.74 / WORDS.length,
             duration: 0.05,
             ease: "none",
           },
           0.08,
         );
 
-        // Fade in the stats block at 0.80 progress
         textTl.fromTo(
           statsRef.current,
           { opacity: 0 },
@@ -69,13 +64,13 @@ export default function ProfileScene() {
           0.8,
         );
 
-        // 2. IMAGE TIMELINE (Delayed Scrub for premium feel)
+        // 2. IMAGE TIMELINE (Focus Pull Animation)
         const picTl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1, // 1-second delay for the image
+            scrub: 1,
           },
         });
 
@@ -87,7 +82,7 @@ export default function ProfileScene() {
             {
               filter: "blur(20px) brightness(1.5)",
               clipPath: "inset(0% 0% 0% 0%)",
-            }, // Ensure clip-path doesn't hide it
+            },
             { filter: "blur(0px) brightness(1)", ease: "none", duration: 0.79 },
             0.08,
           )
@@ -96,12 +91,18 @@ export default function ProfileScene() {
             { scale: 1.2 },
             { scale: 1, ease: "none", duration: 0.79 },
             0.08,
+          )
+          .fromTo(
+            metaRef.current,
+            { y: 15, opacity: 0 },
+            { y: 0, opacity: 1, ease: "power2.out", duration: 0.1 },
+            0.77,
           );
       });
 
       // --- MOBILE LOGIC (No Scrubbing, Natural Flow) ---
       mm.add("(max-width: 767px)", () => {
-        // Image Reveal
+        // Image Reveal (Focus Pull Animation)
         gsap.fromTo(
           imgContainerRef.current,
           {
@@ -147,11 +148,11 @@ export default function ProfileScene() {
           },
         );
 
-        // Text Highlight (Native GSAP Stagger)
+        // Text Highlight
         gsap.to(wordsRef.current, {
           color: "rgba(19,18,16,1)",
           duration: 0.4,
-          stagger: 0.04, // Lights up words consecutively
+          stagger: 0.04,
           ease: "none",
           scrollTrigger: { trigger: ".intro-text", start: "top 75%" },
         });
@@ -185,12 +186,19 @@ export default function ProfileScene() {
         className={`w-full overflow-hidden ${isDesktop ? "sticky top-0 flex h-screen items-center" : "relative pt-24 pb-24"}`}
       >
         <div className="mx-auto flex flex-col md:grid w-full max-w-7xl md:grid-cols-12 items-center gap-12 px-6 md:px-10">
-          {/* Portrait Plate */}
+          {/* Portrait Plate - Removed Border, Added Mask */}
           <div className="flex w-full justify-center md:col-span-5 md:block">
-            <div className="relative aspect-[3/4] w-[65%] sm:w-[55%] md:w-full max-w-[280px] md:max-w-md border border-line">
+            <div className="relative aspect-[3/4] w-[65%] sm:w-[55%] md:w-full max-w-[280px] md:max-w-md">
               <div
                 ref={imgContainerRef}
                 className="absolute inset-0 overflow-hidden will-change-transform"
+                style={{
+                  // This blends the hard edges of the image directly into the background
+                  WebkitMaskImage:
+                    "radial-gradient(ellipse at 50% 45%, black 45%, transparent 100%)",
+                  maskImage:
+                    "radial-gradient(ellipse at 50% 45%, black 45%, transparent 100%)",
+                }}
               >
                 <img
                   ref={imgRef}
@@ -209,7 +217,7 @@ export default function ProfileScene() {
 
                 <div
                   ref={metaRef}
-                  className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-5"
+                  className="absolute inset-x-0 bottom-8 flex items-end justify-between px-6 md:px-10"
                 >
                   <span className="t-label text-[10px] md:text-[12px] uppercase tracking-[0.2em] text-ink">
                     sean
@@ -220,7 +228,8 @@ export default function ProfileScene() {
                 </div>
               </div>
 
-              <div className="pointer-events-none absolute left-4 top-4 font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink-dim mix-blend-difference">
+              {/* Tag moved to sit comfortably within the blended edge */}
+              <div className="pointer-events-none absolute left-6 top-8 font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink-dim mix-blend-difference">
                 01 - Profile
               </div>
             </div>
@@ -242,7 +251,6 @@ export default function ProfileScene() {
                   ref={(el) => {
                     wordsRef.current[i] = el;
                   }}
-                  // Start out faint, GSAP will animate to solid ink directly
                   style={{ color: "rgba(19,18,16,0.14)" }}
                 >
                   {w}{" "}
