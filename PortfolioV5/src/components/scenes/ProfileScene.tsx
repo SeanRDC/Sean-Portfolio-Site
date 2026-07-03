@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -9,17 +9,15 @@ const COPY =
   "It started with pure curiosity — a kid staring at a terminal just to make the machine respond. That passion became a discipline: studying the deep theoretical foundations of computer science, and building the digital architecture that shapes our future.";
 const WORDS = COPY.split(" ");
 
-function clamp01(x: number) {
-  return Math.min(1, Math.max(0, x));
-}
-
 export default function ProfileScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const imgContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
 
-  const [progress, setProgress] = useState(0);
+  // New DOM Refs to bypass React State
+  const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const statsRef = useRef<HTMLDivElement>(null);
 
   // Track viewport size to seamlessly toggle between Pinning (Desktop) and Flowing (Mobile)
   const [isDesktop, setIsDesktop] = useState(
@@ -38,20 +36,46 @@ export default function ProfileScene() {
 
       // --- DESKTOP LOGIC (Scrubbing & Pinning) ---
       mm.add("(min-width: 768px)", () => {
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
-          onUpdate: (self) => setProgress(self.progress),
+        // 1. TEXT & STATS TIMELINE (Instant Scrub)
+        const textTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true, // Instant scrub for text
+          },
         });
 
+        // Create a 1-second master track to place animations at exact percentages
+        textTl.to({}, { duration: 1 });
+
+        // Stagger the text colors from 0.08 to 0.82 progress
+        textTl.to(
+          wordsRef.current,
+          {
+            color: "rgba(19,18,16,1)", // Solid ink color
+            stagger: 0.74 / WORDS.length, // Distribute evenly
+            duration: 0.05,
+            ease: "none",
+          },
+          0.08,
+        );
+
+        // Fade in the stats block at 0.80 progress
+        textTl.fromTo(
+          statsRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.12, ease: "none" },
+          0.8,
+        );
+
+        // 2. IMAGE TIMELINE (Delayed Scrub for premium feel)
         const picTl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1,
+            scrub: 1, // 1-second delay for the image
           },
         });
 
@@ -60,38 +84,34 @@ export default function ProfileScene() {
         picTl
           .fromTo(
             imgContainerRef.current,
-            { clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)" },
             {
-              clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-              ease: "none",
-              duration: 0.79,
-            },
+              filter: "blur(20px) brightness(1.5)",
+              clipPath: "inset(0% 0% 0% 0%)",
+            }, // Ensure clip-path doesn't hide it
+            { filter: "blur(0px) brightness(1)", ease: "none", duration: 0.79 },
             0.08,
           )
           .fromTo(
             imgRef.current,
-            { scale: 1.3 },
+            { scale: 1.2 },
             { scale: 1, ease: "none", duration: 0.79 },
             0.08,
-          )
-          .fromTo(
-            metaRef.current,
-            { y: 15, opacity: 0 },
-            { y: 0, opacity: 1, ease: "power2.out", duration: 0.1 },
-            0.77,
           );
       });
 
       // --- MOBILE LOGIC (No Scrubbing, Natural Flow) ---
       mm.add("(max-width: 767px)", () => {
-        // Image Reveal (Fires once when scrolling into view)
+        // Image Reveal
         gsap.fromTo(
           imgContainerRef.current,
-          { clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)" },
           {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            filter: "blur(20px) brightness(1.5)",
+            clipPath: "inset(0% 0% 0% 0%)",
+          },
+          {
+            filter: "blur(0px) brightness(1)",
             duration: 1.5,
-            ease: "power3.inOut",
+            ease: "power3.out",
             scrollTrigger: {
               trigger: imgContainerRef.current,
               start: "top 80%",
@@ -100,11 +120,11 @@ export default function ProfileScene() {
         );
         gsap.fromTo(
           imgRef.current,
-          { scale: 1.3 },
+          { scale: 1.2 },
           {
             scale: 1,
             duration: 1.5,
-            ease: "power3.inOut",
+            ease: "power3.out",
             scrollTrigger: {
               trigger: imgContainerRef.current,
               start: "top 80%",
@@ -127,17 +147,25 @@ export default function ProfileScene() {
           },
         );
 
-        // Text Highlight (Fires an automated timeline rather than scrubbing to mouse wheel)
-        gsap.to(
-          { val: 0 },
+        // Text Highlight (Native GSAP Stagger)
+        gsap.to(wordsRef.current, {
+          color: "rgba(19,18,16,1)",
+          duration: 0.4,
+          stagger: 0.04, // Lights up words consecutively
+          ease: "none",
+          scrollTrigger: { trigger: ".intro-text", start: "top 75%" },
+        });
+
+        // Stats Reveal
+        gsap.fromTo(
+          statsRef.current,
+          { opacity: 0 },
           {
-            val: 1,
-            duration: 2, // Takes 2 seconds to "read" through the text
-            ease: "power2.inOut",
+            opacity: 1,
+            duration: 0.8,
+            delay: 1.2,
+            ease: "power2.out",
             scrollTrigger: { trigger: ".intro-text", start: "top 75%" },
-            onUpdate: function () {
-              setProgress(this.targets()[0].val);
-            },
           },
         );
       });
@@ -151,7 +179,6 @@ export default function ProfileScene() {
     <section
       id="profile"
       ref={sectionRef}
-      // Only forces massive height on Desktop. Mobile gets normal document flow.
       className={`relative bg-paper ${isDesktop ? "h-[260vh]" : "min-h-screen"}`}
     >
       <div
@@ -209,27 +236,24 @@ export default function ProfileScene() {
             </div>
 
             <p className="t-display max-w-2xl text-[clamp(24px,3.4vw,46px)] leading-[1.12]">
-              {WORDS.map((w, i) => {
-                const start = 0.08 + (i / WORDS.length) * 0.74;
-                const wp = clamp01((progress - start) / 0.05);
-                return (
-                  <span
-                    key={i}
-                    style={{
-                      color: `rgba(19,18,16,${0.14 + wp * 0.86})`,
-                      transition: "color 0.1s linear",
-                    }}
-                  >
-                    {w}{" "}
-                  </span>
-                );
-              })}
+              {WORDS.map((w, i) => (
+                <span
+                  key={i}
+                  ref={(el) => {
+                    wordsRef.current[i] = el;
+                  }}
+                  // Start out faint, GSAP will animate to solid ink directly
+                  style={{ color: "rgba(19,18,16,0.14)" }}
+                >
+                  {w}{" "}
+                </span>
+              ))}
             </p>
 
-            {/* Stats Block (Stacked with lines on Mobile, Flex Wrap on Desktop) */}
+            {/* Stats Block */}
             <div
-              className="mt-8 md:mt-12 flex flex-col md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-4 divide-y divide-line md:divide-y-0 border-y border-line md:border-0"
-              style={{ opacity: clamp01((progress - 0.8) / 0.12) }}
+              ref={statsRef}
+              className="mt-8 md:mt-12 flex flex-col md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-4 divide-y divide-line md:divide-y-0 border-y border-line md:border-0 opacity-0"
             >
               {[
                 ["03+", "Years building"],
