@@ -14,6 +14,7 @@ export const TILES: Tile[] = [
     meta: "Cisco - Certified",
     kind: "CERT",
     image: "/certs/itn.webp",
+    link: "https://www.credly.com/badges/62be9ccd-87c7-411b-9571-c2fb008b82e2/linked_in_profile"
   },
   {
     label: "Google UX Design",

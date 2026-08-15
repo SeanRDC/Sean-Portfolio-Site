@@ -16,10 +16,10 @@ const TILES: Tile[] = [
     image: "/certs/cg1.webp",
   },
   {
-    label: "Responsive Web Design",
-    meta: "freeCodeCamp - 2025",
+    label: "IBM AI Developer",
+    meta: "Professional - 2026",
     kind: "CERT",
-    image: "/certs/fccrwb.webp",
+    image: "/certs/IBM/IBM.webp",
   },
   {
     label: "CSS Essentials",
