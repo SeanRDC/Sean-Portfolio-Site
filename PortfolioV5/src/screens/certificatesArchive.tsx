@@ -14,13 +14,11 @@ export default function CertificatesArchive() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const row1 = TILES.slice(0, 6);
-  const row2 = TILES.slice(6, 12);
-  const row3 = TILES.slice(12, 18);
-
-  const row1Items = [...row1, ...row1];
-  const row2Items = [...row2, ...row2];
-  const row3Items = [...row3, ...row3];
+  // Dynamically divide the array into 3 equal rows so it scales perfectly up to your 40+ certificates
+  const third = Math.ceil(TILES.length / 3);
+  const row1 = TILES.slice(0, third);
+  const row2 = TILES.slice(third, third * 2);
+  const row3 = TILES.slice(third * 2);
 
   useGSAP(
     () => {
@@ -153,13 +151,13 @@ export default function CertificatesArchive() {
 
         <section className="relative hidden lg:flex h-full w-full flex-col justify-center gap-8 overflow-hidden bg-paper/50 py-10 pl-8">
           <div className="archive-row scroll-left flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row1Items.map((t, i) => <ArchiveCard key={`r1-${i}`} tile={t} index={i} />)}
+            {row1.map((t, i) => <ArchiveCard key={`r1-${i}`} tile={t} index={i} />)}
           </div>
           <div className="archive-row scroll-right flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row2Items.map((t, i) => <ArchiveCard key={`r2-${i}`} tile={t} index={i} />)}
+            {row2.map((t, i) => <ArchiveCard key={`r2-${i}`} tile={t} index={i} />)}
           </div>
           <div className="archive-row scroll-left flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row3Items.map((t, i) => <ArchiveCard key={`r3-${i}`} tile={t} index={i} />)}
+            {row3.map((t, i) => <ArchiveCard key={`r3-${i}`} tile={t} index={i} />)}
           </div>
         </section>
       </div>
