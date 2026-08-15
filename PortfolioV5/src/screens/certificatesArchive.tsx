@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -14,25 +14,29 @@ export default function CertificatesArchive() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Dynamically divide the array into 3 equal rows so it scales perfectly up to your 40+ certificates
-  const third = Math.ceil(TILES.length / 3);
-  const row1 = TILES.slice(0, third);
-  const row2 = TILES.slice(third, third * 2);
-  const row3 = TILES.slice(third * 2);
+  const randomizedTiles = useMemo(() => {
+    const array = [...TILES];
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }, []);
+
+  const third = Math.ceil(randomizedTiles.length / 3);
+  const row1 = randomizedTiles.slice(0, third);
+  const row2 = randomizedTiles.slice(third, third * 2);
+  const row3 = randomizedTiles.slice(third * 2);
 
   useGSAP(
     () => {
-      // 1. INSTANTLY FIX MOBILE SCROLL POSITION
-      // Snaps the page to the top before the black overlay shrinks away
       window.scrollTo({ top: 0, behavior: "instant" });
 
-      // 2. SEAMLESS ENTRY: Shrink the black hole back into the original button coordinates
       const cx = location.state?.cx || window.innerWidth / 2;
       const cy = location.state?.cy || window.innerHeight - 100;
 
       const entryTl = gsap.timeline();
-      
-      // Changed to 200vmax to guarantee full screen coverage on tall mobile devices
+
       entryTl.fromTo(pageFadeRef.current, {
         clipPath: `circle(200vmax at ${cx}px ${cy}px)`
       }, {
@@ -41,44 +45,73 @@ export default function CertificatesArchive() {
         ease: "power3.inOut"
       });
 
-      // Stagger in the UI smoothly for both Mobile and Desktop
       entryTl.fromTo(".sidebar-item", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }, 0.4);
-      
+
       if (window.innerWidth >= 1024) {
         entryTl.fromTo(".archive-row", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 1.2, stagger: 0.15, ease: "power3.out" }, 0.4);
       } else {
         entryTl.fromTo(".mob-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, 0.4);
       }
 
-      // 3. DESKTOP SCROLL LOGIC
       const mm = gsap.matchMedia();
       mm.add("(min-width: 1024px)", () => {
+        // Pre-hint the compositor so these layers are promoted BEFORE scroll starts,
+        // instead of thrashing style/paint during the scroll itself.
+        gsap.set([".scroll-left", ".scroll-right"], {
+          force3D: true,
+          willChange: "transform"
+        });
+
+        // Track pointer-events state in a ref instead of writing to the DOM
+        // unconditionally on every scroll tick. Writing style.pointerEvents
+        // every onUpdate (even to the same value) forces a style recalc on
+        // every frame of the scrub — this was the main source of the stutter.
+        let pointerEventsDisabled = false;
+        let scrollTimeout: ReturnType<typeof setTimeout>;
+
         const scrollTl = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
             end: "+=300%",
-            scrub: 1,
+            scrub: 1.2,
             pin: true,
+            anticipatePin: 1,
+            onUpdate: () => {
+              if (!pointerEventsDisabled && containerRef.current) {
+                containerRef.current.style.pointerEvents = "none";
+                pointerEventsDisabled = true;
+              }
+              clearTimeout(scrollTimeout);
+              scrollTimeout = setTimeout(() => {
+                if (containerRef.current) {
+                  containerRef.current.style.pointerEvents = "auto";
+                }
+                pointerEventsDisabled = false;
+              }, 150);
+            }
           },
         });
 
         scrollTl.to(".scroll-left", { xPercent: -50, ease: "none", force3D: true }, 0);
         scrollTl.fromTo(".scroll-right", { xPercent: -50 }, { xPercent: 0, ease: "none", force3D: true }, 0);
+
+        return () => {
+          clearTimeout(scrollTimeout);
+          gsap.set([".scroll-left", ".scroll-right"], { willChange: "auto" });
+        };
       });
 
       return () => mm.revert();
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [] }
   );
 
-  // --- SEAMLESS EXIT BACK TO RING SCENE ---
   const handleBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const btn = e.currentTarget;
     const rect = btn.getBoundingClientRect();
-    
-    // Grab the exact center of the "Back" button
+
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
@@ -92,7 +125,6 @@ export default function CertificatesArchive() {
       duration: 1.2,
       ease: "power3.inOut",
       onComplete: () => {
-        // Send state to Ring Scene so it knows to reverse the animation!
         navigate("/#ring", { state: { returnToRing: true, cx, cy } });
         setTimeout(() => overlay.remove(), 100);
       }
@@ -101,20 +133,19 @@ export default function CertificatesArchive() {
 
   return (
     <div ref={containerRef} className="min-h-screen lg:h-screen w-full bg-paper font-mono-x text-ink lg:overflow-hidden relative">
-      
-      {/* OVERLAY STARTS FULLY COVERING THE SCREEN */}
-      <div 
-        ref={pageFadeRef} 
-        className="fixed inset-0 bg-ink z-[9999999] pointer-events-none" 
-        style={{ 
-          clipPath: `circle(200vmax at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)` 
-        }} 
+
+      <div
+        ref={pageFadeRef}
+        className="fixed inset-0 bg-ink z-[9999999] pointer-events-none"
+        style={{
+          clipPath: `circle(200vmax at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)`
+        }}
       />
 
       <div className="flex flex-col lg:grid lg:h-full w-full lg:grid-cols-[340px_1fr]">
         <aside className="relative z-20 flex w-full flex-col justify-between border-b lg:border-b-0 lg:border-r border-line bg-paper px-6 py-8 lg:px-8 lg:py-10 lg:h-full">
           <div className="space-y-12">
-            
+
             <button
               onClick={handleBack}
               className="sidebar-item group flex w-fit items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-ink-dim transition-colors hover:text-ink cursor-pointer bg-transparent border-none p-0 outline-none"
@@ -142,22 +173,22 @@ export default function CertificatesArchive() {
         </aside>
 
         <section className="flex lg:hidden w-full flex-col gap-8 bg-paper/50 px-6 py-10">
-          {TILES.map((t, i) => (
-            <div key={`mob-${i}`} className="mob-card">
+          {randomizedTiles.map((t, i) => (
+            <div key={`mob-${t.label}-${i}`} className="mob-card">
               <ArchiveCard tile={t} index={i} />
             </div>
           ))}
         </section>
 
         <section className="relative hidden lg:flex h-full w-full flex-col justify-center gap-8 overflow-hidden bg-paper/50 py-10 pl-8">
-          <div className="archive-row scroll-left flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row1.map((t, i) => <ArchiveCard key={`r1-${i}`} tile={t} index={i} />)}
+          <div className="archive-row scroll-left flex w-max gap-8">
+            {row1.map((t, i) => <ArchiveCard key={`r1-${t.label}-${i}`} tile={t} index={i} />)}
           </div>
-          <div className="archive-row scroll-right flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row2.map((t, i) => <ArchiveCard key={`r2-${i}`} tile={t} index={i} />)}
+          <div className="archive-row scroll-right flex w-max gap-8">
+            {row2.map((t, i) => <ArchiveCard key={`r2-${t.label}-${i}`} tile={t} index={i} />)}
           </div>
-          <div className="archive-row scroll-left flex w-max gap-8 will-change-transform" style={{ transform: "translateZ(0)" }}>
-            {row3.map((t, i) => <ArchiveCard key={`r3-${i}`} tile={t} index={i} />)}
+          <div className="archive-row scroll-left flex w-max gap-8">
+            {row3.map((t, i) => <ArchiveCard key={`r3-${t.label}-${i}`} tile={t} index={i} />)}
           </div>
         </section>
       </div>
@@ -175,7 +206,7 @@ function ArchiveCard({ tile, index }: { tile: Tile; index: number }) {
             <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M5 19L19 5M5 5h14v14" />
           </svg>
         </div>
-        <img src={tile.image} alt={tile.label} draggable={false} decoding="async" fetchPriority={index < 4 ? "high" : "auto"} loading={index < 4 ? "eager" : "lazy"} className="h-full w-full object-cover opacity-80 grayscale transition-all duration-700 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0" />
+        <img src={tile.image} alt={tile.label} draggable={false} decoding="async" fetchPriority={index < 3 ? "high" : "auto"} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover opacity-80 grayscale transition-[transform,filter,opacity] duration-500 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0" />
       </div>
       <div className="flex items-start justify-between border-t border-line pt-3 transition-colors duration-500 group-hover:border-ink">
         <div className="pr-4">

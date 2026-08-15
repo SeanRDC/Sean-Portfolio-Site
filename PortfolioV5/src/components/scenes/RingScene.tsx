@@ -66,8 +66,8 @@ const TILES: Tile[] = [
 ];
 
 const N = TILES.length;
-const IMG_W = 260;
-const IMG_H = 180;
+const IMG_W = 360;
+const IMG_H = 260;
 const SLICES = 10;
 const SLICE_W = IMG_W / SLICES;
 const CYL_R = 400;
