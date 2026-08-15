@@ -22,16 +22,16 @@ const TILES: Tile[] = [
     image: "/certs/IBM/IBM.webp",
   },
   {
-    label: "CSS Essentials",
-    meta: "Cisco - 2026",
+    label: "OWASP Top 10 - 2021",
+    meta: "Infosec - 2026",
     kind: "CERT",
-    image: "/certs/cse.webp",
+    image: "/certs/OWASP.webp",
   },
   {
-    label: "HTML Essentials",
-    meta: "Cisco - 2025",
+    label: "AI Fluency: Capabilities & Limitations",
+    meta: "Antrophic Academy - 2026",
     kind: "CERT",
-    image: "/certs/he.webp",
+    image: "/certs/Antrophic/A1.webp",
   },
   {
     label: "JavaScript Essentials 2",
@@ -40,10 +40,10 @@ const TILES: Tile[] = [
     image: "/certs/je2.webp",
   },
   {
-    label: "Python Essentials 2",
-    meta: "Cisco - 2024",
+    label: "Python for Data Science, AI & Development",
+    meta: "IBM - 2026",
     kind: "CERT",
-    image: "/certs/pe2.webp",
+    image: "/certs/IBM/I5.webp",
   },
   {
     label: "Foundations of UX Design",
@@ -52,10 +52,10 @@ const TILES: Tile[] = [
     image: "/certs/cg2.webp",
   },
   {
-    label: "Figma HighFigh Prototypes",
-    meta: "Google - 2025",
+    label: "Building Gen AI Powered Apps",
+    meta: "IBM - 2026",
     kind: "CERT",
-    image: "/certs/cg5.webp",
+    image: "/certs/IBM/I7.webp",
   },
   {
     label: "Dynamic UI for Web",
@@ -123,6 +123,8 @@ const CurvedImage = ({ src }: { src: string }) => {
               transformOrigin: `50% 50% ${-CYL_R}px`,
               transform: `rotateY(${angle}deg)`,
               willChange: "transform",
+              imageRendering: "crisp-edges" as any,
+              backfaceVisibility: "hidden",
             }}
           />
         );
@@ -178,8 +180,11 @@ export default function RingScene() {
       const pos = getPos(imgT);
       const rotDeg = (pos.rotY * 180) / Math.PI;
       const depth = (pos.z + ORBIT_RZ) / (ORBIT_RZ * 2);
-      const scale = 0.4 + depth * 0.6;
-      const blurPx = (1 - depth) * 12;
+      
+      const scale = 0.2 + depth * 0.4;
+      const rawBlur = (1 - depth) * 12;
+      const blurPx = rawBlur < 1.5 ? 0 : rawBlur;
+      
       const brightness = 0.2 + depth * 0.8;
 
       let alpha = 1;
