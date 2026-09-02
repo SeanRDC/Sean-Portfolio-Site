@@ -27,7 +27,6 @@ const renderText = (text: string) => {
 
 export default function ProfileScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
 
   useGSAP(
     () => {
@@ -79,23 +78,6 @@ export default function ProfileScene() {
           });
         },
       });
-
-      // 2. Image Reveal
-      gsap.fromTo(
-        imageRef.current,
-        { scale: 1.1, filter: "blur(10px)", opacity: 0 },
-        {
-          scale: 1,
-          filter: "blur(0px)",
-          opacity: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: imageRef.current,
-            start: "top 85%",
-          },
-        }
-      );
     },
     { scope: sectionRef }
   );
@@ -282,10 +264,7 @@ export default function ProfileScene() {
               </div>
 
               {/* 2. Profile Image Block (Stacked below) */}
-              <div 
-                ref={imageRef} 
-                className="relative w-full aspect-[4/3] overflow-hidden"
-              >
+              <div className="relative w-full aspect-[4/3] overflow-hidden">
                 <img
                   src="/sean-profile.webp"
                   alt="Sean"
