@@ -43,8 +43,6 @@ export default function ProfileScene() {
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        // You currently have this set to start right at the top (1%). 
-        // If you want it dead-centered, change to: start: "top 50%", end: "bottom 50%"
         start: "top 80%",
         end: "bottom 60%",
         scrub: 0.1,
@@ -106,7 +104,7 @@ export default function ProfileScene() {
     <section
       id="profile"
       ref={sectionRef}
-      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center"
+      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.15)]"
     >
       <style>{`
         :root {
@@ -274,7 +272,6 @@ export default function ProfileScene() {
               <p>Bachelor of Computer Science.</p>
               <p>+03 years of Building.</p>
               <p>Backend AI Engineer Intern.</p>
-              <p>40+ Certifications.</p>
             </div>
 
             {/* Container for the stacked visuals */}
