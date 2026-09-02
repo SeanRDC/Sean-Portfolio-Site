@@ -168,9 +168,7 @@ export default function ProjectsScene() {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeGalleryIdx, setActiveGalleryIdx] = useState(0);
-  const [isListView, setIsListView] = useState(
-    () => typeof window !== "undefined" && window.innerWidth < 768,
-  );
+  const [isListView, setIsListView] = useState(true);
 
   useGSAP(
     () => {
