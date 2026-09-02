@@ -101,6 +101,7 @@ export default function ApertureScene() {
             tint={0.6}
             flow={0.7}
             contrast={0.7}
+            interactive
           />
           <div
             className="absolute inset-0"

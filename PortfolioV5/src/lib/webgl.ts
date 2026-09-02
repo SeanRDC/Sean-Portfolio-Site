@@ -1,4 +1,3 @@
-
 export const QUAD_VS = `
 attribute vec2 aPos;
 varying vec2 vUv;

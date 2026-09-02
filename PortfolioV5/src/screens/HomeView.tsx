@@ -1,4 +1,3 @@
-import FilmGrain from "../components/FilmGrain";
 import Nav from "../components/Nav";
 import ApertureScene from "../components/scenes/ApertureScene";
 import ProfileScene from "../components/scenes/ProfileScene";
@@ -10,7 +9,6 @@ import ContactScene from "../components/scenes/ContactScene";
 export default function HomeView() {
   return (
     <div className="relative bg-paper">
-      <FilmGrain />
       <Nav />
       <main className="relative z-10">
         <ApertureScene />
