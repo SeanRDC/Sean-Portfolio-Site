@@ -86,7 +86,7 @@ export default function ProfileScene() {
     <section
       id="profile"
       ref={sectionRef}
-      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-30px_40px_-15px_rgba(0,0,0,0.15)]"
+      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-30px_40px_-15px_rgba(0,0,0,0.15)] rounded-t-[50px]"
     >
       <style>{`
         :root {
