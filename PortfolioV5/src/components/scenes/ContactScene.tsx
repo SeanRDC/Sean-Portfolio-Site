@@ -29,7 +29,7 @@ export default function ContactScene() {
             trigger: sectionRef.current,
             start: "top 60%",
             end: "top top",
-            scrub: true,
+            scrub: 0.5, 
           },
         },
       );
@@ -62,14 +62,14 @@ export default function ContactScene() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative flex h-screen flex-col justify-between bg-paper px-6 pb-8 pt-32 transition-colors duration-0 md:px-16"
+      className="relative flex h-screen flex-col justify-between bg-paper px-6 pb-8 pt-32 md:px-16"
     >
       {/* Top indicator */}
       <div className="font-mono-x text-[11px] uppercase tracking-[0.4em] text-ink-dim">
         05 - The Finale
       </div>
 
-      {/* Main Colossal CTA - Original Layout */}
+      {/* Main Colossal CTA */}
       <div className="flex flex-1 flex-col justify-center">
         <h2
           ref={textRef}
@@ -79,7 +79,6 @@ export default function ContactScene() {
           <br />
           TOUCH
         </h2>
-
         <a
           href="mailto:delacruzseanrhani@gmail.com"
           className="group mt-12 inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink"
@@ -115,7 +114,7 @@ export default function ContactScene() {
           </a>
         </div>
         <div className="font-mono-x hidden text-right text-[10px] uppercase tracking-widest text-ink-dim md:block">
-          Local Time —{" "}
+          Local Time :{" "}
           {new Date().toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
