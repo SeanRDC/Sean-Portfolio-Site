@@ -1,282 +1,313 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const COPY =
-  "It started with pure curiosity — a kid staring at a terminal just to make the machine respond. That passion became a discipline: studying the deep theoretical foundations of computer science, and building the digital architecture that shapes our future.";
-const WORDS = COPY.split(" ");
+const P1 = "21 year old Full-Stack Agentic AI Automation Developer based in the Philippines, pursuing my Bachelor's degree in Computer Science while interning as a Backend AI Engineer at Flyrank AI.";
+const P2 = "A Python enthusiast, solving everyday coding challenges. Technical expertise backed by professional certifications in Google's UI/UX Design, IBM's AI Development, and n8n professional workflow automation.";
+
+// Helper function to split text into words and characters for the GSAP wave animation
+const renderText = (text: string) => {
+  return text.split(" ").map((word, wIdx) => (
+    <span key={wIdx} className="inline-block mr-[0.25em]">
+      {word.split("").map((char, cIdx) => (
+        <span
+          key={cIdx}
+          className="wave-char inline-block"
+          style={{ color: "rgba(19, 18, 16, 0.15)" }} 
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  ));
+};
 
 export default function ProfileScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const imgContainerRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const metaRef = useRef<HTMLDivElement>(null);
-
-  const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const statsRef = useRef<HTMLDivElement>(null);
-
-  const [isDesktop, setIsDesktop] = useState(
-    () => typeof window !== "undefined" && window.innerWidth >= 768,
-  );
-
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      // 1. Text Wave Animation
+      const chars = gsap.utils.toArray(".wave-char");
+      const startColor = "rgba(19, 18, 16, 0.15)";
+      const waveColor = "rgba(19, 18, 16, 1)"; 
+      const endColor = "rgba(19, 18, 16, 1)"; 
 
-      // --- DESKTOP LOGIC (Scrubbing & Pinning) ---
-      mm.add("(min-width: 768px)", () => {
-        // 1. TEXT & STATS TIMELINE
-        const textTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: true,
-          },
-        });
+      const activeChars = new Set();
+      const progress = { value: 0 };
+      let isReady = true;
 
-        textTl.to({}, { duration: 1 });
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        // You currently have this set to start right at the top (1%). 
+        // If you want it dead-centered, change to: start: "top 50%", end: "bottom 50%"
+        start: "top 80%",
+        end: "bottom 60%",
+        scrub: 0.1,
+        onUpdate: (self) => {
+          if (!isReady) return;
+          progress.value = self.progress;
+          const activeCount = Math.round(progress.value * chars.length);
 
-        textTl.to(
-          wordsRef.current,
-          {
-            color: "rgba(19,18,16,1)",
-            stagger: 0.74 / WORDS.length,
-            duration: 0.05,
-            ease: "none",
-          },
-          0.08,
-        );
+          chars.forEach((char: any, index) => {
+            const isActive = index < activeCount;
 
-        textTl.fromTo(
-          statsRef.current,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.12, ease: "none" },
-          0.8,
-        );
+            if (isActive && !activeChars.has(char)) {
+              activeChars.add(char);
+              gsap.killTweensOf(char);
+              gsap
+                .timeline()
+                .to(char, {
+                  color: waveColor,
+                  duration: 0.1,
+                  ease: "power2.out",
+                })
+                .to(char, {
+                  color: endColor,
+                  duration: 0.2,
+                  ease: "power2.in",
+                });
+            }
 
-        // 2. IMAGE TIMELINE (Focus Pull Animation)
-        const picTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1,
-          },
-        });
-
-        picTl.to({}, { duration: 1 });
-
-        picTl
-          .fromTo(
-            imgContainerRef.current,
-            {
-              filter: "blur(20px) brightness(1.5)",
-              clipPath: "inset(0% 0% 0% 0%)",
-            },
-            { filter: "blur(0px) brightness(1)", ease: "none", duration: 0.79 },
-            0.08,
-          )
-          .fromTo(
-            imgRef.current,
-            { scale: 1.2 },
-            { scale: 1, ease: "none", duration: 0.79 },
-            0.08,
-          )
-          .fromTo(
-            metaRef.current,
-            { y: 15, opacity: 0 },
-            { y: 0, opacity: 1, ease: "power2.out", duration: 0.1 },
-            0.77,
-          );
+            if (!isActive && activeChars.has(char)) {
+              activeChars.delete(char);
+              gsap.killTweensOf(char);
+              gsap.to(char, { color: startColor, duration: 0.2, ease: "none" });
+            }
+          });
+        },
       });
 
-      // --- MOBILE LOGIC (No Scrubbing, Natural Flow) ---
-      mm.add("(max-width: 767px)", () => {
-        // Image Reveal (Focus Pull Animation)
-        gsap.fromTo(
-          imgContainerRef.current,
-          {
-            filter: "blur(20px) brightness(1.5)",
-            clipPath: "inset(0% 0% 0% 0%)",
+      // 2. Image Reveal
+      gsap.fromTo(
+        imageRef.current,
+        { scale: 1.1, filter: "blur(10px)", opacity: 0 },
+        {
+          scale: 1,
+          filter: "blur(0px)",
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: imageRef.current,
+            start: "top 85%",
           },
-          {
-            filter: "blur(0px) brightness(1)",
-            duration: 1.5,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: imgContainerRef.current,
-              start: "top 80%",
-            },
-          },
-        );
-        gsap.fromTo(
-          imgRef.current,
-          { scale: 1.2 },
-          {
-            scale: 1,
-            duration: 1.5,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: imgContainerRef.current,
-              start: "top 80%",
-            },
-          },
-        );
-        gsap.fromTo(
-          metaRef.current,
-          { y: 15, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            delay: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: imgContainerRef.current,
-              start: "top 80%",
-            },
-          },
-        );
-
-        // Text Highlight
-        gsap.to(wordsRef.current, {
-          color: "rgba(19,18,16,1)",
-          duration: 0.4,
-          stagger: 0.04,
-          ease: "none",
-          scrollTrigger: { trigger: ".intro-text", start: "top 75%" },
-        });
-
-        // Stats Reveal
-        gsap.fromTo(
-          statsRef.current,
-          { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 0.8,
-            delay: 1.2,
-            ease: "power2.out",
-            scrollTrigger: { trigger: ".intro-text", start: "top 75%" },
-          },
-        );
-      });
-
-      return () => mm.revert();
+        }
+      );
     },
-    { scope: sectionRef },
+    { scope: sectionRef }
   );
 
   return (
     <section
       id="profile"
       ref={sectionRef}
-      className={`relative bg-paper ${isDesktop ? "h-[260vh]" : "min-h-screen"}`}
+      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center"
     >
-      <div
-        className={`w-full overflow-hidden ${isDesktop ? "sticky top-0 flex h-screen items-center" : "relative pt-24 pb-24"}`}
-      >
-        <div className="mx-auto flex flex-col md:grid w-full max-w-7xl md:grid-cols-12 items-center gap-12 px-6 md:px-10">
-          {/* Portrait Plate - Removed Border, Added Mask */}
-          <div className="flex w-full justify-center md:col-span-5 md:block">
-            <div className="relative aspect-[3/4] w-[65%] sm:w-[55%] md:w-full max-w-[280px] md:max-w-md">
-              <div
-                ref={imgContainerRef}
-                className="absolute inset-0 overflow-hidden will-change-transform"
-                style={{
-                  // This blends the hard edges of the image directly into the background
-                  WebkitMaskImage:
-                    "radial-gradient(ellipse at 50% 45%, black 45%, transparent 100%)",
-                  maskImage:
-                    "radial-gradient(ellipse at 50% 45%, black 45%, transparent 100%)",
-                }}
+      <style>{`
+        :root {
+          --light-gray: #d6d2c8;
+          --dark-gray: #55524e;
+          --gray: #9b9484;
+          --dark-blue: #2b293e;
+          --light-blue: #35b7da;
+        }
+
+        #computer {
+          position: absolute;
+          width: 340px;
+          height: 300px;
+          top: 50%;
+          left: 50%;
+          /* Scaled down to fit comfortably in its own block above the image */
+          transform: translate(-50%, -50%) scale(0.5);
+          z-index: 10;
+          pointer-events: none;
+          background:
+          /* Bottom Section */
+          repeating-linear-gradient(90deg, var(--gray) 0 10px, var(--light-gray) 10px 18px) 258px 236px / 64px 10px,
+          repeating-linear-gradient(90deg, var(--dark-gray) 0 10px, var(--light-gray) 10px 18px) 258px 246px / 64px 38px,
+          linear-gradient(var(--dark-gray), var(--dark-gray)) 166px 264px / 10px 14px,
+          linear-gradient(var(--light-gray) 10px, var(--dark-gray) 10px) 144px 248px / 80px 20px,
+          linear-gradient(90deg, var(--dark-gray) 10px, var(--gray) 10px) 124px 236px / 110px 48px,
+          linear-gradient(90deg, var(--gray) 10px, var(--light-gray) 10px) 90px 230px / 250px 60px,
+          linear-gradient(90deg, var(--gray) 10px, var(--light-gray) 10px) 100px 220px / 240px 80px,
+          linear-gradient(var(--dark-gray), var(--dark-gray)) 10px bottom / 330px 80px,
+          linear-gradient(var(--dark-gray), var(--dark-gray)) left bottom / 320px 70px,
+
+          /* Top Section */
+          linear-gradient(90deg, var(--gray) 18px, var(--light-gray) 18px 26px, var(--gray) 26px 36px, var(--dark-gray) 36px 122px, var(--light-gray) 122px 160px, var(--gray) 160px) 120px 180px / 170px 10px,
+          linear-gradient(var(--gray) 10px, var(--dark-blue) 10px 150px, var(--gray) 150px) 130px 10px / 150px 160px,
+          linear-gradient(90deg, var(--gray) 10px, var(--dark-blue) 10px 180px, var(--gray) 180px) 110px 30px / 190px 120px,
+          linear-gradient(var(--gray), var(--gray)) 120px 20px / 170px 140px,
+          linear-gradient(var(--light-gray), var(--light-gray)) 110px top / 190px 200px,
+          linear-gradient(90deg, var(--gray) 10px, var(--light-gray) 10px) 90px 10px / 220px 180px,
+          linear-gradient(var(--gray), var(--gray)) 100px top / 200px 200px,
+          linear-gradient(var(--dark-gray), var(--dark-gray)) 40px top / 260px 200px,
+          linear-gradient(90deg, var(--dark-gray) 50%, var(--light-gray) 50%) 30px 10px / 280px 180px,
+
+          /* Back section */
+          linear-gradient(90deg, var(--dark-gray) 96px, var(--gray) 96px) 70px 210px / 216px 14px,
+          linear-gradient(var(--dark-gray), var(--dark-gray)) 90px 190px / 178px 30px;
+          background-repeat: no-repeat;
+        }
+
+        #computer::before {
+          content: "";
+          display: block;
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          top: 95px;
+          left: 175px;
+          background-color: var(--light-blue);
+          animation: hello 3500ms linear infinite forwards alternate;
+        }
+
+        @keyframes hello {
+          0%, 18% {
+            box-shadow: 
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            40px -30px 0 var(--light-blue),
+            40px -20px 0 var(--light-blue),
+            10px -30px 0 var(--light-blue),
+            10px -20px 0 var(--light-blue),
+            50px 0 0 var(--light-blue),
+            40px 10px 0 var(--light-blue),
+            30px 10px 0 var(--light-blue),
+            20px 10px 0 var(--light-blue),
+            10px 10px 0 var(--light-blue);
+          }
+          24%, 38% {
+            box-shadow:
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            50px -30px 0 var(--light-blue),
+            40px -20px 0 var(--light-blue),
+            0 -30px 0 var(--light-blue),
+            10px -20px 0 var(--light-blue),
+            50px 0 0 var(--light-blue),
+            40px 10px 0 var(--light-blue),
+            30px 0 0 var(--light-blue),
+            20px 10px 0 var(--light-blue),
+            10px 10px 0 var(--light-blue);
+          }
+          44%, 58% {
+            box-shadow:
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            50px -30px 0 var(--light-blue),
+            50px 0 0 var(--light-blue),
+            40px 10px 0 var(--light-blue),
+            30px -20px 0 var(--light-blue),
+            30px 0 0 var(--light-blue),
+            30px 10px 0 var(--light-blue),
+            10px -10px var(--light-blue),
+            0 -30px 0 var(--light-blue),
+            0 -20px 0 var(--light-blue),
+            0 10px 0 var(--light-blue);
+          }
+          64%, 78% {
+            box-shadow:
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            0 0 0 var(--light-blue),
+            50px -30px 0 var(--light-blue),
+            50px 0 0 var(--light-blue),
+            50px 10px 0 var(--light-blue),
+            30px -30px 0 var(--light-blue),
+            30px -20px 0 var(--light-blue),
+            30px 0 0 var(--light-blue),
+            30px 10px 0 var(--light-blue),
+            10px -10px var(--light-blue),
+            0 -30px 0 var(--light-blue),
+            0 -20px 0 var(--light-blue),
+            0 10px 0 var(--light-blue);
+          }
+          84%, 100% {
+            box-shadow:
+            50px -30px 0 var(--light-blue),
+            50px -10px 0 var(--light-blue),
+            50px 0 0 var(--light-blue),
+            50px 10px 0 var(--light-blue),
+            30px -30px 0 var(--light-blue),
+            30px -20px 0 var(--light-blue),
+            30px -10px 0 var(--light-blue),
+            30px 0 0 var(--light-blue),
+            30px 10px 0 var(--light-blue),
+            20px -10px 0 var(--light-blue),
+            10px -10px 0 var(--light-blue),
+            0 -30px 0 var(--light-blue),
+            0 -20px 0 var(--light-blue),
+            0 -10px var(--light-blue),
+            0 10px 0 var(--light-blue);
+          }
+        }
+      `}</style>
+
+      <div className="mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-16">
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-16 md:gap-8 items-stretch">
+          
+          {/* LEFT COLUMN: Labels (Top), Computer (Middle), Image (Bottom) */}
+          <div className="md:col-span-4 flex flex-col justify-between">
+            <div className="font-mono-x text-[10px] md:text-[11px] uppercase tracking-[0.1em] text-ink-dim leading-[1.8]">
+              <p>Full-Stack Developer.</p>
+              <p>AI Automation.</p>
+              <p>UI/UX Design.</p>
+              <p>Bachelor of Computer Science.</p>
+              <p>+03 years of Building.</p>
+              <p>Backend AI Engineer Intern.</p>
+              <p>40+ Certifications.</p>
+            </div>
+
+            {/* Container for the stacked visuals */}
+            <div className="mt-16 md:mt-auto flex flex-col items-center md:items-start self-start w-[80%] max-w-[320px]">
+              
+              {/* 1. Computer Block (Stacked on top) */}
+              <div className="relative w-full h-[160px] md:h-[118px] mb-4">
+                <div id="computer"></div>
+              </div>
+
+              {/* 2. Profile Image Block (Stacked below) */}
+              <div 
+                ref={imageRef} 
+                className="relative w-full aspect-[4/3] overflow-hidden"
               >
                 <img
-                  ref={imgRef}
                   src="/sean-profile.webp"
                   alt="Sean"
-                  className="h-full w-full object-cover will-change-transform"
+                  className="w-full h-full object-cover"
                 />
-
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent 55%, rgba(19,18,16,0.18) 100%)",
-                  }}
-                />
-
-                <div
-                  ref={metaRef}
-                  className="absolute inset-x-0 bottom-8 flex items-end justify-between px-6 md:px-10"
-                >
-                  <span className="t-label text-[10px] md:text-[12px] uppercase tracking-[0.2em] text-ink">
-                    sean
-                  </span>
-                  <span className="font-mono-x text-[8px] md:text-[10px] uppercase text-ink-dim">
-                    Portrait / 2024
-                  </span>
-                </div>
               </div>
 
-              {/* Tag moved to sit comfortably within the blended edge */}
-              <div className="pointer-events-none absolute left-6 top-8 font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink-dim mix-blend-difference">
-                01 - Profile
-              </div>
             </div>
           </div>
 
-          {/* Word-by-Word Intro */}
-          <div className="intro-text w-full md:col-span-7 md:pl-6">
-            <div className="mb-4 md:mb-8 flex items-center gap-4">
-              <span className="font-mono-x text-[11px] uppercase tracking-[0.4em] text-ink-soft">
-                The Introduction
-              </span>
-              <span className="h-px flex-1 bg-line" />
-            </div>
-
-            <p className="t-display max-w-2xl text-[clamp(24px,3.4vw,46px)] leading-[1.12]">
-              {WORDS.map((w, i) => (
-                <span
-                  key={i}
-                  ref={(el) => {
-                    wordsRef.current[i] = el;
-                  }}
-                  style={{ color: "rgba(19,18,16,0.14)" }}
-                >
-                  {w}{" "}
-                </span>
-              ))}
-            </p>
-
-            {/* Stats Block */}
-            <div
-              ref={statsRef}
-              className="mt-8 md:mt-12 flex flex-col md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-4 divide-y divide-line md:divide-y-0 border-y border-line md:border-0 opacity-0"
-            >
-              {[
-                ["03+", "Years building"],
-                ["ComSci", "Career path"],
-                ["20+", "Certificates"],
-              ].map(([k, v]) => (
-                <div key={k} className="py-4 md:py-0">
-                  <div className="t-sub text-[26px] text-ink">{k}</div>
-                  <div className="font-mono-x text-[11px] uppercase tracking-wider text-ink-dim">
-                    {v}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* RIGHT COLUMN: The wave text */}
+          <div className="md:col-span-8 flex flex-col justify-center">
+            <h2 className="t-display text-[clamp(18px,3vw,50px)] leading-[1.05] tracking-tight text-ink m-0 max-w-4xl">
+              <div className="mb-8">{renderText(P1)}</div>
+              <div>{renderText(P2)}</div>
+            </h2>
           </div>
+          
         </div>
       </div>
     </section>
