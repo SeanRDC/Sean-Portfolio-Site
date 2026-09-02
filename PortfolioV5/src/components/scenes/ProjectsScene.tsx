@@ -583,6 +583,7 @@ export default function ProjectsScene() {
         ref={sectionRef}
         className={`relative bg-paper ${isListView ? "cursor-none" : ""}`}
         style={{ height: isListView ? "auto" : `${(N + 1) * 100}vh` }}
+        id="projects"
       >
         <div
           ref={previewRef}

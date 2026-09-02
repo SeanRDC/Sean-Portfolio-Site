@@ -22,7 +22,7 @@ export default function Nav() {
   useGSAP(() => {
     ScrollTrigger.create({
       trigger: "#contact",
-      start: "top 60%",
+      start: "top 60%", 
       onEnter: () =>
         gsap.to(navRef.current, {
           yPercent: -100,
@@ -57,6 +57,38 @@ export default function Nav() {
     };
   }, []);
 
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const target = document.getElementById(id);
+    if (!target) return;
+    const st = ScrollTrigger.getAll().find((t) => t.trigger === target);
+    let targetY = st ? st.start : target.getBoundingClientRect().top + window.scrollY;
+
+    if (id === "projects") {
+      targetY += 500;
+    } else if (id === "profile") {
+      targetY += 770;
+    } else if (id === "stack") {
+      targetY += 150;
+    } else if (id === "ring") {
+      targetY += 3500;
+    } else if (id === "contact") {
+      targetY += 5000
+    }
+
+    gsap.to(
+      { y: window.scrollY },
+      {
+        y: targetY,
+        duration: 1.2,
+        ease: "power3.inOut",
+        onUpdate: function () {
+          window.scrollTo(0, this.targets()[0].y);
+        },
+      }
+    );
+  };
+
   // Tell ProjectsScene to run the exit animation when Back is clicked
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -81,8 +113,13 @@ export default function Nav() {
       }}
     >
       <div className="flex items-center justify-between px-6 py-4 md:px-10">
+        
         {/* Dynamic Logo */}
-        <a href="#aperture" className="flex items-center gap-3">
+        <a 
+          href="#aperture" 
+          onClick={(e) => handleScroll(e, "aperture")}
+          className="flex items-center gap-3"
+        >
           <span
             className="h-1.5 w-1.5 transition-colors"
             style={{
@@ -131,6 +168,7 @@ export default function Nav() {
                 <a
                   key={l.id}
                   href={`#${l.id}`}
+                  onClick={(e) => handleScroll(e, l.id)}
                   className="group flex items-baseline gap-1.5"
                 >
                   <span className="font-mono-x text-[10px] text-ink-faint group-hover:text-ink">
@@ -144,6 +182,7 @@ export default function Nav() {
             </nav>
             <a
               href="#contact"
+              onClick={(e) => handleScroll(e, "contact")}
               className="t-label hidden border border-line-strong px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper sm:inline-block"
             >
               Contact Me
