@@ -28,7 +28,7 @@ export default function ContactScene() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 60%",
-            end: "top top",
+            end: "top 20%",
             scrub: 0.5, 
           },
         },

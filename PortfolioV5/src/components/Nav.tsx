@@ -73,7 +73,7 @@ export default function Nav() {
     } else if (id === "ring") {
       targetY += 3500;
     } else if (id === "contact") {
-      targetY += 5000
+      targetY += 1000
     }
 
     gsap.to(
