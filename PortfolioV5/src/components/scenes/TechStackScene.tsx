@@ -132,6 +132,7 @@ export default function TechStackScene() {
     () => {
       // Only run the ScrollTrigger logic on md screens (768px) and up
       const mm = gsap.matchMedia();
+
       mm.add("(min-width: 768px)", () => {
         ScrollTrigger.create({
           trigger: sectionRef.current,
@@ -141,6 +142,7 @@ export default function TechStackScene() {
           onUpdate: (self) => setProgress(self.progress),
         });
       });
+
       return () => mm.revert();
     },
     { scope: sectionRef },
@@ -153,9 +155,6 @@ export default function TechStackScene() {
       className="relative bg-paper"
       style={{ height: isDesktop ? "300vh" : "auto" }}
     >
-      {/* On desktop: sticky, h-screen, hides overflow for GSAP scrubbing
-        On mobile: relative, normal document flow 
-      */}
       <div
         className={`w-full border-y border-line ${isDesktop ? "sticky top-0 h-screen overflow-hidden" : "relative min-h-screen"}`}
       >
@@ -174,8 +173,8 @@ export default function TechStackScene() {
               One continuous system - from the database layer to the DOM, from
               the circuit to the chassis.
             </p>
-
-            {/* Hidden on mobile since there is no scrubbing timeline to track */}
+            
+            {/* Loading Bar Tracker */}
             <div className="mt-6 md:mt-8 items-center gap-3 hidden md:flex">
               <div className="h-px w-24 bg-line-strong">
                 <div
@@ -201,22 +200,30 @@ export default function TechStackScene() {
                 isDesktop
                   ? {
                       top: "50%",
-                      transform: `translateY(calc(-${progress * 100}% + 26vh))`,
+                      transform: `translateY(-${progress * 100}%)`,
                       willChange: "transform",
                     }
-                  : {} // No inline styles on mobile, let natural scroll take over
+                  : {} 
               }
             >
               {STACK.map((cat, i) => {
                 const center = (i + 0.5) / STACK.length;
-                const near = 1 - clamp01(Math.abs(progress - center) / 0.18);
+                // Tightened from 0.15 to 0.12 to snap into focus a bit quicker
+                const near = 1 - clamp01(Math.abs(progress - center) / 0.12);
 
                 return (
                   <div
                     key={cat.name}
                     className="flex flex-col gap-4 border-b border-line py-6 md:py-8"
-                    // Highlight effect only runs on Desktop during scrub
-                    style={{ opacity: isDesktop ? 0.35 + near * 0.65 : 1 }}
+                    style={
+                      isDesktop
+                        ? {
+                            opacity: 0.55 + near * 0.95,
+                            filter: `blur(${(1 - near) * 1}px)`,
+                            transform: `scale(${0.96 + near * 0.04})`,
+                          }
+                        : { opacity: 1 }
+                    }
                   >
                     <div className="flex items-center gap-4 md:gap-6">
                       <span className="font-mono-x w-6 md:w-8 text-[10px] md:text-[12px] text-ink-faint">
@@ -231,7 +238,6 @@ export default function TechStackScene() {
                         </div>
                       </div>
                     </div>
-
                     <div className="pl-10 md:pl-14 flex flex-wrap gap-2">
                       {cat.badges.map((url, j) => (
                         <img
@@ -248,7 +254,7 @@ export default function TechStackScene() {
               })}
             </div>
 
-            {/* Desktop Fade Gradients (Hidden on Mobile) */}
+            {/* Desktop Fade Gradients to smooth out the edges */}
             <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-transparent hidden md:block" />
             <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-paper to-transparent hidden md:block" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-paper to-transparent hidden md:block" />
