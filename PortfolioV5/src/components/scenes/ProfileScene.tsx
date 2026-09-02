@@ -104,7 +104,7 @@ export default function ProfileScene() {
     <section
       id="profile"
       ref={sectionRef}
-      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.15)]"
+      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-30px_40px_-15px_rgba(0,0,0,0.15)]"
     >
       <style>{`
         :root {
@@ -121,7 +121,6 @@ export default function ProfileScene() {
           height: 300px;
           top: 50%;
           left: 50%;
-          /* Scaled down to fit comfortably in its own block above the image */
           transform: translate(-50%, -50%) scale(0.5);
           z-index: 10;
           pointer-events: none;
