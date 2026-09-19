@@ -20,11 +20,26 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     n: "01",
+    title: "ROUTER",
+    kind: "Agentic AI Notification Router",
+    blurb:
+      "An AI-powered WhatsApp routing agent built during a 24-hour HackerRank hackathon. It autonomously classifies multimodal messages into priority queues using strict Pydantic schema validation and automated rate-limit retries.",
+    meta: ["Python", "Gemini API", "Pydantic", "Google GenAI SDK"],
+    image: "/images/router-cover.webp",
+    gallery: [
+      "/mockups/router-1.webp",
+      "/mockups/router-2.webp",
+      "/mockups/router-3.webp",
+    ],
+    year: "2026",
+  },
+  {
+    n: "02",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
-      "A bespoke jewelry storefront with a real-time custom builder - configure metal, stone and setting live - backed by a points-based loyalty engine and headless checkout.",
-    meta: ["MERN", "Custom Builder", "Loyalty Engine", "Stripe"],
+      "A bespoke jewelry storefront featuring a live custom builder for dynamic metal and stone configurations, backed by a headless checkout flow integrated with the PayMongo API for secure, real-time order fulfillment.",
+    meta: ["MERN Stack", "Custom Builder", "PayMongo", "MongoDB Atlas"],
     image: "/images/beaded-cover.webp",
     gallery: [
       "/mockups/beaded-1.webp",
@@ -34,26 +49,26 @@ const PROJECTS: Project[] = [
     year: "2026",
   },
   {
-    n: "02",
-    title: "FLOWER",
-    kind: "Flower Encyclopedia Database and UI",
+    n: "03",
+    title: "PEONY",
+    kind: "Digital Flower Encyclopedia",
     blurb:
-      "A comprehensive digital herbarium featuring custom taxonomical filters and micro-animations. Each entry uses fluid UI transitions to render petal textures and growth patterns.",
-    meta: ["React", "Custom Components", "Realtime", "Design System"],
+      "A dynamic digital herbarium featuring a custom multi-parameter filtering engine, Google OAuth integration, and a custom 6-digit OTP verification system. Frontend rendering is optimized with debounced search and asynchronous skeleton loaders.",
+    meta: ["React", "Framer Motion", "Google OAuth", "REST APIs"],
     image: "/images/flower-cover.webp",
     gallery: [
       "/mockups/flower-1.webp",
       "/mockups/flower-2.webp",
       "/mockups/flower-3.webp",
     ],
-    year: "2025",
+    year: "2026",
   },
   {
-    n: "03",
+    n: "04",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
-      "A performance-focused storefront engine utilizing a custom headless modular system. Currently under development.",
+      "A performance-focused storefront engine utilizing a headless modular CMS, prioritizing state management and rendering speed for scalable e-commerce deployments.",
     meta: [
       "React",
       "Headless CMS",
