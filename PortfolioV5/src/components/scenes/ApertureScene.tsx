@@ -67,7 +67,12 @@ export default function ApertureScene() {
       );
       tl.to(
         maskRef.current,
-        { scale: 4, duration: 1.5, ease: "power2.inOut" }
+        { 
+          scale: 4, 
+          duration: 1.5, 
+          ease: "power2.inOut",
+          force3D: false
+        }
       );
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
