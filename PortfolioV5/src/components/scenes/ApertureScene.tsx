@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useLocation } from "react-router-dom";
 import StoneCanvas from "../StoneCanvas";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -11,6 +12,7 @@ const CHARS = "SRDCOIGP";
 const getRand = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
 export default function ApertureScene() {
+  const location = useLocation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
@@ -21,17 +23,16 @@ export default function ApertureScene() {
   const refD = useRef<SVGTextElement>(null);
   const refC = useRef<SVGTextElement>(null);
 
-  const [introDone, setIntroDone] = useState(
-    () => typeof sessionStorage !== "undefined" && sessionStorage.getItem("introPlayed") === "true"
-  );
+  // Initialize as true ONLY if returning from the certificates archive
+  const [introDone, setIntroDone] = useState(!!location.state?.returnToRing);
 
   useGSAP(
     () => {
-      const hasPlayed = sessionStorage.getItem("introPlayed") === "true";
+      const hasPlayed = location.state?.returnToRing;
       const isMobile = window.innerWidth < 768;
 
       if (hasPlayed) {
-        // If returning to the page, instantly set to final state & skip locking
+        // If returning to the page from the archive, instantly set to final state & skip locking
         setIntroDone(true);
         gsap.set(maskRef.current, { scale: 4 });
         gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
@@ -45,13 +46,12 @@ export default function ApertureScene() {
           },
           onComplete: () => {
             document.body.style.overflow = "";
-            sessionStorage.setItem("introPlayed", "true");
             setIntroDone(true);
           },
         });
 
         if (!isMobile) {
-          // Desktop: Play the 3-second letter shuffling effect
+          // Desktop: Play the full 3-second letter shuffling effect
           let lastStep = -1;
           tl.to({ v: 0 }, {
             v: 100,
@@ -70,29 +70,45 @@ export default function ApertureScene() {
             },
           });
           tl.to({}, { duration: 0.5 });
+          
+          // Desktop: Fade out R, D, C and slide S to center
+          tl.to(
+            [refR.current, refD.current, refC.current],
+            { opacity: 0, duration: 0.8, ease: "power2.inOut" }
+          );
+          tl.to(
+            refS.current,
+            { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
+            "<"
+          );
+          
+          // Desktop: Zoom in
+          tl.to(
+            maskRef.current,
+            { 
+              scale: 4, 
+              duration: 1.5, 
+              ease: "power2.inOut",
+              force3D: false 
+            }
+          );
         } else {
-          // Mobile: Skip the shuffle. Hold briefly on "SRDC", then zoom directly to "S"
-          tl.to({}, { duration: 0.4 });
-        }
+          // Mobile: Instantly hide R, D, C and center S
+          gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
+          gsap.set(refS.current, { attr: { x: 50 } });
 
-        tl.to(
-          [refR.current, refD.current, refC.current],
-          { opacity: 0, duration: 0.8, ease: "power2.inOut" }
-        );
-        tl.to(
-          refS.current,
-          { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
-          "<"
-        );
-        tl.to(
-          maskRef.current,
-          { 
-            scale: 4, 
-            duration: 1.5, 
-            ease: "power2.inOut",
-            force3D: false // Keeps the SVG edge sharp during zoom
-          }
-        );
+          // Mobile: Hold briefly on the centered "S", then zoom directly in
+          tl.to({}, { duration: 0.4 });
+          tl.to(
+            maskRef.current,
+            { 
+              scale: 4, 
+              duration: 1.5, 
+              ease: "power2.inOut",
+              force3D: false 
+            }
+          );
+        }
       }
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
