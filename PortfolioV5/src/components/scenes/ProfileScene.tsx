@@ -52,7 +52,7 @@ export default function ProfileScene() {
     <section
       id="profile"
       ref={sectionRef}
-      className="relative min-h-screen bg-paper py-24 md:py-32 flex items-center z-20 shadow-[0_-30px_40px_-15px_rgba(0,0,0,0.15)] rounded-t-[50px]"
+      className="relative min-h-screen bg-paper py-12 md:py-32 flex items-center z-20 shadow-[0_-30px_40px_-15px_rgba(0,0,0,0.15)] rounded-t-[50px]"
     >
       <style>{`
         :root {
@@ -208,7 +208,7 @@ export default function ProfileScene() {
       `}</style>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-16">
-        <div className="flex flex-col md:grid md:grid-cols-12 gap-16 md:gap-8 items-stretch">
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-8 md:gap-8 items-stretch">
           
           {/* LEFT COLUMN: Labels (Top), Computer (Middle), Image (Bottom) */}
           <div className="md:col-span-4 flex flex-col justify-between">
@@ -222,14 +222,14 @@ export default function ProfileScene() {
             </div>
 
             {/* Container for the stacked visuals */}
-            <div className="mt-16 md:mt-auto flex flex-col items-center md:items-start self-start w-[80%] max-w-[320px]">
+            <div className="mt-8 md:mt-auto flex flex-col items-center md:items-start self-center md:self-start w-full sm:w-[80%] md:w-[80%] max-w-[400px] md:max-w-[320px]">
               
-              {/* 1. Computer Block (Stacked on top) */}
-              <div className="relative w-full h-[160px] md:h-[118px] mb-4">
+              {/* 1. Computer Block (Hidden on mobile) */}
+              <div className="relative w-full h-[160px] md:h-[118px] mb-4 hidden md:block">
                 <div id="computer"></div>
               </div>
 
-              {/* 2. Profile Image Block (Stacked below) */}
+              {/* 2. Profile Image Block */}
               <div className="relative w-full aspect-[4/3] overflow-hidden">
                 <img
                   src="/sean-profile.webp"
@@ -237,13 +237,12 @@ export default function ProfileScene() {
                   className="w-full h-full object-cover"
                 />
               </div>
-
             </div>
           </div>
 
           {/* RIGHT COLUMN: The wave text */}
-          <div className="md:col-span-8 flex flex-col justify-center">
-            <h2 className="t-display text-[clamp(18px,3vw,50px)] leading-[1.05] tracking-tight text-ink m-0 max-w-4xl">
+          <div className="md:col-span-8 flex flex-col justify-center mt-2 md:mt-0">
+            <h2 className="t-display text-[26px] sm:text-[32px] md:text-[clamp(30px,3vw,50px)] leading-[1.2] md:leading-[1.05] tracking-tight text-ink m-0 max-w-4xl text-justify md:text-left">
               <div className="mb-8">{renderText(P1)}</div>
               <div>{renderText(P2)}</div>
             </h2>
