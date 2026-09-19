@@ -21,61 +21,74 @@ export default function ApertureScene() {
   const refD = useRef<SVGTextElement>(null);
   const refC = useRef<SVGTextElement>(null);
 
-  const [introDone, setIntroDone] = useState(false);
+  const [introDone, setIntroDone] = useState(
+    () => typeof sessionStorage !== "undefined" && sessionStorage.getItem("introPlayed") === "true"
+  );
 
   useGSAP(
     () => {
-      // --- 1. THE OPENING INTRO ANIMATION ---
-      const tl = gsap.timeline({
-        onStart: () => {
-          document.body.style.overflow = "hidden";
-          window.scrollTo(0, 0);
-        },
-        onComplete: () => {
-          document.body.style.overflow = "";
-          setIntroDone(true);
-        },
-      });
+      const hasPlayed = sessionStorage.getItem("introPlayed") === "true";
 
-      let lastStep = -1;
-      tl.to({ v: 0 }, {
-        v: 100,
-        duration: 3.0,
-        ease: "none",
-        onUpdate: function () {
-          const p = this.targets()[0].v;
-          const step = Math.floor(p / 6); 
-          if (step !== lastStep) {
-            lastStep = step;
-            if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
-            if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
-            if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
-            if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
+      if (hasPlayed) {
+        // If returning to the page, instantly set to final state & skip locking
+        setIntroDone(true);
+        gsap.set(maskRef.current, { scale: 4 });
+        gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
+        gsap.set(refS.current, { attr: { x: 50 } });
+      } else {
+        // --- 1. THE OPENING INTRO ANIMATION ---
+        const tl = gsap.timeline({
+          onStart: () => {
+            document.body.style.overflow = "hidden";
+            window.scrollTo(0, 0);
+          },
+          onComplete: () => {
+            document.body.style.overflow = "";
+            sessionStorage.setItem("introPlayed", "true");
+            setIntroDone(true);
+          },
+        });
+
+        let lastStep = -1;
+        tl.to({ v: 0 }, {
+          v: 100,
+          duration: 3.0,
+          ease: "none",
+          onUpdate: function () {
+            const p = this.targets()[0].v;
+            const step = Math.floor(p / 6);
+            if (step !== lastStep) {
+              lastStep = step;
+              if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
+              if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
+              if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
+              if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
+            }
+          },
+        });
+        tl.to({}, { duration: 0.5 });
+        tl.to(
+          [refR.current, refD.current, refC.current],
+          { opacity: 0, duration: 0.8, ease: "power2.inOut" }
+        );
+        tl.to(
+          refS.current,
+          { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
+          "<"
+        );
+        tl.to(
+          maskRef.current,
+          { 
+            scale: 4, 
+            duration: 1.5, 
+            ease: "power2.inOut",
+            force3D: false
           }
-        },
-      });
-
-      tl.to({}, { duration: 0.5 });
-      tl.to(
-        [refR.current, refD.current, refC.current],
-        { opacity: 0, duration: 0.8, ease: "power2.inOut" }
-      );
-      tl.to(
-        refS.current,
-        { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
-        "<"
-      );
-      tl.to(
-        maskRef.current,
-        { 
-          scale: 4, 
-          duration: 1.5, 
-          ease: "power2.inOut",
-          force3D: false
-        }
-      );
+        );
+      }
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
+      // (This stays outside the if/else so the scroll effect always works)
       gsap.to(containerRef.current, {
         scale: 0.85,
         opacity: 0.2,
@@ -92,7 +105,7 @@ export default function ApertureScene() {
     },
     { scope: sectionRef }
   );
-
+  
   return (
     <section id="aperture" ref={sectionRef} className="relative h-screen">
       <div 
