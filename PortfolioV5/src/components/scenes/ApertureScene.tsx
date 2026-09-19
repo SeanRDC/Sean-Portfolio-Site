@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useLocation } from "react-router-dom";
 import StoneCanvas from "../StoneCanvas";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -11,6 +12,7 @@ const CHARS = "SRDCOIGP";
 const getRand = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
 export default function ApertureScene() {
+  const location = useLocation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
@@ -21,54 +23,93 @@ export default function ApertureScene() {
   const refD = useRef<SVGTextElement>(null);
   const refC = useRef<SVGTextElement>(null);
 
-  const [introDone, setIntroDone] = useState(false);
+  // Initialize as true ONLY if returning from the certificates archive
+  const [introDone, setIntroDone] = useState(!!location.state?.returnToRing);
 
   useGSAP(
     () => {
-      // --- 1. THE OPENING INTRO ANIMATION ---
-      const tl = gsap.timeline({
-        onStart: () => {
-          document.body.style.overflow = "hidden";
-          window.scrollTo(0, 0);
-        },
-        onComplete: () => {
-          document.body.style.overflow = "";
-          setIntroDone(true);
-        },
-      });
+      const hasPlayed = location.state?.returnToRing;
+      const isMobile = window.innerWidth < 768;
 
-      let lastStep = -1;
-      tl.to({ v: 0 }, {
-        v: 100,
-        duration: 3.0,
-        ease: "none",
-        onUpdate: function () {
-          const p = this.targets()[0].v;
-          const step = Math.floor(p / 6); 
-          if (step !== lastStep) {
-            lastStep = step;
-            if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
-            if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
-            if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
-            if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
-          }
-        },
-      });
+      if (hasPlayed) {
+        // If returning to the page from the archive, instantly set to final state & skip locking
+        setIntroDone(true);
+        gsap.set(maskRef.current, { scale: 4 });
+        gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
+        gsap.set(refS.current, { attr: { x: 50 } });
+      } else {
+        // --- 1. THE OPENING INTRO ANIMATION ---
+        const tl = gsap.timeline({
+          onStart: () => {
+            document.body.style.overflow = "hidden";
+            window.scrollTo(0, 0);
+          },
+          onComplete: () => {
+            document.body.style.overflow = "";
+            setIntroDone(true);
+          },
+        });
 
-      tl.to({}, { duration: 0.5 });
-      tl.to(
-        [refR.current, refD.current, refC.current],
-        { opacity: 0, duration: 0.8, ease: "power2.inOut" }
-      );
-      tl.to(
-        refS.current,
-        { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
-        "<"
-      );
-      tl.to(
-        maskRef.current,
-        { scale: 4, duration: 1.5, ease: "power2.inOut" }
-      );
+        if (!isMobile) {
+          // Desktop: Play the full 3-second letter shuffling effect
+          let lastStep = -1;
+          tl.to({ v: 0 }, {
+            v: 100,
+            duration: 3.0,
+            ease: "none",
+            onUpdate: function () {
+              const p = this.targets()[0].v;
+              const step = Math.floor(p / 6);
+              if (step !== lastStep) {
+                lastStep = step;
+                if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
+                if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
+                if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
+                if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
+              }
+            },
+          });
+          tl.to({}, { duration: 0.5 });
+          
+          // Desktop: Fade out R, D, C and slide S to center
+          tl.to(
+            [refR.current, refD.current, refC.current],
+            { opacity: 0, duration: 0.8, ease: "power2.inOut" }
+          );
+          tl.to(
+            refS.current,
+            { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
+            "<"
+          );
+          
+          // Desktop: Zoom in
+          tl.to(
+            maskRef.current,
+            { 
+              scale: 4, 
+              duration: 1.5, 
+              ease: "power2.inOut",
+              force3D: false 
+            }
+          );
+        } else {
+          // Mobile: Instantly hide R, D, C and center S
+          gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
+          gsap.set(refS.current, { attr: { x: 50 } });
+
+          // Mobile: Hold briefly on the centered "S", then zoom directly in
+          tl.to({}, { duration: 0.4 });
+          tl.to(
+            maskRef.current,
+            { 
+              scale: 4, 
+              duration: 1.5, 
+              ease: "power2.inOut",
+              force3D: false 
+            }
+          );
+        }
+      }
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
       gsap.to(containerRef.current, {
@@ -87,7 +128,7 @@ export default function ApertureScene() {
     },
     { scope: sectionRef }
   );
-
+  
   return (
     <section id="aperture" ref={sectionRef} className="relative h-screen">
       <div 

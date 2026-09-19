@@ -671,7 +671,7 @@ export default function ProjectsScene() {
                         ))}
                       </div>
                     </div>
-                    <div className="mt-8 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink transition-all group-hover:scale-110 group-hover:bg-ink group-hover:text-paper md:mt-0">
+                    <div className="hidden md:flex mt-8 h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink transition-all group-hover:scale-110 group-hover:bg-ink group-hover:text-paper md:mt-0">
                       <span className="font-mono-x text-xl">↗</span>
                     </div>
                   </div>
@@ -725,7 +725,7 @@ export default function ProjectsScene() {
           </div>
         )}
 
-        <div className="pointer-events-none fixed bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100]">
+        <div className="hidden md:block pointer-events-none fixed bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100]">
           <div ref={btnRef} className="pointer-events-auto invisible opacity-0">
             <button
               onClick={handleToggle}
@@ -761,12 +761,12 @@ export default function ProjectsScene() {
       <section
         ref={detailOverlayRef}
         style={{ display: "none" }}
-        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-hidden"
+        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-y-auto md:overflow-hidden"
       >
         {selectedProject && (
-          <div className="w-full h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative pt-24 md:pt-0">
+          <div className="w-full min-h-full md:h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative pt-24 md:pt-0">
             {/* LEFT COLUMN: Text Info */}
-            <div className="md:w-5/12 h-full flex flex-col justify-center px-8 md:px-16 relative shrink-0 z-[50010]">
+            <div className="md:w-5/12 h-auto md:h-full flex flex-col justify-start md:justify-center px-8 md:px-16 relative shrink-0 z-[50010]">
               <div className="flex items-baseline gap-5 mb-8">
                 <div ref={realDetailTitleWrapRef} className="opacity-0">
                   <h1 className="t-colossal text-[clamp(42px,5.5vw,110px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5]">
@@ -791,7 +791,7 @@ export default function ProjectsScene() {
                 ))}
               </div>
               {/* Mobile Native Fallback Images */}
-              <div className="md:hidden flex flex-col gap-6 mt-16 detail-animate-in pb-24 h-full overflow-y-auto">
+              <div className="md:hidden flex flex-col gap-6 mt-16 detail-animate-in pb-24 h-auto overflow-visible">
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}

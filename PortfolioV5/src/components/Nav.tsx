@@ -180,10 +180,21 @@ export default function Nav() {
                 </a>
               ))}
             </nav>
+            
+            {/* Desktop / Tablet Contact Button */}
             <a
               href="#contact"
               onClick={(e) => handleScroll(e, "contact")}
               className="t-label hidden border border-line-strong px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-ink transition-colors hover:bg-ink hover:text-paper sm:inline-block"
+            >
+              Contact Me
+            </a>
+
+            {/* Mobile Contact Link (Hidden on sm and larger) */}
+            <a
+              href="#contact"
+              onClick={(e) => handleScroll(e, "contact")}
+              className="font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink transition-colors hover:text-ink-dim sm:hidden"
             >
               Contact Me
             </a>

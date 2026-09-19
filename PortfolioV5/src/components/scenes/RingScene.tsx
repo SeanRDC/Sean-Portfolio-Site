@@ -340,32 +340,43 @@ export default function RingScene() {
         </div>
 
         <div className="absolute inset-0" style={{ perspective: "1200px" }}>
-          <div
-            className="absolute inset-0"
-            style={{ transformStyle: "preserve-3d" }}
-          >
             <div
-              ref={textContainerRef}
-              className="absolute left-1/2 top-1/2 z-0 w-[min(640px,86vw)]"
-              style={{ willChange: "transform, opacity" }}
+              className="absolute inset-0"
+              style={{ transformStyle: "preserve-3d" }}
             >
-              <div className="text-center">
-                <div className="mb-5 font-mono-x text-[11px] uppercase tracking-[0.5em] text-ink-dim">
-                  Milestones
-                </div>
-                <p className="t-display text-[clamp(26px,4.2vw,54px)] leading-[1.06] text-ink">
-                  Every certification is a chance to{" "}
-                  <span className="t-serif-i font-normal text-ink-dim">
-                    push the limits
-                  </span>{" "}
-                  of what one engineer can{" "}
-                  <span className="t-serif-i font-normal text-ink-dim">
-                    ship
-                  </span>
-                  .
-                </p>
+              {/* Scattered Background Certificates (Pushed back in 3D space) */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{ transform: "translateZ(-200px)" }}
+              >
+                <img src={TILES[0].image} alt="" className="absolute top-[5%] -left-[35%] md:-left-[10%] w-[220px] md:w-[320px] -rotate-12 opacity-[0.90] md:opacity-[0.03] blur-sm" />
+                <img src={TILES[1].image} alt="" className="absolute top-[30%] -right-[45%] md:-right-[20%] w-[260px] md:w-[380px] rotate-12 opacity-[0.90] md:opacity-[0.03] blur-md" />
+                <img src={TILES[2].image} alt="" className="absolute bottom-[20%] -left-[35%] md:-left-[15%] w-[200px] md:w-[280px] rotate-6 opacity-[0.90] md:opacity-[0.03] blur-sm" />
+                <img src={TILES[3].image} alt="" className="absolute -bottom-[5%] -right-[35%] md:-right-[10%] w-[240px] md:w-[340px] -rotate-6 opacity-[0.90] md:opacity-[0.03] blur-sm" />
               </div>
-            </div>
+
+              <div
+                ref={textContainerRef}
+                className="absolute left-1/2 top-1/2 z-0 w-[90vw] md:w-[min(640px,86vw)]"
+                style={{ willChange: "transform, opacity" }}
+              >
+                <div className="text-center">
+                  <div className="mb-5 font-mono-x text-[11px] uppercase tracking-[0.5em] text-ink-dim">
+                    Milestones
+                  </div>
+                  <p className="t-display text-[32px] sm:text-[40px] md:text-[clamp(26px,4.2vw,54px)] leading-[1.1] md:leading-[1.06] text-ink">
+                    Every certification is a chance to{" "}
+                    <span className="t-serif-i font-normal text-ink-dim">
+                      push the limits
+                    </span>{" "}
+                    of what one engineer can{" "}
+                    <span className="t-serif-i font-normal text-ink-dim">
+                      ship
+                    </span>
+                    . 
+                  </p>
+                </div>
+              </div>
 
             <div
               className="absolute inset-0 hidden md:block"
