@@ -30,52 +30,18 @@ export default function ProfileScene() {
 
   useGSAP(
     () => {
-      // 1. Text Wave Animation
       const chars = gsap.utils.toArray(".wave-char");
-      const startColor = "rgba(19, 18, 16, 0.15)";
-      const waveColor = "rgba(19, 18, 16, 1)"; 
-      const endColor = "rgba(19, 18, 16, 1)"; 
+      const targetColor = "rgba(19, 18, 16, 1)"; 
 
-      const activeChars = new Set();
-      const progress = { value: 0 };
-      let isReady = true;
-
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top 80%",
-        end: "bottom 60%",
-        scrub: 0.1,
-        onUpdate: (self) => {
-          if (!isReady) return;
-          progress.value = self.progress;
-          const activeCount = Math.round(progress.value * chars.length);
-
-          chars.forEach((char: any, index) => {
-            const isActive = index < activeCount;
-
-            if (isActive && !activeChars.has(char)) {
-              activeChars.add(char);
-              gsap.killTweensOf(char);
-              gsap
-                .timeline()
-                .to(char, {
-                  color: waveColor,
-                  duration: 0.1,
-                  ease: "power2.out",
-                })
-                .to(char, {
-                  color: endColor,
-                  duration: 0.2,
-                  ease: "power2.in",
-                });
-            }
-
-            if (!isActive && activeChars.has(char)) {
-              activeChars.delete(char);
-              gsap.killTweensOf(char);
-              gsap.to(char, { color: startColor, duration: 0.2, ease: "none" });
-            }
-          });
+      gsap.to(chars, {
+        color: targetColor,
+        stagger: 0.1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          end: "bottom 60%",
+          scrub: 0.5, 
         },
       });
     },
