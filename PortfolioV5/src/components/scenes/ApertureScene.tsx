@@ -28,6 +28,7 @@ export default function ApertureScene() {
   useGSAP(
     () => {
       const hasPlayed = sessionStorage.getItem("introPlayed") === "true";
+      const isMobile = window.innerWidth < 768;
 
       if (hasPlayed) {
         // If returning to the page, instantly set to final state & skip locking
@@ -49,24 +50,31 @@ export default function ApertureScene() {
           },
         });
 
-        let lastStep = -1;
-        tl.to({ v: 0 }, {
-          v: 100,
-          duration: 3.0,
-          ease: "none",
-          onUpdate: function () {
-            const p = this.targets()[0].v;
-            const step = Math.floor(p / 6);
-            if (step !== lastStep) {
-              lastStep = step;
-              if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
-              if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
-              if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
-              if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
-            }
-          },
-        });
-        tl.to({}, { duration: 0.5 });
+        if (!isMobile) {
+          // Desktop: Play the 3-second letter shuffling effect
+          let lastStep = -1;
+          tl.to({ v: 0 }, {
+            v: 100,
+            duration: 3.0,
+            ease: "none",
+            onUpdate: function () {
+              const p = this.targets()[0].v;
+              const step = Math.floor(p / 6);
+              if (step !== lastStep) {
+                lastStep = step;
+                if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
+                if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
+                if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
+                if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
+              }
+            },
+          });
+          tl.to({}, { duration: 0.5 });
+        } else {
+          // Mobile: Skip the shuffle. Hold briefly on "SRDC", then zoom directly to "S"
+          tl.to({}, { duration: 0.4 });
+        }
+
         tl.to(
           [refR.current, refD.current, refC.current],
           { opacity: 0, duration: 0.8, ease: "power2.inOut" }
@@ -82,13 +90,12 @@ export default function ApertureScene() {
             scale: 4, 
             duration: 1.5, 
             ease: "power2.inOut",
-            force3D: false
+            force3D: false // Keeps the SVG edge sharp during zoom
           }
         );
       }
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
-      // (This stays outside the if/else so the scroll effect always works)
       gsap.to(containerRef.current, {
         scale: 0.85,
         opacity: 0.2,
