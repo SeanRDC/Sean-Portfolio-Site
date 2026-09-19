@@ -70,7 +70,7 @@ export default function StoneCanvas({
   interactive = false,
 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const mouse = useRef({ x: 0.5, y: 0.5, amt: 0 });
+  const mouse = useRef({ currX: 0.5, currY: 0.5, targetX: 0.5, targetY: 0.5, amt: 0 });
 
   useEffect(() => {
     const canvas = ref.current;
@@ -108,7 +108,9 @@ export default function StoneCanvas({
       if (!visible) { raf = 0; return; }
       const t = (performance.now() - t0) / 1000;
       gl.uniform1f(uTime, t);
-      gl.uniform2f(uMouse, mouse.current.x, mouse.current.y);
+      mouse.current.currX += (mouse.current.targetX - mouse.current.currX) * 0.08;
+      mouse.current.currY += (mouse.current.targetY - mouse.current.currY) * 0.08;
+      gl.uniform2f(uMouse, mouse.current.currX, mouse.current.currY);
       gl.uniform1f(uMouseAmt, interactive ? mouse.current.amt : 0.0);
       mouse.current.amt *= 0.95;
       gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -125,8 +127,8 @@ export default function StoneCanvas({
 
     const onMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.current.x = (e.clientX - rect.left) / rect.width;
-      mouse.current.y = 1.0 - (e.clientY - rect.top) / rect.height;
+      mouse.current.targetX = (e.clientX - rect.left) / rect.width;
+      mouse.current.targetY = 1.0 - (e.clientY - rect.top) / rect.height;
       mouse.current.amt = 1;
     };
     if (interactive) window.addEventListener("pointermove", onMove, { passive: true });
