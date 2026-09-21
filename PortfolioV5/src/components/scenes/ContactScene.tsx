@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -8,6 +8,24 @@ gsap.registerPlugin(ScrollTrigger);
 export default function ContactScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  
+  // State to manage the Resume Overlay visibility
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+
+  // Lock the background scroll when the resume is open
+  useEffect(() => {
+    if (isResumeOpen) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, [isResumeOpen]);
 
   useGSAP(
     () => {
@@ -29,7 +47,7 @@ export default function ContactScene() {
             trigger: sectionRef.current,
             start: "top 60%",
             end: "top 20%",
-            scrub: 0.5, 
+            scrub: 0.5,
           },
         },
       );
@@ -82,17 +100,34 @@ export default function ContactScene() {
           <br />
           TOUCH
         </h2>
-        <a
-          href="mailto:delacruzseanrhani@gmail.com"
-          className="group mt-8 md:mt-12 inline-flex w-fit max-w-full items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink"
-        >
-          <span className="t-label text-[10px] md:text-[13px] uppercase tracking-[0.2em] text-ink truncate">
-            delacruzseanrhani@gmail.com
-          </span>
-          <span className="font-mono-x text-base text-ink transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 shrink-0">
-            ↗
-          </span>
-        </a>
+        
+        <div className="flex flex-col gap-4 mt-8 md:mt-12 w-fit max-w-full">
+          {/* Email Button */}
+          <a
+            href="mailto:delacruzseanrhani@gmail.com"
+            className="group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink"
+          >
+            <span className="t-label text-[10px] md:text-[13px] uppercase tracking-[0.2em] text-ink truncate">
+              delacruzseanrhani@gmail.com
+            </span>
+            <span className="font-mono-x text-base text-ink transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 shrink-0">
+              ↗
+            </span>
+          </a>
+
+          {/* View Resume Button */}
+          <button
+            onClick={() => setIsResumeOpen(true)}
+            className="group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink cursor-pointer bg-transparent outline-none p-0 text-left"
+          >
+            <span className="t-label text-[10px] md:text-[13px] uppercase tracking-[0.2em] text-ink">
+              View Resume
+            </span>
+            <span className="font-mono-x text-base text-ink transition-transform group-hover:translate-x-1 shrink-0">
+              →
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Minimal Footer */}
@@ -149,8 +184,70 @@ export default function ContactScene() {
             timeZone: "Asia/Manila",
           })}
         </div>
-        
       </div>
+
+      {/* ── RESUME MODAL OVERLAY ── */}
+      {isResumeOpen && (
+        <div 
+          className="fixed inset-0 z-[99999999] block h-[100dvh] w-screen overflow-y-auto overscroll-contain bg-black/60 backdrop-blur-xl text-[#f5f5f5]"
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          
+          {/* Top Right Actions (Sticky so it stays visible while scrolling) */}
+          <div className="fixed top-6 right-6 md:top-8 md:right-10 z-[100000000] flex items-center gap-4">
+            <a
+              href="/resume.pdf"
+              download="Sean_Dela_Cruz_Resume.pdf"
+              className="t-label border border-[#333] bg-[#111] px-4 py-2 text-[10px] md:text-[11px] uppercase tracking-[0.15em] text-[#f5f5f5] transition-colors hover:bg-[#f5f5f5] hover:text-[#111]"
+            >
+              Download PDF
+            </a>
+            <button
+              onClick={() => setIsResumeOpen(false)}
+              className="flex h-10 w-10 md:h-11 md:w-11 cursor-pointer items-center justify-center rounded-full border border-[#333] bg-[#111] text-[#f5f5f5] transition-colors hover:bg-[#f5f5f5] hover:text-[#111]"
+              aria-label="Close Resume"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Scrollable Paper Format Container */}
+          <div className="mx-auto flex w-full max-w-[850px] flex-col gap-8 md:gap-12 px-4 pt-24 pb-32 md:px-12">
+            
+            {/* PAGE 1 */}
+            <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
+              <img 
+                src="/resume/page1.jpg" 
+                alt="Resume Page 1" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            {/* PAGE 2 */}
+            <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
+              <img 
+                src="/resume/page2.jpg" 
+                alt="Resume Page 2" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            {/* PAGE 3 */}
+            <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
+              <img 
+                src="/resume/page3.jpg" 
+                alt="Resume Page 3" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+          </div>
+        </div>
+      )}
     </section>
   );
 }
