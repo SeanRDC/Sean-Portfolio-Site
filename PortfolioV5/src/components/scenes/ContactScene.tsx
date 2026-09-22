@@ -193,6 +193,9 @@ export default function ContactScene() {
           data-lenis-prevent="true"
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsResumeOpen(false);
+          }}
         >
           
           {/* Top Right Actions (Sticky so it stays visible while scrolling) */}
@@ -216,12 +219,17 @@ export default function ContactScene() {
           </div>
 
           {/* Scrollable Paper Format Container */}
-          <div className="mx-auto flex w-full max-w-[850px] flex-col gap-8 md:gap-12 px-4 pt-24 pb-32 md:px-12">
+          <div 
+            className="mx-auto flex w-full max-w-[850px] flex-col gap-8 md:gap-12 px-4 pt-24 pb-32 md:px-12"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsResumeOpen(false);
+            }}
+          >
             
             {/* PAGE 1 */}
             <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
               <img 
-                src="/resume/page1.jpg" 
+                src="/resume/page1.webp" 
                 alt="Resume Page 1" 
                 className="h-full w-full object-cover"
               />
@@ -230,7 +238,7 @@ export default function ContactScene() {
             {/* PAGE 2 */}
             <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
               <img 
-                src="/resume/page2.jpg" 
+                src="/resume/page2.webp" 
                 alt="Resume Page 2" 
                 className="h-full w-full object-cover"
               />
@@ -239,7 +247,7 @@ export default function ContactScene() {
             {/* PAGE 3 */}
             <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
               <img 
-                src="/resume/page3.jpg" 
+                src="/resume/page3.webp" 
                 alt="Resume Page 3" 
                 className="h-full w-full object-cover"
               />
