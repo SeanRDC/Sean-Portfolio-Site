@@ -20,6 +20,21 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     n: "01",
+    title: "VELO",
+    kind: "AI-Powered Canvas LMS Client",
+    blurb:
+      "A distraction-free, local-first Canvas LMS client that pulls every deadline across all enrolled courses into one sorted feed. It pairs a tool-calling AI co-pilot and study planner with offline caching, and ships with a scroll-driven landing page built in React and GSAP.",
+    meta: ["Flutter", "Canvas REST API", "Groq AI", "React + GSAP"],
+    image: "/images/velo-cover.webp",
+    gallery: [
+      "/mockups/velo-1.webp",
+      "/mockups/velo-2.webp",
+      "/mockups/velo-3.webp",
+    ],
+    year: "2026",
+  },
+  {
+    n: "02",
     title: "ROUTER",
     kind: "Agentic AI Notification Router",
     blurb:
@@ -34,7 +49,7 @@ const PROJECTS: Project[] = [
     year: "2026",
   },
   {
-    n: "02",
+    n: "03",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
@@ -49,7 +64,7 @@ const PROJECTS: Project[] = [
     year: "2026",
   },
   {
-    n: "03",
+    n: "04",
     title: "PEONY",
     kind: "Digital Flower Encyclopedia",
     blurb:
@@ -64,7 +79,7 @@ const PROJECTS: Project[] = [
     year: "2026",
   },
   {
-    n: "04",
+    n: "05",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
