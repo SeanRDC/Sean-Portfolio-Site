@@ -15,6 +15,8 @@ type Project = {
   image: string;
   gallery: string[];
   year?: string;
+  github: string;
+  live?: string;
 };
 
 const PROJECTS: Project[] = [
@@ -32,6 +34,8 @@ const PROJECTS: Project[] = [
       "/mockups/velo-3.webp",
     ],
     year: "2026",
+    github: "https://github.com/SeanRDC/Velo-A-better-canvas",
+    live: "https://velo-landing-page-delta.vercel.app/",
   },
   {
     n: "02",
@@ -47,6 +51,7 @@ const PROJECTS: Project[] = [
       "/mockups/router-3.webp",
     ],
     year: "2026",
+    github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
   },
   {
     n: "03",
@@ -62,6 +67,8 @@ const PROJECTS: Project[] = [
       "/mockups/beaded-3.webp",
     ],
     year: "2026",
+    github: "https://github.com/SeanRDC/Beaded-By-Unknown-Website",
+    live: "https://www.beadedbyunknown.shop",
   },
   {
     n: "04",
@@ -77,6 +84,8 @@ const PROJECTS: Project[] = [
       "/mockups/flower-3.webp",
     ],
     year: "2026",
+    github: "https://github.com/SeanRDC/Flower-Catalogue-Website",
+    live: "https://flower-catalogue-website.vercel.app",
   },
   {
     n: "05",
@@ -97,6 +106,8 @@ const PROJECTS: Project[] = [
       "/mockups/pixel-3.webp",
     ],
     year: "2026",
+    github: "https://github.com/SeanRDC/Pixel-Clothing-Website",
+    live: "https://pixel-clothing.vercel.app",
   },
 ];
 
@@ -836,6 +847,37 @@ export default function ProjectsScene() {
                   </span>
                 ))}
               </div>
+              <div className="detail-animate-in mt-8 flex items-center gap-3">
+                <a
+                  href={selectedProject.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${selectedProject.title} on GitHub`}
+                  title="View source on GitHub"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#333] text-[#999] transition-colors hover:bg-[#f5f5f5] hover:text-[#111]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                    <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                  </svg>
+                </a>
+                {selectedProject.live && (
+                  <a
+                    href={selectedProject.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Visit the ${selectedProject.title} website`}
+                    title="Visit the live website"
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-[#333] text-[#999] transition-colors hover:bg-[#f5f5f5] hover:text-[#111]"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M2 12h20"></path>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                  </a>
+                )}
+              </div>
               {/* Mobile Native Fallback Images */}
               <div className="md:hidden flex flex-col gap-6 mt-16 detail-animate-in pb-24 h-auto overflow-visible">
                 {selectedProject.gallery.map((img, i) => (
@@ -850,7 +892,7 @@ export default function ProjectsScene() {
             </div>
 
             {/* RIGHT COLUMN: Custom Scroll Gallery */}
-            <div className="hidden md:flex flex-1 h-full relative detail-animate-in bg-[#0f0f0f]">
+            <div className="hidden md:flex flex-1 h-full relative detail-animate-in">
               <div
                 ref={thumbsWrapRef}
                 className="w-[100px] md:w-[140px] h-full overflow-hidden flex-shrink-0 relative z-20 border-l border-[#222]"
@@ -889,7 +931,7 @@ export default function ProjectsScene() {
                   ))}
                 </div>
               </div>
-              <div className="flex-1 h-full p-8 md:p-12 flex items-center justify-center relative bg-[#050505]">
+              <div className="flex-1 h-full p-8 md:p-12 flex items-center justify-center relative">
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}
