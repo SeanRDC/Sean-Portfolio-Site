@@ -83,7 +83,8 @@ export default function Nav() {
         duration: 1.2,
         ease: "power3.inOut",
         onUpdate: function () {
-          window.scrollTo(0, this.targets()[0].y);
+          // "instant" so the CSS scroll-behavior: smooth doesn't re-ease every frame of this tween
+          window.scrollTo({ top: this.targets()[0].y, behavior: "instant" });
         },
       }
     );

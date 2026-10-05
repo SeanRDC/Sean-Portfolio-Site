@@ -115,7 +115,10 @@ function clamp01(x: number) {
 
 export default function TechStackScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
+  const pctRef = useRef<HTMLSpanElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const catRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Track if we are on a desktop screen to handle responsive logic safely
   const [isDesktop, setIsDesktop] = useState(
@@ -134,13 +137,57 @@ export default function TechStackScene() {
       const mm = gsap.matchMedia();
 
       mm.add("(min-width: 768px)", () => {
+        // Written straight to the DOM: re-rendering the whole badge list through
+        // React state on every scroll frame was the main source of stutter here.
+        const lastNear: number[] = [];
+        let lastPct = "";
+
+        const apply = (progress: number) => {
+          if (barRef.current)
+            barRef.current.style.transform = `scaleX(${progress})`;
+
+          const pct = `${String(Math.round(progress * 100)).padStart(2, "0")}%`;
+          if (pct !== lastPct && pctRef.current) {
+            lastPct = pct;
+            pctRef.current.textContent = pct;
+          }
+
+          if (listRef.current)
+            listRef.current.style.transform = `translateY(-${progress * 100}%)`;
+
+          catRefs.current.forEach((el, i) => {
+            if (!el) return;
+            const center = (i + 0.5) / STACK.length;
+            // Tightened from 0.15 to 0.12 to snap into focus a bit quicker
+            const near = 1 - clamp01(Math.abs(progress - center) / 0.12);
+            if (near === lastNear[i]) return;
+            lastNear[i] = near;
+            el.style.opacity = `${0.55 + near * 0.95}`;
+            el.style.filter = `blur(${(1 - near) * 1}px)`;
+            el.style.transform = `scale(${0.96 + near * 0.04})`;
+          });
+        };
+
+        apply(0);
+
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
           end: "bottom bottom",
           scrub: true,
-          onUpdate: (self) => setProgress(self.progress),
+          onUpdate: (self) => apply(self.progress),
+          onRefresh: (self) => apply(self.progress),
         });
+
+        return () => {
+          if (listRef.current) listRef.current.style.transform = "";
+          catRefs.current.forEach((el) => {
+            if (!el) return;
+            el.style.opacity = "";
+            el.style.filter = "";
+            el.style.transform = "";
+          });
+        };
       });
 
       return () => mm.revert();
@@ -178,12 +225,16 @@ export default function TechStackScene() {
             <div className="mt-6 md:mt-8 items-center gap-3 hidden md:flex">
               <div className="h-px w-24 bg-line-strong">
                 <div
-                  className="h-full bg-ink"
-                  style={{ width: `${progress * 100}%` }}
+                  ref={barRef}
+                  className="h-full w-full origin-left bg-ink"
+                  style={{ transform: "scaleX(0)" }}
                 />
               </div>
-              <span className="font-mono-x text-[10px] tabular-nums text-ink-dim">
-                {String(Math.round(progress * 100)).padStart(2, "0")}%
+              <span
+                ref={pctRef}
+                className="font-mono-x text-[10px] tabular-nums text-ink-dim"
+              >
+                00%
               </span>
             </div>
           </div>
@@ -193,37 +244,20 @@ export default function TechStackScene() {
             className={`relative flex-1 ${isDesktop ? "overflow-hidden px-10" : "px-6 pb-20"}`}
           >
             <div
+              ref={listRef}
               className={
                 isDesktop ? "absolute inset-x-10" : "relative w-full pt-8"
               }
-              style={
-                isDesktop
-                  ? {
-                      top: "50%",
-                      transform: `translateY(-${progress * 100}%)`,
-                      willChange: "transform",
-                    }
-                  : {} 
-              }
+              style={isDesktop ? { top: "50%", willChange: "transform" } : {}}
             >
               {STACK.map((cat, i) => {
-                const center = (i + 0.5) / STACK.length;
-                // Tightened from 0.15 to 0.12 to snap into focus a bit quicker
-                const near = 1 - clamp01(Math.abs(progress - center) / 0.12);
-
                 return (
                   <div
                     key={cat.name}
+                    ref={(el) => {
+                      catRefs.current[i] = el;
+                    }}
                     className="flex flex-col gap-4 border-b border-line py-6 md:py-8"
-                    style={
-                      isDesktop
-                        ? {
-                            opacity: 0.55 + near * 0.95,
-                            filter: `blur(${(1 - near) * 1}px)`,
-                            transform: `scale(${0.96 + near * 0.04})`,
-                          }
-                        : { opacity: 1 }
-                    }
                   >
                     <div className="flex items-center gap-4 md:gap-6">
                       <span className="font-mono-x w-6 md:w-8 text-[10px] md:text-[12px] text-ink-faint">

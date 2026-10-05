@@ -100,6 +100,8 @@ const PROJECTS: Project[] = [
   },
 ];
 
+const N = PROJECTS.length;
+
 const GalleryContent = ({
   p,
   N,
@@ -194,7 +196,27 @@ export default function ProjectsScene() {
   const galleryY = useRef(0);
   const qGalleryY = useRef<gsap.QuickToFunc | null>(null);
 
-  const [progress, setProgress] = useState(0);
+  const galleryArticleRefs = useRef<(HTMLElement | null)[]>([]);
+  const galleryBarRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const galleryCountRef = useRef<HTMLSpanElement>(null);
+
+  // Written straight to the DOM so scrubbing the gallery doesn't re-render
+  // the whole scene through React state on every scroll frame.
+  const applyGallery = (progress: number) => {
+    const t = Math.min(1, Math.max(0, (progress - 0.08) / 0.84));
+    const active = Math.min(N - 1, Math.round(t * (N - 1)));
+    const shift = `translateX(-${t * (N - 1) * 100}%)`;
+    galleryArticleRefs.current.forEach((el) => {
+      if (el) el.style.transform = shift;
+    });
+    galleryBarRefs.current.forEach((el, i) => {
+      if (el)
+        el.style.background = i <= active ? "var(--ink)" : "var(--line-strong)";
+    });
+    if (galleryCountRef.current)
+      galleryCountRef.current.textContent = `0${active + 1} / 0${N}`;
+  };
+
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeGalleryIdx, setActiveGalleryIdx] = useState(0);
@@ -203,19 +225,25 @@ export default function ProjectsScene() {
   useGSAP(
     () => {
       if (previewRef.current && cursorRef.current) {
-        xMovePreview.current = gsap.quickTo(previewRef.current, "left", {
+        // Follow the mouse with transforms (compositor only) instead of left/top,
+        // which forced a layout + repaint on every frame of the follow.
+        gsap.set([previewRef.current, cursorRef.current], {
+          xPercent: -50,
+          yPercent: -50,
+        });
+        xMovePreview.current = gsap.quickTo(previewRef.current, "x", {
           duration: 0.4,
           ease: "power3",
         });
-        yMovePreview.current = gsap.quickTo(previewRef.current, "top", {
+        yMovePreview.current = gsap.quickTo(previewRef.current, "y", {
           duration: 0.4,
           ease: "power3",
         });
-        xMoveCursor.current = gsap.quickTo(cursorRef.current, "left", {
+        xMoveCursor.current = gsap.quickTo(cursorRef.current, "x", {
           duration: 0.2,
           ease: "power3",
         });
-        yMoveCursor.current = gsap.quickTo(cursorRef.current, "top", {
+        yMoveCursor.current = gsap.quickTo(cursorRef.current, "y", {
           duration: 0.2,
           ease: "power3",
         });
@@ -257,7 +285,8 @@ export default function ProjectsScene() {
           start: "top top",
           end: "bottom bottom",
           scrub: true,
-          onUpdate: (self) => setProgress(self.progress),
+          onUpdate: (self) => applyGallery(self.progress),
+          onRefresh: (self) => applyGallery(self.progress),
         });
       }
     },
@@ -602,10 +631,6 @@ export default function ProjectsScene() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const N = PROJECTS.length;
-  const t = Math.min(1, Math.max(0, (progress - 0.08) / 0.84));
-  const active = Math.min(N - 1, Math.round(t * (N - 1)));
-
   return (
     <div className="relative">
       {/* 1. MAIN PROJECTS SCENE */}
@@ -617,7 +642,7 @@ export default function ProjectsScene() {
       >
         <div
           ref={previewRef}
-          className="pointer-events-none fixed z-40 w-[300px] md:w-[450px] aspect-[4/3] overflow-hidden border border-line shadow-2xl opacity-0 scale-90 -translate-x-1/2 -translate-y-1/2 bg-paper"
+          className="pointer-events-none fixed left-0 top-0 z-40 w-[300px] md:w-[450px] aspect-[4/3] overflow-hidden border border-line shadow-2xl opacity-0 scale-90 bg-paper"
         >
           {activeImage && (
             <img
@@ -629,7 +654,7 @@ export default function ProjectsScene() {
         </div>
         <div
           ref={cursorRef}
-          className="pointer-events-none fixed z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-ink text-paper font-mono-x text-[9px] font-bold uppercase tracking-widest opacity-0 scale-50 -translate-x-1/2 -translate-y-1/2"
+          className="pointer-events-none fixed left-0 top-0 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-ink text-paper font-mono-x text-[9px] font-bold uppercase tracking-widest opacity-0 scale-50"
         >
           View
         </div>
@@ -697,14 +722,14 @@ export default function ProjectsScene() {
         ) : (
           <div className="sticky top-0 h-screen w-full overflow-hidden">
             <div className="flex h-full w-full">
-              {PROJECTS.map((p) => (
+              {PROJECTS.map((p, i) => (
                 <article
                   key={p.n}
-                  className="relative flex h-full w-full shrink-0 items-center px-6 md:px-16"
-                  style={{
-                    transform: `translateX(-${t * (N - 1) * 100}%)`,
-                    willChange: "transform",
+                  ref={(el) => {
+                    galleryArticleRefs.current[i] = el;
                   }}
+                  className="relative flex h-full w-full shrink-0 items-center px-6 md:px-16"
+                  style={{ willChange: "transform" }}
                 >
                   <GalleryContent
                     p={p}
@@ -725,16 +750,22 @@ export default function ProjectsScene() {
                 {PROJECTS.map((p, i) => (
                   <div
                     key={p.n}
+                    ref={(el) => {
+                      galleryBarRefs.current[i] = el;
+                    }}
                     className="h-px flex-1 transition-colors duration-300"
                     style={{
                       background:
-                        i <= active ? "var(--ink)" : "var(--line-strong)",
+                        i === 0 ? "var(--ink)" : "var(--line-strong)",
                     }}
                   />
                 ))}
               </div>
-              <span className="font-mono-x text-[10px] tabular-nums text-ink-dim transition-all">
-                0{active + 1} / 0{N}
+              <span
+                ref={galleryCountRef}
+                className="font-mono-x text-[10px] tabular-nums text-ink-dim transition-all"
+              >
+                {`01 / 0${N}`}
               </span>
             </div>
           </div>

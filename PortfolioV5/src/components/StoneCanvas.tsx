@@ -104,15 +104,28 @@ export default function StoneCanvas({
     let raf = 0;
     let visible = true;
     const t0 = performance.now();
+    let prev = t0;
+    let lastMove = -Infinity;
+    // How long after the last pointer event the ripple is still held at full strength.
+    // Slow mouse movement fires events many frames apart, so without this the ripple
+    // fades between events and snaps back to full on the next one.
+    const HOLD_MS = 180;
     const loop = () => {
       if (!visible) { raf = 0; return; }
-      const t = (performance.now() - t0) / 1000;
+      const now = performance.now();
+      const t = (now - t0) / 1000;
+      // Frame-rate independent easing (k = 1 at 60fps)
+      const k = Math.min((now - prev) / 16.667, 3);
+      prev = now;
+      const m = mouse.current;
       gl.uniform1f(uTime, t);
-      mouse.current.currX += (mouse.current.targetX - mouse.current.currX) * 0.08;
-      mouse.current.currY += (mouse.current.targetY - mouse.current.currY) * 0.08;
-      gl.uniform2f(uMouse, mouse.current.currX, mouse.current.currY);
-      gl.uniform1f(uMouseAmt, interactive ? mouse.current.amt : 0.0);
-      mouse.current.amt *= 0.95;
+      const follow = 1 - Math.pow(0.92, k);
+      m.currX += (m.targetX - m.currX) * follow;
+      m.currY += (m.targetY - m.currY) * follow;
+      gl.uniform2f(uMouse, m.currX, m.currY);
+      gl.uniform1f(uMouseAmt, interactive ? m.amt : 0.0);
+      if (now - lastMove < HOLD_MS) m.amt += (1 - m.amt) * (1 - Math.pow(0.8, k));
+      else m.amt *= Math.pow(0.95, k);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(loop);
     };
@@ -129,7 +142,7 @@ export default function StoneCanvas({
       const rect = canvas.getBoundingClientRect();
       mouse.current.targetX = (e.clientX - rect.left) / rect.width;
       mouse.current.targetY = 1.0 - (e.clientY - rect.top) / rect.height;
-      mouse.current.amt = 1;
+      lastMove = performance.now();
     };
     if (interactive) window.addEventListener("pointermove", onMove, { passive: true });
 

@@ -234,6 +234,7 @@ export default function ProfileScene() {
                 <img
                   src="/sean-profile.webp"
                   alt="Sean"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>

@@ -146,11 +146,17 @@ export default function RingScene() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const lastPct = useRef("");
+
   const updateRing = (p: number) => {
     if (progressBarRef.current)
-      progressBarRef.current.style.width = `${p * 100}%`;
-    if (progressTextRef.current)
-      progressTextRef.current.innerText = `${String(Math.round(p * 100)).padStart(2, "0")}%`;
+      progressBarRef.current.style.transform = `scaleX(${p})`;
+    const pct = `${String(Math.round(p * 100)).padStart(2, "0")}%`;
+    if (progressTextRef.current && pct !== lastPct.current) {
+      lastPct.current = pct;
+      progressTextRef.current.textContent = pct;
+    }
 
     const phraseStart = 0.25;
     const phraseEnd = 0.75;
@@ -172,10 +178,16 @@ export default function RingScene() {
       if (!el) return;
       const imgT = p * TOTAL_RANGE - i * STAGGER;
 
+      // Tiles outside their orbit window are fully transparent; hiding them too
+      // stops the browser from compositing their blurred layers for nothing.
       if (imgT <= 0 || imgT >= 1) {
-        el.style.opacity = "0";
+        if (el.style.visibility !== "hidden") {
+          el.style.opacity = "0";
+          el.style.visibility = "hidden";
+        }
         return;
       }
+      if (el.style.visibility === "hidden") el.style.visibility = "";
 
       const pos = getPos(imgT);
       const rotDeg = (pos.rotY * 180) / Math.PI;
@@ -198,7 +210,7 @@ export default function RingScene() {
       el.style.zIndex = zIndex.toString();
       el.style.filter = `blur(${blurPx.toFixed(1)}px) brightness(${brightness.toFixed(2)})`;
 
-      const labelEl = el.querySelector(".cert-label") as HTMLElement;
+      const labelEl = labelRefs.current[i];
       if (labelEl) {
         labelEl.style.opacity =
           depth > 0.7 ? ((depth - 0.7) * 3.33).toString() : "0";
@@ -401,6 +413,9 @@ export default function RingScene() {
                 >
                   <CurvedImage src={t.image} />
                   <div
+                    ref={(el) => {
+                      labelRefs.current[i] = el;
+                    }}
                     className="cert-label absolute -bottom-8 left-0 w-full text-center"
                     style={{ transform: "translateZ(20px)", opacity: 0 }}
                   >
@@ -421,8 +436,8 @@ export default function RingScene() {
           <div className="h-px flex-1 bg-line-strong">
             <div
               ref={progressBarRef}
-              className="h-full bg-ink"
-              style={{ width: "0%" }}
+              className="h-full w-full origin-left bg-ink"
+              style={{ transform: "scaleX(0)" }}
             />
           </div>
           <span

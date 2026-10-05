@@ -22,11 +22,13 @@ export default function CertificatesArchive() {
       
       // Setup the quickTo functions for the floating preview
       if (previewRef.current) {
-        xMovePreview.current = gsap.quickTo(previewRef.current, "left", {
+        // Transforms instead of left/top so following the mouse never triggers layout
+        gsap.set(previewRef.current, { xPercent: -50, yPercent: -50 });
+        xMovePreview.current = gsap.quickTo(previewRef.current, "x", {
           duration: 0.3,
           ease: "power3",
         });
-        yMovePreview.current = gsap.quickTo(previewRef.current, "top", {
+        yMovePreview.current = gsap.quickTo(previewRef.current, "y", {
           duration: 0.3,
           ease: "power3",
         });
@@ -122,7 +124,7 @@ export default function CertificatesArchive() {
       {/* Floating Image Preview */}
       <div
         ref={previewRef}
-        className="pointer-events-none fixed z-50 w-[260px] md:w-[340px] aspect-[4/3] overflow-hidden border border-line bg-ink shadow-2xl opacity-0 scale-90 -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none fixed left-0 top-0 z-50 w-[260px] md:w-[340px] aspect-[4/3] overflow-hidden border border-line bg-ink shadow-2xl opacity-0 scale-90"
       >
         {activeImage && (
           <img
