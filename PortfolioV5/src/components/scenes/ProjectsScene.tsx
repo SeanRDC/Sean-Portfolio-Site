@@ -27,7 +27,7 @@ const PROJECTS: Project[] = [
     blurb:
       "A distraction-free, local-first Canvas LMS client that pulls every deadline across all enrolled courses into one sorted feed. It pairs a tool-calling AI co-pilot and study planner with offline caching, and ships with a scroll-driven landing page built in React and GSAP.",
     meta: ["Flutter", "Canvas REST API", "Groq AI", "React + GSAP"],
-    image: "/images/velo-cover.webp",
+    image: "/mockups/velo-1.webp",
     gallery: [
       "/mockups/velo-1.webp",
       "/mockups/velo-2.webp",
@@ -496,7 +496,7 @@ export default function ProjectsScene() {
   // --- CUSTOM SCROLL GALLERY LOGIC ---
   useEffect(() => {
     const el = detailOverlayRef.current;
-    if (!el || !selectedProject || window.innerWidth < 1024) return;
+    if (!el || !selectedProject || window.innerWidth < 768) return;
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -547,7 +547,7 @@ export default function ProjectsScene() {
   }, [selectedProject]);
 
   useEffect(() => {
-    if (!selectedProject || window.innerWidth < 1024) return;
+    if (!selectedProject || window.innerWidth < 768) return;
     let rafId: number;
 
     const updateActive = () => {
@@ -899,7 +899,7 @@ export default function ProjectsScene() {
               >
                 <div
                   ref={thumbsInnerRef}
-                  className="flex flex-col gap-6 w-full py-[40vh] px-4"
+                  className="flex flex-col gap-6 w-full py-[calc(50vh-40px)] px-4"
                 >
                   {selectedProject.gallery.map((img, i) => (
                     <img
