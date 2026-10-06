@@ -233,7 +233,7 @@ export default function ProfileScene() {
               <div className="relative w-full aspect-[4/3] overflow-hidden">
                 <img
                   src="/sean-profile.webp"
-                  alt="Sean"
+                  alt="Sean Dela Cruz"
                   decoding="async"
                   className="w-full h-full object-cover"
                 />

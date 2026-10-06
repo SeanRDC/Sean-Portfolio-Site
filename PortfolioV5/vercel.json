@@ -4,6 +4,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/certificates-archive",
+      "destination": "/certificates-archive/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

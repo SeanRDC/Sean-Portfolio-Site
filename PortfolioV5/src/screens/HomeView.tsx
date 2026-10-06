@@ -5,8 +5,11 @@ import ProjectsScene from "../components/scenes/ProjectsScene";
 import TechStackScene from "../components/scenes/TechStackScene";
 import RingScene from "../components/scenes/RingScene";
 import ContactScene from "../components/scenes/ContactScene";
+import { usePageTitle } from "../lib/usePageTitle";
 
 export default function HomeView() {
+  usePageTitle("Sean Dela Cruz | Full-Stack Developer & AI Automation Engineer");
+
   return (
     <div className="relative bg-paper">
       <Nav />

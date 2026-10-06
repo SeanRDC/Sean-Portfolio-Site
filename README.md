@@ -20,7 +20,7 @@
     A highly interactive, production-ready developer portfolio built to bridge the gap between solid engineering and high-end UX. Features cinematic scroll sequences, 3D spatial UI elements, and meticulously optimized mobile layouts.
     <br />
     <br />
-    <a href="https://example.com"><strong>View Live Demo »</strong></a>
+    <a href="https://www.seandelacruz.com"><strong>View Live Demo »</strong></a>
   </p>
 </div>
 

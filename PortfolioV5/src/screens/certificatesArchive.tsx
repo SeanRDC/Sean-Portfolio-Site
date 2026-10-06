@@ -3,8 +3,11 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { TILES } from "../data/certificates";
+import { usePageTitle } from "../lib/usePageTitle";
 
 export default function CertificatesArchive() {
+  usePageTitle("Certificates | Sean Dela Cruz");
+
   const containerRef = useRef<HTMLDivElement>(null);
   const pageFadeRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);

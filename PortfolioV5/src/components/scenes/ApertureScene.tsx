@@ -204,9 +204,12 @@ export default function ApertureScene() {
             <div className="text-ink-faint">Portfolio V5</div>
           </div>
           <div className="absolute inset-x-0 bottom-12 flex flex-col items-center gap-3">
-            <span className="t-label text-[12px] uppercase tracking-[0.4em] text-ink-soft">
-              sean - Developer &amp; Engineer
-            </span>
+            <h1 className="t-label m-0 px-6 text-center text-[12px] uppercase leading-relaxed tracking-[0.4em] text-ink-soft">
+              Sean Dela Cruz
+              <span className="hidden md:inline"> - </span>
+              <br className="md:hidden" />
+              Developer &amp; Engineer
+            </h1>
             <div className="flex items-center gap-3">
               <span className="font-mono-x text-[10px] uppercase tracking-[0.3em] text-ink-dim">
                 Scroll to enter
