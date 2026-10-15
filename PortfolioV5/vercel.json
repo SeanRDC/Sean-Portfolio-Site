@@ -2,6 +2,18 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/certificates-archive/index.html",
+      "destination": "/certificates-archive",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/certificates-archive",
