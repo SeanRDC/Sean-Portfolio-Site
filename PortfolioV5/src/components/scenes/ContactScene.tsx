@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { MOBILE_MOTION } from "../../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,8 +30,12 @@ export default function ContactScene() {
 
   useGSAP(
     () => {
+      // Flip the theme only on the two sections on screen here. Scrubbing these
+      // variables on <html> restyled the whole page every frame (the nav is
+      // already sliding away at this point, so it doesn't need them).
+      const ring = document.getElementById("ring");
       gsap.fromTo(
-        document.documentElement,
+        ring ? [ring, sectionRef.current] : sectionRef.current,
         {
           "--paper": "#f3efe7",
           "--ink": "#131210",
@@ -48,9 +53,47 @@ export default function ContactScene() {
             start: "top 60%",
             end: "top 20%",
             scrub: 0.5,
+            // The page background (seen in the overscroll bounce) flips once,
+            // at the end; background isn't inherited, so only <body> restyles.
+            onLeave: () => (document.body.style.backgroundColor = "#131210"),
+            onEnterBack: () => (document.body.style.backgroundColor = ""),
           },
         },
       );
+
+      const mm = gsap.matchMedia();
+      mm.add(MOBILE_MOTION, () => {
+        gsap.from(".contact-cta > *", {
+          autoAlpha: 0,
+          y: 16,
+          duration: 0.6,
+          stagger: 0.1,
+          delay: 0.35,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".contact-cta",
+            start: "top 92%",
+            toggleActions: "play none none reverse",
+          },
+        });
+        gsap.from(".contact-footer > *", {
+          autoAlpha: 0,
+          y: 10,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".contact-footer",
+            start: "top 98%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+
+      return () => {
+        mm.revert();
+        document.body.style.backgroundColor = "";
+      };
 
       gsap.fromTo(
         textRef.current,
@@ -101,11 +144,11 @@ export default function ContactScene() {
           TOUCH
         </h2>
         
-        <div className="flex flex-col gap-4 mt-8 md:mt-12 w-fit max-w-full">
+        <div className="contact-cta flex flex-col gap-4 mt-8 md:mt-12 w-fit max-w-full">
           {/* Email Button */}
           <a
             href="mailto:delacruzseanrhani@gmail.com"
-            className="group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink"
+            className="tap group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink"
           >
             <span className="t-label text-[10px] md:text-[13px] uppercase tracking-[0.2em] text-ink truncate">
               delacruzseanrhani@gmail.com
@@ -118,7 +161,7 @@ export default function ContactScene() {
           {/* View Resume Button */}
           <button
             onClick={() => setIsResumeOpen(true)}
-            className="group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink cursor-pointer bg-transparent outline-none p-0 text-left"
+            className="tap group inline-flex w-fit items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink cursor-pointer bg-transparent outline-none p-0 text-left"
           >
             <span className="t-label text-[10px] md:text-[13px] uppercase tracking-[0.2em] text-ink">
               View Resume
@@ -131,7 +174,7 @@ export default function ContactScene() {
       </div>
 
       {/* Minimal Footer */}
-      <div className="grid w-full grid-cols-2 items-center border-t border-line pt-6 md:grid-cols-4">
+      <div className="contact-footer grid w-full grid-cols-2 items-center border-t border-line pt-6 md:grid-cols-4">
         
         {/* 1. Year (Always visible) */}
         <div className="font-mono-x text-[10px] uppercase tracking-widest text-ink-dim">
@@ -140,13 +183,13 @@ export default function ContactScene() {
 
         {/* 2. MOBILE ONLY: Social Icons Flexbox */}
         <div className="flex items-center justify-end gap-5 md:hidden">
-          <a href="https://github.com/SeanRDC" className="text-ink-dim hover:text-ink transition-colors">
+          <a href="https://github.com/SeanRDC" className="tap text-ink-dim hover:text-ink transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
               <path d="M9 18c-4.51 2-5-2-7-2"></path>
             </svg>
           </a>
-          <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" className="text-ink-dim hover:text-ink transition-colors">
+          <a href="https://www.linkedin.com/in/sean-rhani-dela-cruz-834573334" className="tap text-ink-dim hover:text-ink transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
               <rect x="2" y="9" width="4" height="12"></rect>

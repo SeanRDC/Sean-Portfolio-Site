@@ -817,7 +817,7 @@ export default function ProjectsScene() {
                   onMouseEnter={() => handleMouseEnter(p.image)}
                   onMouseLeave={handleMouseLeave}
                   onClick={(e) => openProject(e, p)}
-                  className="proj-list-item group flex flex-col items-start justify-between border-b border-line py-12 transition-colors hover:bg-ink/[0.02] md:flex-row md:items-center cursor-none"
+                  className="proj-list-item tap group flex flex-col items-start justify-between border-b border-line py-12 transition-colors hover:bg-ink/[0.02] md:flex-row md:items-center cursor-none"
                 >
                   <div className="flex items-baseline gap-6 md:w-1/2 md:gap-12 pointer-events-none">
                     <span className="font-mono-x text-[12px] text-ink-faint shrink-0">

@@ -145,3 +145,16 @@ body {
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* ---- Mobile tap feedback ---- */
+/* Uses the standalone `scale` property so it never fights GSAP's transforms. */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .tap {
+    transition: scale 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tap:active {
+    scale: 0.96;
+    transition-duration: 0.1s;
+  }
+}

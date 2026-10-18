@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { MOBILE_MOTION } from "../../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -187,6 +188,36 @@ export default function TechStackScene() {
         };
       });
 
+      mm.add(MOBILE_MOTION, () => {
+        gsap.from(".stack-title", {
+          autoAlpha: 0,
+          y: 40,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: ".stack-title", start: "top 85%" },
+        });
+
+        // Each category rises in, then its badges pop in one after another.
+        catRefs.current.forEach((el) => {
+          if (!el) return;
+          const tl = gsap.timeline({
+            scrollTrigger: { trigger: el, start: "top 88%" },
+          });
+          tl.from(el, { autoAlpha: 0, y: 28, duration: 0.6, ease: "power2.out" }).from(
+            el.querySelectorAll("img"),
+            {
+              autoAlpha: 0,
+              y: 8,
+              scale: 0.85,
+              duration: 0.4,
+              stagger: 0.03,
+              ease: "back.out(2)",
+            },
+            "-=0.35",
+          );
+        });
+      });
+
       return () => mm.revert();
     },
     { scope: sectionRef },
@@ -208,7 +239,7 @@ export default function TechStackScene() {
             <div className="font-mono-x mb-2 md:mb-6 text-[11px] uppercase tracking-[0.4em] text-ink-dim">
               03 - Capability
             </div>
-            <h2 className="t-colossal text-[clamp(46px,11vw,150px)] leading-[0.82] text-ink">
+            <h2 className="stack-title t-colossal text-[clamp(46px,11vw,150px)] leading-[0.82] text-ink">
               TECH
               <br className="hidden md:block" />
               <span className="md:hidden"> </span>STACK

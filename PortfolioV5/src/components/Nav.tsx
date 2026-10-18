@@ -205,7 +205,7 @@ export default function Nav() {
             <a
               href="#contact"
               onClick={(e) => handleScroll(e, "contact")}
-              className="font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink transition-colors hover:text-ink-dim sm:hidden"
+              className="tap inline-block font-mono-x text-[10px] uppercase tracking-[0.2em] text-ink transition-colors hover:text-ink-dim sm:hidden"
             >
               Contact Me
             </a>

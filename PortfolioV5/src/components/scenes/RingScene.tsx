@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { createCertRing, type TileState } from "../certRing";
+import { MOBILE_MOTION } from "../../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -70,11 +71,12 @@ const TILES: Tile[] = [
 const N = TILES.length;
 const IMG_W = 360;
 const IMG_H = 260;
-const PERSPECTIVE = 1200;
+// Scales with the orbit so the front card's magnification stays ~1.85x.
+const PERSPECTIVE = 1400;
 const LABEL_GAP = 24;
 
-const ORBIT_RX = 480;
-const ORBIT_RZ = 550;
+const ORBIT_RX = 560;
+const ORBIT_RZ = 645;
 // The cards are panels of one globe this size, so they bend with the ring.
 const SPHERE_R = (ORBIT_RX + ORBIT_RZ) / 2;
 
@@ -86,8 +88,8 @@ const PHRASE: { text: string; accent?: boolean }[] = [
   { text: "ship", accent: true },
   { text: "." },
 ];
-const TILT_Y = 140;
-const OFF_X = 1200;
+const TILT_Y = 165;
+const OFF_X = 1400;
 const ENTRY_ANGLE = Math.PI / 2;
 
 const STAGGER = 0.08;
@@ -240,6 +242,38 @@ export default function RingScene() {
 
       mm.add("(max-width: 767px)", () => {
         updateRing(0.5);
+      });
+
+      mm.add(MOBILE_MOTION, () => {
+        // The blurred certificates behind the phrase drift at different
+        // speeds as the section scrolls past, for a little depth.
+        gsap.utils.toArray<HTMLElement>(".ring-bg").forEach((el, i) => {
+          const dir = i % 2 ? -1 : 1;
+          gsap.fromTo(
+            el,
+            { y: 60 * dir, rotate: `-=${4 * dir}` },
+            {
+              y: -60 * dir,
+              rotate: `+=${8 * dir}`,
+              ease: "none",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+              },
+            },
+          );
+        });
+
+        gsap.from(wordRefs.current, {
+          autoAlpha: 0,
+          y: 18,
+          duration: 0.6,
+          stagger: 0.04,
+          ease: "power2.out",
+          scrollTrigger: { trigger: sectionRef.current, start: "top 55%" },
+        });
       });
 
       // --- REVERSE ANIMATION IF RETURNING FROM ARCHIVE ---
@@ -407,10 +441,10 @@ export default function RingScene() {
                 className="absolute inset-0 pointer-events-none"
                 style={{ transform: "translateZ(-200px)" }}
               >
-                <img src={TILES[0].image} alt="" decoding="async" className="absolute top-[5%] -left-[35%] md:-left-[10%] w-[220px] md:w-[320px] -rotate-12 opacity-[0.90] md:hidden blur-sm" />
-                <img src={TILES[1].image} alt="" decoding="async" className="absolute top-[30%] -right-[45%] md:-right-[20%] w-[260px] md:w-[380px] rotate-12 opacity-[0.90] md:hidden blur-md" />
-                <img src={TILES[2].image} alt="" decoding="async" className="absolute bottom-[20%] -left-[35%] md:-left-[15%] w-[200px] md:w-[280px] rotate-6 opacity-[0.90] md:hidden blur-sm" />
-                <img src={TILES[3].image} alt="" decoding="async" className="absolute -bottom-[5%] -right-[35%] md:-right-[10%] w-[240px] md:w-[340px] -rotate-6 opacity-[0.90] md:hidden blur-sm" />
+                <img src={TILES[0].image} alt="" decoding="async" className="ring-bg absolute top-[5%] -left-[35%] md:-left-[10%] w-[220px] md:w-[320px] -rotate-12 opacity-[0.90] md:hidden blur-sm" />
+                <img src={TILES[1].image} alt="" decoding="async" className="ring-bg absolute top-[30%] -right-[45%] md:-right-[20%] w-[260px] md:w-[380px] rotate-12 opacity-[0.90] md:hidden blur-md" />
+                <img src={TILES[2].image} alt="" decoding="async" className="ring-bg absolute bottom-[20%] -left-[35%] md:-left-[15%] w-[200px] md:w-[280px] rotate-6 opacity-[0.90] md:hidden blur-sm" />
+                <img src={TILES[3].image} alt="" decoding="async" className="ring-bg absolute -bottom-[5%] -right-[35%] md:-right-[10%] w-[240px] md:w-[340px] -rotate-6 opacity-[0.90] md:hidden blur-sm" />
               </div>
 
               <div
@@ -486,7 +520,7 @@ export default function RingScene() {
           >
             <button
               onClick={handleNavigate}
-              className="group block w-[190px] h-[40px] bg-ink cursor-pointer outline-none border-none p-0"
+              className="tap group block w-[190px] h-[40px] bg-ink cursor-pointer outline-none border-none p-0"
               style={{
                 clipPath:
                   "polygon(0% 0%, calc(100% - 10px) 0%, 100% 10px, 100% 100%, 0% 100%)",

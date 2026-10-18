@@ -2,6 +2,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { MOBILE_MOTION } from "../../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,9 +42,49 @@ export default function ProfileScene() {
           trigger: sectionRef.current,
           start: "top 80%",
           end: "bottom 60%",
-          scrub: 0.5, 
+          scrub: 0.5,
         },
       });
+
+      const mm = gsap.matchMedia();
+      mm.add(MOBILE_MOTION, () => {
+        gsap.from(".profile-labels p", {
+          autoAlpha: 0,
+          x: -12,
+          duration: 0.6,
+          stagger: 0.07,
+          ease: "power2.out",
+          scrollTrigger: { trigger: ".profile-labels", start: "top 88%" },
+        });
+
+        // The photo wipes up into view, then drifts slightly inside its frame.
+        gsap.fromTo(
+          ".profile-photo",
+          { clipPath: "inset(100% 0% 0% 0%)" },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 1.1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: ".profile-photo", start: "top 85%" },
+          },
+        );
+        gsap.fromTo(
+          ".profile-photo img",
+          { scale: 1.15, yPercent: -5 },
+          {
+            scale: 1.08,
+            yPercent: 5,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".profile-photo",
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      });
+      return () => mm.revert();
     },
     { scope: sectionRef }
   );
@@ -212,7 +253,7 @@ export default function ProfileScene() {
           
           {/* LEFT COLUMN: Labels (Top), Computer (Middle), Image (Bottom) */}
           <div className="md:col-span-4 flex flex-col justify-between">
-            <div className="font-mono-x text-[10px] md:text-[11px] uppercase tracking-[0.1em] text-ink-dim leading-[1.8]">
+            <div className="profile-labels font-mono-x text-[10px] md:text-[11px] uppercase tracking-[0.1em] text-ink-dim leading-[1.8]">
               <p>Full-Stack Developer.</p>
               <p>AI Automation.</p>
               <p>UI/UX Design.</p>
@@ -230,7 +271,7 @@ export default function ProfileScene() {
               </div>
 
               {/* 2. Profile Image Block */}
-              <div className="relative w-full aspect-[4/3] overflow-hidden">
+              <div className="profile-photo relative w-full aspect-[4/3] overflow-hidden">
                 <img
                   src="/sean-profile.webp"
                   srcSet="/sean-profile-480.webp 480w, /sean-profile.webp 800w"
