@@ -138,10 +138,10 @@ export default function ApertureScene() {
         <div
           ref={maskRef}
           className="absolute inset-0 pointer-events-none"
-          style={{
-            transformOrigin: "50% 47%",
-            willChange: "transform, opacity",
-          }}
+          // No will-change here: a promoted layer is rasterized once at scale 1
+          // and the 4x zoom then stretches that bitmap, blurring the S. Left as
+          // a plain element, the SVG is redrawn at its real size every frame.
+          style={{ transformOrigin: "50% 47%" }}
         >
           <svg
             className="h-full w-full pointer-events-auto"

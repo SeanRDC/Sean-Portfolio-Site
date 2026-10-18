@@ -1,11 +1,13 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { createCertRing, type TileState } from "../certRing";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// `image` is a 1024px copy for the ring; the archive page keeps the originals.
 type Tile = { label: string; meta: string; kind: string; image: string };
 
 const TILES: Tile[] = [
@@ -13,69 +15,77 @@ const TILES: Tile[] = [
     label: "Google Ux Design",
     meta: "Professional - 2025",
     kind: "CERT",
-    image: "/certs/cg1.webp",
+    image: "/certs/ring/cg1.webp",
   },
   {
     label: "IBM AI Developer",
     meta: "Professional - 2026",
     kind: "CERT",
-    image: "/certs/IBM/IBM.webp",
+    image: "/certs/ring/IBM.webp",
   },
   {
     label: "OWASP Top 10 - 2021",
     meta: "Infosec - 2026",
     kind: "CERT",
-    image: "/certs/OWASP.webp",
+    image: "/certs/ring/OWASP.webp",
   },
   {
     label: "AI Fluency: Capabilities & Limitations",
     meta: "Antrophic Academy - 2026",
     kind: "CERT",
-    image: "/certs/Antrophic/A1.webp",
+    image: "/certs/ring/A1.webp",
   },
   {
     label: "JavaScript Essentials 2",
     meta: "Cisco - 2026",
     kind: "CERT",
-    image: "/certs/je2.webp",
+    image: "/certs/ring/je2.webp",
   },
   {
     label: "Python for Data Science, AI & Development",
     meta: "IBM - 2026",
     kind: "CERT",
-    image: "/certs/IBM/I5.webp",
+    image: "/certs/ring/I5.webp",
   },
   {
     label: "Foundations of UX Design",
     meta: "Google",
     kind: "CERT",
-    image: "/certs/cg2.webp",
+    image: "/certs/ring/cg2.webp",
   },
   {
     label: "Building Gen AI Powered Apps",
     meta: "IBM - 2026",
     kind: "CERT",
-    image: "/certs/IBM/I7.webp",
+    image: "/certs/ring/I7.webp",
   },
   {
     label: "Dynamic UI for Web",
     meta: "Google - 2025",
     kind: "CERT",
-    image: "/certs/cg9.webp",
+    image: "/certs/ring/cg9.webp",
   },
 ];
 
 const N = TILES.length;
 const IMG_W = 360;
 const IMG_H = 260;
-const SLICES = 10;
-const SLICE_W = IMG_W / SLICES;
-const CYL_R = 400;
-const TOTAL_BEND_DEG = (IMG_W / CYL_R) * (180 / Math.PI);
-const STEP_DEG = TOTAL_BEND_DEG / SLICES;
+const PERSPECTIVE = 1200;
+const LABEL_GAP = 24;
 
 const ORBIT_RX = 480;
 const ORBIT_RZ = 550;
+// The cards are panels of one globe this size, so they bend with the ring.
+const SPHERE_R = (ORBIT_RX + ORBIT_RZ) / 2;
+
+// The phrase, word by word; `accent` words use the serif italic.
+const PHRASE: { text: string; accent?: boolean }[] = [
+  ..."Every certification is a chance to".split(" ").map((text) => ({ text })),
+  ..."push the limits".split(" ").map((text) => ({ text, accent: true })),
+  ..."of what one engineer can".split(" ").map((text) => ({ text })),
+  { text: "ship", accent: true },
+  { text: "." },
+];
 const TILT_Y = 140;
 const OFF_X = 1200;
 const ENTRY_ANGLE = Math.PI / 2;
@@ -100,44 +110,15 @@ function getPos(t: number) {
   return { x: OFF_X * p, y: TILT_Y, z: ORBIT_RZ * (1 - p), rotY: Math.PI * 2 };
 }
 
-const CurvedImage = ({ src }: { src: string }) => {
-  return (
-    <div
-      className="relative"
-      style={{ width: IMG_W, height: IMG_H, transformStyle: "preserve-3d" }}
-    >
-      {Array.from({ length: SLICES }).map((_, s) => {
-        const angle = (s - (SLICES - 1) / 2) * STEP_DEG;
-        const displayW = SLICE_W + 1.5;
-        return (
-          <div
-            key={s}
-            className="absolute top-0 h-full"
-            style={{
-              width: `${displayW}px`,
-              left: "50%",
-              marginLeft: `${-displayW / 2}px`,
-              backgroundImage: `url(${src})`,
-              backgroundSize: `${IMG_W}px ${IMG_H}px`,
-              backgroundPosition: `${-s * SLICE_W}px 0`,
-              transformOrigin: `50% 50% ${-CYL_R}px`,
-              transform: `rotateY(${angle}deg)`,
-              willChange: "transform",
-              imageRendering: "crisp-edges" as any,
-              backfaceVisibility: "hidden",
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
-
 export default function RingScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const returnOverlayRef = useRef<HTMLDivElement>(null);
 
-  const ringItemsRef = useRef<(HTMLDivElement | null)[]>([]);
+  // The ring is drawn by WebGL into one canvas under the phrase.
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const ringRef = useRef<ReturnType<typeof createCertRing>>(null);
+  const progressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const progressTextRef = useRef<HTMLSpanElement>(null);
@@ -165,57 +146,68 @@ export default function RingScene() {
       let textAlpha = 0;
       if (p >= phraseStart && p <= phraseEnd) {
         const globalP = (p - phraseStart) / (phraseEnd - phraseStart);
-        textY = 150 * (0.5 - globalP);
+        textY = 200 * (0.5 - globalP);
         if (globalP < 0.1) textAlpha = globalP / 0.1;
         else if (globalP > 0.75) textAlpha = (1 - globalP) / 0.25;
         else textAlpha = 1;
+
+        // Words surface one after another out of a blur over the first 40%
+        // of the phrase's window, each taking about three words' worth.
+        const revealEnd = 0.4;
+        const words = wordRefs.current;
+        words.forEach((w, wi) => {
+          if (!w) return;
+          let wp = 1;
+          if (globalP < revealEnd) {
+            const t = (globalP / revealEnd) * (words.length + 4) - wi;
+            wp = Math.max(0, Math.min(1, t / 3));
+          }
+          w.style.opacity = wp.toFixed(3);
+          w.style.filter = wp >= 1 ? "none" : `blur(${(8 * (1 - wp)).toFixed(1)}px)`;
+        });
       }
-      textContainerRef.current.style.transform = `translate(-50%, calc(-50% + ${textY}px)) translateZ(-100px)`;
+      textContainerRef.current.style.transform = `translate(-50%, calc(-50% + ${textY}px))`;
       textContainerRef.current.style.opacity = textAlpha.toString();
     }
 
-    ringItemsRef.current.forEach((el, i) => {
-      if (!el) return;
-      const imgT = p * TOTAL_RANGE - i * STAGGER;
+    progressRef.current = p;
+    const tiles: { i: number; s: TileState }[] = [];
+    const view = canvasRef.current;
+    const halfW = (view?.clientWidth ?? 0) / 2;
+    const halfH = (view?.clientHeight ?? 0) / 2;
+    // One card size for the whole ring, from the viewport width.
+    const scale = Math.min(260, Math.max(150, halfW * 2 * 0.16)) / IMG_W;
 
-      // Tiles outside their orbit window are fully transparent; hiding them too
-      // stops the browser from compositing their blurred layers for nothing.
+    TILES.forEach((_, i) => {
+      const imgT = p * TOTAL_RANGE - i * STAGGER;
+      const labelEl = labelRefs.current[i];
       if (imgT <= 0 || imgT >= 1) {
-        if (el.style.visibility !== "hidden") {
-          el.style.opacity = "0";
-          el.style.visibility = "hidden";
-        }
+        if (labelEl) labelEl.style.opacity = "0";
         return;
       }
-      if (el.style.visibility === "hidden") el.style.visibility = "";
 
+      // Every card keeps its size; perspective alone gives the depth, so the
+      // ones passing behind the globe stay visible (seen from their back).
       const pos = getPos(imgT);
-      const rotDeg = (pos.rotY * 180) / Math.PI;
       const depth = (pos.z + ORBIT_RZ) / (ORBIT_RZ * 2);
-      
-      const scale = 0.2 + depth * 0.4;
-      const rawBlur = (1 - depth) * 12;
-      const blurPx = rawBlur < 1.5 ? 0 : rawBlur;
-      
-      const brightness = 0.2 + depth * 0.8;
 
       let alpha = 1;
       if (imgT < 0.06) alpha = imgT / 0.06;
       else if (imgT > 0.94) alpha = (1 - imgT) / 0.06;
 
-      const zIndex = Math.round(pos.z + 1000);
+      tiles.push({ i, s: { ...pos, scale, alpha } });
 
-      el.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) scale(${scale.toFixed(2)}) rotateY(${rotDeg.toFixed(1)}deg)`;
-      el.style.opacity = alpha.toString();
-      el.style.zIndex = zIndex.toString();
-      el.style.filter = `blur(${blurPx.toFixed(1)}px) brightness(${brightness.toFixed(2)})`;
-
-      const labelEl = labelRefs.current[i];
       if (labelEl) {
+        // Same projection as the tile: under its bottom edge, sized with it.
+        const k = PERSPECTIVE / (PERSPECTIVE - pos.z);
+        const ly = pos.y + scale * (IMG_H / 2 + LABEL_GAP);
+        labelEl.style.transform = `translate(${(halfW + pos.x * k).toFixed(1)}px, ${(halfH + ly * k).toFixed(1)}px) translate(-50%, -50%) scale(${(scale * k).toFixed(3)})`;
         labelEl.style.opacity =
           depth > 0.7 ? ((depth - 0.7) * 3.33).toString() : "0";
       }
     });
+
+    ringRef.current?.draw(tiles);
 
     if (returnBtnRef.current) {
       if (p > 0.02 && p < 0.98) {
@@ -302,6 +294,54 @@ export default function RingScene() {
     { scope: sectionRef },
   );
 
+  // Desktop only (the ring is hidden on phones). Setting up WebGL takes a
+  // few dozen ms, so do it in idle time a few screens before the section
+  // arrives rather than mid-scroll, and not on page load.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const section = sectionRef.current;
+    if (!canvas || !section) return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+
+    let ro: ResizeObserver | null = null;
+    let idle = 0;
+    const init = () => {
+      if (ringRef.current) return;
+      ringRef.current = createCertRing(
+        canvas,
+        TILES.map((t) => t.image),
+        { w: IMG_W, h: IMG_H },
+        PERSPECTIVE,
+        SPHERE_R,
+        () => updateRing(progressRef.current),
+      );
+      ro = new ResizeObserver(() => {
+        ringRef.current?.resize();
+        updateRing(progressRef.current);
+      });
+      ro.observe(canvas);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        if ("requestIdleCallback" in window)
+          idle = window.requestIdleCallback(init, { timeout: 1500 });
+        else init();
+      },
+      { rootMargin: "300% 0px" },
+    );
+    io.observe(section);
+
+    return () => {
+      io.disconnect();
+      if (idle) window.cancelIdleCallback(idle);
+      ro?.disconnect();
+      ringRef.current?.dispose();
+      ringRef.current = null;
+    };
+  }, []);
+
   const handleNavigate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const btn = e.currentTarget;
@@ -351,20 +391,26 @@ export default function RingScene() {
           </div>
         </div>
 
-        <div className="absolute inset-0" style={{ perspective: "1200px" }}>
+        <canvas
+          ref={canvasRef}
+          className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
+        />
+
+        <div className="absolute inset-0" style={{ perspective: `${PERSPECTIVE}px` }}>
             <div
               className="absolute inset-0"
               style={{ transformStyle: "preserve-3d" }}
             >
-              {/* Scattered Background Certificates (Pushed back in 3D space) */}
+              {/* Scattered Background Certificates (Pushed back in 3D space). Phones only:
+                  on desktop they were 3% opacity yet cost a ~50ms frame to blur. */}
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{ transform: "translateZ(-200px)" }}
               >
-                <img src={TILES[0].image} alt="" className="absolute top-[5%] -left-[35%] md:-left-[10%] w-[220px] md:w-[320px] -rotate-12 opacity-[0.90] md:opacity-[0.03] blur-sm" />
-                <img src={TILES[1].image} alt="" className="absolute top-[30%] -right-[45%] md:-right-[20%] w-[260px] md:w-[380px] rotate-12 opacity-[0.90] md:opacity-[0.03] blur-md" />
-                <img src={TILES[2].image} alt="" className="absolute bottom-[20%] -left-[35%] md:-left-[15%] w-[200px] md:w-[280px] rotate-6 opacity-[0.90] md:opacity-[0.03] blur-sm" />
-                <img src={TILES[3].image} alt="" className="absolute -bottom-[5%] -right-[35%] md:-right-[10%] w-[240px] md:w-[340px] -rotate-6 opacity-[0.90] md:opacity-[0.03] blur-sm" />
+                <img src={TILES[0].image} alt="" decoding="async" className="absolute top-[5%] -left-[35%] md:-left-[10%] w-[220px] md:w-[320px] -rotate-12 opacity-[0.90] md:hidden blur-sm" />
+                <img src={TILES[1].image} alt="" decoding="async" className="absolute top-[30%] -right-[45%] md:-right-[20%] w-[260px] md:w-[380px] rotate-12 opacity-[0.90] md:hidden blur-md" />
+                <img src={TILES[2].image} alt="" decoding="async" className="absolute bottom-[20%] -left-[35%] md:-left-[15%] w-[200px] md:w-[280px] rotate-6 opacity-[0.90] md:hidden blur-sm" />
+                <img src={TILES[3].image} alt="" decoding="async" className="absolute -bottom-[5%] -right-[35%] md:-right-[10%] w-[240px] md:w-[340px] -rotate-6 opacity-[0.90] md:hidden blur-sm" />
               </div>
 
               <div
@@ -377,56 +423,41 @@ export default function RingScene() {
                     Milestones
                   </div>
                   <p className="t-display text-[32px] sm:text-[40px] md:text-[clamp(26px,4.2vw,54px)] leading-[1.1] md:leading-[1.06] text-ink">
-                    Every certification is a chance to{" "}
-                    <span className="t-serif-i font-normal text-ink-dim">
-                      push the limits
-                    </span>{" "}
-                    of what one engineer can{" "}
-                    <span className="t-serif-i font-normal text-ink-dim">
-                      ship
-                    </span>
-                    . 
+                    {PHRASE.map((w, wi) => (
+                      <span key={wi}>
+                        {wi > 0 && w.text !== "." && " "}
+                        <span
+                          ref={(el) => {
+                            wordRefs.current[wi] = el;
+                          }}
+                          className={`inline-block ${w.accent ? "t-serif-i font-normal text-ink-dim" : ""}`}
+                        >
+                          {w.text}
+                        </span>
+                      </span>
+                    ))}
                   </p>
                 </div>
               </div>
 
-            <div
-              className="absolute inset-0 hidden md:block"
-              style={{ transformStyle: "preserve-3d" }}
-            >
-              {TILES.map((t, i) => (
-                <div
-                  key={t.label}
-                  ref={(el) => {
-                    ringItemsRef.current[i] = el;
-                  }}
-                  className="absolute left-1/2 top-1/2"
-                  style={{
-                    width: IMG_W,
-                    height: IMG_H,
-                    marginLeft: -IMG_W / 2,
-                    marginTop: -IMG_H / 2,
-                    opacity: 0,
-                    transformStyle: "preserve-3d",
-                    willChange: "transform, opacity, filter",
-                  }}
-                >
-                  <CurvedImage src={t.image} />
-                  <div
-                    ref={(el) => {
-                      labelRefs.current[i] = el;
-                    }}
-                    className="cert-label absolute -bottom-8 left-0 w-full text-center"
-                    style={{ transform: "translateZ(20px)", opacity: 0 }}
-                  >
-                    <div className="font-mono-x text-[9px] uppercase tracking-[0.2em] text-ink">
-                      {t.label}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 hidden md:block">
+          {TILES.map((t, i) => (
+            <div
+              key={t.label}
+              ref={(el) => {
+                labelRefs.current[i] = el;
+              }}
+              className="cert-label absolute left-0 top-0 text-center"
+              style={{ width: IMG_W, opacity: 0 }}
+            >
+              <div className="font-mono-x text-[9px] uppercase tracking-[0.2em] text-ink">
+                {t.label}
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="pointer-events-none absolute inset-x-10 bottom-8 z-50 hidden md:flex items-center gap-4">
