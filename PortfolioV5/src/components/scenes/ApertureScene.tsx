@@ -4,19 +4,27 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useLocation } from "react-router-dom";
 import StoneCanvas from "../StoneCanvas";
+import { carveIntro } from "../intro/carveIntro";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// A smaller, cleaner character set for a sophisticated, slow scramble
-const CHARS = "SRDCOIGP";
-const getRand = () => CHARS[Math.floor(Math.random() * CHARS.length)];
+const ZOOM = 1.1;
+
+// Wait for the intro face so outlines are measured against the real letters,
+// but never hold the page back for more than a moment.
+const fontReady = () =>
+  Promise.race([
+    document.fonts.load("900 expanded 24px Archivo").catch(() => {}),
+    new Promise((r) => setTimeout(r, 2500)),
+  ]);
 
 export default function ApertureScene() {
   const location = useLocation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
-  
+  const overlayRef = useRef<SVGGElement>(null);
+
   // References for the SVG letters inside the mask
   const refS = useRef<SVGTextElement>(null);
   const refR = useRef<SVGTextElement>(null);
@@ -27,88 +35,55 @@ export default function ApertureScene() {
   const [introDone, setIntroDone] = useState(!!location.state?.returnToRing);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const hasPlayed = location.state?.returnToRing;
-      const isMobile = window.innerWidth < 768;
+      const letters = { S: refS.current!, R: refR.current!, D: refD.current!, C: refC.current! };
+      const rest = [letters.R, letters.D, letters.C];
+
+      const reveal = () => {
+        setIntroDone(true);
+        // Lets the Nav fade in together with the HUD labels
+        window.dispatchEvent(new CustomEvent("introDone"));
+      };
+      const finalState = () => {
+        gsap.set(maskRef.current, { scale: 4 });
+        gsap.set(rest, { opacity: 0 });
+        gsap.set(letters.S, { opacity: 1, attr: { x: 50 } });
+      };
+
+      let cancelled = false;
+      let tl: gsap.core.Timeline | null = null;
+      const skip = () => tl?.progress(1);
+      const skipEvents = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+      const unlock = () => {
+        document.body.style.overflow = "";
+        skipEvents.forEach((ev) => window.removeEventListener(ev, skip));
+      };
 
       if (hasPlayed) {
         // If returning to the page from the archive, instantly set to final state & skip locking
         setIntroDone(true);
-        gsap.set(maskRef.current, { scale: 4 });
-        gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
-        gsap.set(refS.current, { attr: { x: 50 } });
+        finalState();
+      } else if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        // Reduced motion: no zoom or travel, just the labels fading in.
+        finalState();
+        reveal();
       } else {
         // --- 1. THE OPENING INTRO ANIMATION ---
-        const tl = gsap.timeline({
-          onStart: () => {
-            document.body.style.overflow = "hidden";
-            window.scrollTo(0, 0);
-          },
-          onComplete: () => {
-            document.body.style.overflow = "";
-            setIntroDone(true);
-          },
-        });
+        document.body.style.overflow = "hidden";
+        window.scrollTo(0, 0);
+        // Nothing shows until the font is ready, so no fallback letters flash.
+        gsap.set([letters.S, ...rest], { opacity: 0 });
 
-        if (!isMobile) {
-          // Desktop: Play the full 3-second letter shuffling effect
-          let lastStep = -1;
-          tl.to({ v: 0 }, {
-            v: 100,
-            duration: 3.0,
-            ease: "none",
-            onUpdate: function () {
-              const p = this.targets()[0].v;
-              const step = Math.floor(p / 6);
-              if (step !== lastStep) {
-                lastStep = step;
-                if (refS.current) refS.current.textContent = p > 25 ? "S" : getRand();
-                if (refR.current) refR.current.textContent = p > 50 ? "R" : getRand();
-                if (refD.current) refD.current.textContent = p > 75 ? "D" : getRand();
-                if (refC.current) refC.current.textContent = p > 95 ? "C" : getRand();
-              }
-            },
-          });
-          tl.to({}, { duration: 0.5 });
-          
-          // Desktop: Fade out R, D, C and slide S to center
-          tl.to(
-            [refR.current, refD.current, refC.current],
-            { opacity: 0, duration: 0.8, ease: "power2.inOut" }
-          );
-          tl.to(
-            refS.current,
-            { attr: { x: 50 }, duration: 0.8, ease: "power2.inOut" },
-            "<"
-          );
-          
-          // Desktop: Zoom in
-          tl.to(
-            maskRef.current,
-            { 
-              scale: 4, 
-              duration: 1.5, 
-              ease: "power2.inOut",
-              force3D: false 
-            }
-          );
-        } else {
-          // Mobile: Instantly hide R, D, C and center S
-          gsap.set([refR.current, refD.current, refC.current], { opacity: 0 });
-          gsap.set(refS.current, { attr: { x: 50 } });
-
-          // Mobile: Hold briefly on the centered "S", then zoom directly in
-          tl.to({}, { duration: 0.4 });
-          tl.to(
-            maskRef.current,
-            { 
-              scale: 4, 
-              duration: 1.5, 
-              ease: "power2.inOut",
-              force3D: false 
-            }
-          );
-        }
+        fontReady().then(contextSafe!(() => {
+          if (cancelled) return;
+          tl = gsap.timeline({ onComplete: unlock });
+          tl.add(carveIntro({ letters, overlay: overlayRef.current! }));
+          tl.to(maskRef.current, { scale: 4, duration: ZOOM, ease: "power2.inOut", force3D: false });
+          // Start the labels' fade during the zoom so the two read as one move.
+          tl.call(reveal, [], `-=${ZOOM * 0.3}`);
+          skipEvents.forEach((ev) => window.addEventListener(ev, skip, { passive: true }));
+        }));
       }
 
       // --- 2. THE PROFILE OVERLAP TRANSITION ---
@@ -125,6 +100,12 @@ export default function ApertureScene() {
           scrub: true,
         },
       });
+
+      return () => {
+        cancelled = true;
+        unlock();
+        overlayRef.current?.replaceChildren();
+      };
     },
     { scope: sectionRef }
   );
@@ -188,6 +169,8 @@ export default function ApertureScene() {
               fill="url(#lip)"
               mask="url(#s-cut)"
             />
+            {/* chisel lines the intro draws on the plane */}
+            <g ref={overlayRef} mask="url(#s-cut)" />
           </svg>
         </div>
         

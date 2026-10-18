@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useLocation } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,6 +19,10 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [isProjectOpen, setIsProjectOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  // Hidden during the SRDC intro; ApertureScene fires "introDone" when the S
+  // zoom finishes. Returning from the certificates archive skips the intro.
+  const location = useLocation();
+  const [introDone, setIntroDone] = useState(!!location.state?.returnToRing);
 
   useGSAP(() => {
     ScrollTrigger.create({
@@ -47,10 +52,13 @@ export default function Nav() {
     // Listen for the Case Study opening/closing
     const handleProjectOpen = () => setIsProjectOpen(true);
     const handleProjectClose = () => setIsProjectOpen(false);
+    const handleIntroDone = () => setIntroDone(true);
     window.addEventListener("projectOpen", handleProjectOpen);
     window.addEventListener("projectClose", handleProjectClose);
+    window.addEventListener("introDone", handleIntroDone);
 
     return () => {
+      window.removeEventListener("introDone", handleIntroDone);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("projectOpen", handleProjectOpen);
       window.removeEventListener("projectClose", handleProjectClose);
@@ -113,7 +121,9 @@ export default function Nav() {
             : "1px solid transparent",
       }}
     >
-      <div className="flex items-center justify-between px-6 py-4 md:px-10">
+      <div
+        className={`flex items-center justify-between px-6 py-4 md:px-10 transition-opacity duration-1000 ${introDone ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      >
         
         {/* Dynamic Logo */}
         <a 
