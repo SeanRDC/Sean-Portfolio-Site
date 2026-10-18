@@ -1,28 +1,36 @@
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TILES } from "../data/certificates";
 import { usePageTitle } from "../lib/usePageTitle";
+import { holdCover, whenSettled, wipeCover, wipeReveal } from "../lib/circleWipe";
+
+// The preview is 340px wide; the full scans are up to 4961px and stalled the
+// page decoding on hover. public/certs/preview holds 720px copies.
+const previewOf = (image: string) => image.replace("/certs/", "/certs/preview/");
 
 export default function CertificatesArchive() {
   usePageTitle("Certificates | Sean Dela Cruz");
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const pageFadeRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  
+  const previewImgRef = useRef<HTMLImageElement>(null);
+
   const xMovePreview = useRef<gsap.QuickToFunc | null>(null);
   const yMovePreview = useRef<gsap.QuickToFunc | null>(null);
-  
-  const [activeImage, setActiveImage] = useState<string | null>(null);
+
   const navigate = useNavigate();
-  const location = useLocation();
+
+  // Arriving from the ring, the ink circle is still covering the screen; on a
+  // direct load, cover it here before the first paint.
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    holdCover();
+  }, []);
 
   useGSAP(
     () => {
-      window.scrollTo({ top: 0, behavior: "instant" });
-      
       // Setup the quickTo functions for the floating preview
       if (previewRef.current) {
         // Transforms instead of left/top so following the mouse never triggers layout
@@ -36,60 +44,43 @@ export default function CertificatesArchive() {
           ease: "power3",
         });
       }
-
-      // Entry Animation (Circular Reveal)
-      const cx = location.state?.cx || window.innerWidth / 2;
-      const cy = location.state?.cy || window.innerHeight - 100;
-
-      const entryTl = gsap.timeline();
-      entryTl.fromTo(
-        pageFadeRef.current,
-        { clipPath: `circle(200vmax at ${cx}px ${cy}px)` },
-        {
-          clipPath: `circle(0px at ${cx}px ${cy}px)`,
-          duration: 1.2,
-          ease: "power3.inOut",
-        }
-      );
-      
-      // Stagger in the sidebar and list items
-      entryTl.fromTo(
-        ".sidebar-item",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" },
-        0.4
-      );
-      entryTl.fromTo(
-        ".list-item",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, stagger: 0.03, ease: "power2.out" },
-        0.6
-      );
     },
     { scope: containerRef }
   );
 
+  // Reveal only once the route swap has finished its work, so nothing competes
+  // with the wipe. The rows and sidebar rise in with CSS animations (index.css),
+  // which the compositor runs without reading styles back.
+  useEffect(() => {
+    let cancelled = false;
+    whenSettled().then(() => {
+      if (cancelled) return;
+      wipeReveal();
+      containerRef.current?.classList.add("archive-in");
+
+      // Warm the hover previews for mouse users, one at a time in idle time.
+      if (!window.matchMedia("(hover: hover)").matches) return;
+      const queue = [...new Set(TILES.map((t) => previewOf(t.image)))];
+      const next = () => {
+        const src = queue.shift();
+        if (!src || cancelled) return;
+        const img = new Image();
+        img.src = src;
+        img.decode().catch(() => {}).finally(() => window.requestIdleCallback?.(next) ?? setTimeout(next, 50));
+      };
+      next();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleBack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const btn = e.currentTarget;
-    const rect = btn.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-[9999999] bg-ink pointer-events-none";
-    overlay.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
-    document.body.appendChild(overlay);
-
-    gsap.to(overlay, {
-      clipPath: `circle(200vmax at ${cx}px ${cy}px)`,
-      duration: 1.2,
-      ease: "power3.inOut",
-      onComplete: () => {
-        navigate("/#ring", { state: { returnToRing: true, cx, cy } });
-        setTimeout(() => overlay.remove(), 100);
-      },
-    });
+    const rect = e.currentTarget.getBoundingClientRect();
+    wipeCover(rect.left + rect.width / 2, rect.top + rect.height / 2).then(() =>
+      navigate("/#ring", { state: { returnToRing: true } }),
+    );
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -100,7 +91,10 @@ export default function CertificatesArchive() {
   };
 
   const handleMouseEnter = (image: string) => {
-    setActiveImage(image);
+    // Swapped on the element directly: a state update re-rendered all 45 rows.
+    const img = previewImgRef.current;
+    const src = previewOf(image);
+    if (img && img.getAttribute("src") !== src) img.src = src;
     gsap.to(previewRef.current, {
       scale: 1,
       autoAlpha: 1,
@@ -129,25 +123,13 @@ export default function CertificatesArchive() {
         ref={previewRef}
         className="pointer-events-none fixed left-0 top-0 z-50 w-[260px] md:w-[340px] aspect-[4/3] overflow-hidden border border-line bg-ink shadow-2xl opacity-0 scale-90"
       >
-        {activeImage && (
-          <img
-            src={activeImage}
-            alt="Preview"
-            className="w-full h-full object-cover opacity-90"
-          />
-        )}
+        <img
+          ref={previewImgRef}
+          alt="Preview"
+          decoding="async"
+          className="w-full h-full object-cover opacity-90"
+        />
       </div>
-
-      {/* Entry/Exit Circular Overlay */}
-      <div
-        ref={pageFadeRef}
-        className="fixed inset-0 bg-ink z-[9999999] pointer-events-none"
-        style={{
-          clipPath: `circle(200vmax at ${location.state?.cx || window.innerWidth / 2}px ${
-            location.state?.cy || window.innerHeight / 2
-          }px)`,
-        }}
-      />
 
       <div className="flex flex-col lg:grid lg:min-h-screen w-full lg:grid-cols-[340px_1fr]">
         
@@ -156,6 +138,7 @@ export default function CertificatesArchive() {
           <div className="space-y-12">
             <button
               onClick={handleBack}
+              style={{ "--i": 0 } as React.CSSProperties}
               className="sidebar-item group flex w-fit items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-ink-dim transition-colors hover:text-ink cursor-pointer bg-transparent border-none p-0 outline-none"
             >
               <svg
@@ -173,7 +156,8 @@ export default function CertificatesArchive() {
               </svg>
               Back to Sequence
             </button>
-            <div className="sidebar-item [&_p]:mb-5 [&_p]:text-[9px] [&_p]:uppercase [&_p]:leading-relaxed [&_p]:tracking-[0.15em] [&_p]:text-ink-dim">
+            <div style={{ "--i": 1 } as React.CSSProperties}
+              className="sidebar-item [&_p]:mb-5 [&_p]:text-[9px] [&_p]:uppercase [&_p]:leading-relaxed [&_p]:tracking-[0.15em] [&_p]:text-ink-dim">
               <p className="font-bold text-ink">
                 More than credentials—these are milestones:
               </p>
@@ -183,11 +167,16 @@ export default function CertificatesArchive() {
           </div>
           
           <div className="flex flex-col -ml-1 mt-12 lg:mt-0">
-            <h1 className="sidebar-item t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink">Archive</h1>
-            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">Archive</h1>
-            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">Archive</h1>
-            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">Archive</h1>
-            <h1 className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">Archive</h1>
+            <h1 style={{ "--i": 2 } as React.CSSProperties}
+              className="sidebar-item t-display text-[48px] uppercase leading-[0.85] tracking-tight text-ink">Archive</h1>
+            <h1 style={{ "--i": 3 } as React.CSSProperties}
+              className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/80">Archive</h1>
+            <h1 style={{ "--i": 4 } as React.CSSProperties}
+              className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/60">Archive</h1>
+            <h1 style={{ "--i": 5 } as React.CSSProperties}
+              className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/40">Archive</h1>
+            <h1 style={{ "--i": 6 } as React.CSSProperties}
+              className="sidebar-item t-display hidden lg:block text-[48px] uppercase leading-[0.85] tracking-tight text-ink/20">Archive</h1>
           </div>
         </aside>
 
@@ -201,6 +190,7 @@ export default function CertificatesArchive() {
               rel="noopener noreferrer"
               onMouseEnter={() => handleMouseEnter(t.image)}
               onMouseLeave={handleMouseLeave}
+              style={{ "--i": i } as React.CSSProperties}
               className="list-item group flex flex-col sm:flex-row sm:items-center justify-between border-b border-line px-6 py-6 md:px-12 md:py-8 hover:bg-ink/[0.02] transition-colors cursor-pointer"
             >
               <div className="flex flex-col pr-4">

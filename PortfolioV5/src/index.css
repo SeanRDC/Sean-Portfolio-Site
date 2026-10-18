@@ -158,3 +158,38 @@ body {
     transition-duration: 0.1s;
   }
 }
+
+/* ---- Certificates archive entry ---- */
+/* Started by .archive-in once the page has settled; CSS so the compositor runs
+   it, timed against the 1.2s circle reveal. */
+.sidebar-item,
+.list-item {
+  opacity: 0;
+}
+.archive-in .sidebar-item {
+  animation: archive-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(400ms + var(--i, 0) * 100ms);
+  --rise: 30px;
+}
+.archive-in .list-item {
+  animation: archive-rise 0.6s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: calc(600ms + var(--i, 0) * 30ms);
+  --rise: 20px;
+}
+@keyframes archive-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .archive-in .sidebar-item,
+  .archive-in .list-item {
+    animation: none;
+    opacity: 1;
+  }
+}

@@ -1,10 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { createCertRing, type TileState } from "../certRing";
 import { MOBILE_MOTION } from "../../lib/motion";
+import { holdCover, whenSettled, wipeCover, wipeReveal } from "../../lib/circleWipe";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -114,7 +115,6 @@ function getPos(t: number) {
 
 export default function RingScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const returnOverlayRef = useRef<HTMLDivElement>(null);
 
   // The ring is drawn by WebGL into one canvas under the phrase.
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -128,6 +128,19 @@ export default function RingScene() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const returning = !!location.state?.returnToRing;
+  // Resolves once the WebGL ring has its textures (or right away without it).
+  const [ringReady] = useState(() => {
+    let resolve = () => {};
+    const promise = new Promise<void>((r) => (resolve = r));
+    return { promise, resolve };
+  });
+
+  // Coming back from the archive the ink circle should still be up; make sure
+  // of it before the first paint.
+  useLayoutEffect(() => {
+    if (returning) holdCover();
+  }, [returning]);
 
   const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lastPct = useRef("");
@@ -226,10 +239,10 @@ export default function RingScene() {
 
   useGSAP(
     () => {
-      let mm = gsap.matchMedia();
+      const mm = gsap.matchMedia();
 
       mm.add("(min-width: 768px)", () => {
-        if (!location.state?.returnToRing) updateRing(0);
+        if (!returning) updateRing(0);
 
         ScrollTrigger.create({
           trigger: sectionRef.current,
@@ -276,8 +289,11 @@ export default function RingScene() {
         });
       });
 
-      // --- REVERSE ANIMATION IF RETURNING FROM ARCHIVE ---
-      if (location.state?.returnToRing && returnOverlayRef.current) {
+      // --- RETURNING FROM THE ARCHIVE ---
+      // The ink circle is still covering the screen. Jump to the ring, then
+      // reveal once the home page has mounted and the ring's textures are up,
+      // so the wipe never shares frames with that work.
+      if (returning) {
         updateRing(0.5);
 
         window.history.replaceState({}, document.title);
@@ -301,25 +317,7 @@ export default function RingScene() {
             }
           }
 
-          let cx = window.innerWidth / 2;
-          let cy = window.innerHeight - 100;
-          if (returnBtnRef.current) {
-            const rect = returnBtnRef.current.getBoundingClientRect();
-            cx = rect.left + rect.width / 2;
-            cy = rect.top + rect.height / 2;
-          }
-
-          // Updated to 200vmax here as well!
-          gsap.fromTo(
-            returnOverlayRef.current,
-            { clipPath: `circle(200vmax at ${cx}px ${cy}px)` },
-            {
-              clipPath: `circle(0px at ${cx}px ${cy}px)`,
-              duration: 1.2,
-              ease: "power3.inOut",
-              delay: 0.1,
-            },
-          );
+          whenSettled(ringReady.promise, 1500).then(() => wipeReveal());
         });
       }
 
@@ -334,8 +332,10 @@ export default function RingScene() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const section = sectionRef.current;
-    if (!canvas || !section) return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    if (!canvas || !section || !window.matchMedia("(min-width: 768px)").matches) {
+      ringReady.resolve();
+      return;
+    }
 
     let ro: ResizeObserver | null = null;
     let idle = 0;
@@ -347,14 +347,20 @@ export default function RingScene() {
         { w: IMG_W, h: IMG_H },
         PERSPECTIVE,
         SPHERE_R,
-        () => updateRing(progressRef.current),
+        () => {
+          updateRing(progressRef.current);
+          ringReady.resolve();
+        },
       );
+      if (!ringRef.current) ringReady.resolve();
       ro = new ResizeObserver(() => {
         ringRef.current?.resize();
         updateRing(progressRef.current);
       });
       ro.observe(canvas);
     };
+    // Returning to the ring itself: build it now, under the ink circle.
+    if (returning) init();
     const io = new IntersectionObserver(
       (entries) => {
         if (!entries[0].isIntersecting) return;
@@ -374,6 +380,7 @@ export default function RingScene() {
       ringRef.current?.dispose();
       ringRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- set up once per mount
   }, []);
 
   const handleNavigate = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -384,21 +391,8 @@ export default function RingScene() {
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
-    const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-[9999999] bg-ink pointer-events-none";
-    overlay.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
-    document.body.appendChild(overlay);
-
-    // Updated to 200vmax for full mobile coverage
-    gsap.to(overlay, {
-      clipPath: `circle(200vmax at ${cx}px ${cy}px)`,
-      duration: 1.2,
-      ease: "power3.inOut",
-      onComplete: () => {
-        navigate("/certificates-archive", { state: { cx, cy } });
-        setTimeout(() => overlay.remove(), 100);
-      },
-    });
+    // The circle stays up across the route change; the archive reveals it.
+    wipeCover(cx, cy).then(() => navigate("/certificates-archive"));
   };
 
   return (
@@ -407,16 +401,6 @@ export default function RingScene() {
       ref={sectionRef}
       className="relative h-[100vh] md:h-[800vh] bg-paper"
     >
-      {/* ── RETURN OVERLAY ── */}
-      <div
-        ref={returnOverlayRef}
-        className="fixed inset-0 bg-ink z-[9999999] pointer-events-none"
-        style={{
-          display: location.state?.returnToRing ? "block" : "none",
-          clipPath: `circle(200vmax at ${location.state?.cx || window.innerWidth / 2}px ${location.state?.cy || window.innerHeight / 2}px)`,
-        }}
-      />
-
       <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden border-b border-line">
         <div className="pointer-events-none absolute left-6 top-24 z-50 font-mono-x text-[10px] uppercase leading-relaxed text-ink-dim md:left-10">
           <div>04 - Certificates &amp; Milestones</div>
