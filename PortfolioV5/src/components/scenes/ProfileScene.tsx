@@ -233,7 +233,12 @@ export default function ProfileScene() {
               <div className="relative w-full aspect-[4/3] overflow-hidden">
                 <img
                   src="/sean-profile.webp"
+                  srcSet="/sean-profile-480.webp 480w, /sean-profile.webp 800w"
+                  sizes="(min-width: 768px) 320px, 400px"
+                  width={800}
+                  height={1067}
                   alt="Sean Dela Cruz"
+                  loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
                 />

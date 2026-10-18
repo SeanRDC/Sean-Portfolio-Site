@@ -6,6 +6,14 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+type Shot = {
+  src: string;
+  thumb: string;
+  w: number;
+  h: number;
+  mobile: boolean;
+};
+
 type Project = {
   n: string;
   title: string;
@@ -13,82 +21,105 @@ type Project = {
   blurb: string;
   meta: string[];
   image: string;
-  gallery: string[];
+  gallery: Shot[];
   year?: string;
+  group?: boolean;
   github: string;
   live?: string;
+};
+
+// Desktop stills come first, then the mobile counterparts when a project has
+// them. Each still has a 480px copy in thumbs/ for the thumbnail rail.
+const shots = (
+  folder: string,
+  prefix: string,
+  desktop: [number, number],
+  mobile?: [number, number],
+  count = 5,
+): Shot[] => {
+  const make = (name: string, [w, h]: [number, number], isMobile: boolean) => ({
+    src: `/mockups/${folder}/${name}.webp`,
+    thumb: `/mockups/${folder}/thumbs/${name}.webp`,
+    w,
+    h,
+    mobile: isMobile,
+  });
+  const list: Shot[] = [];
+  for (let i = 1; i <= count; i++) list.push(make(`${prefix}-${i}`, desktop, false));
+  if (mobile)
+    for (let i = 1; i <= count; i++)
+      list.push(make(`${prefix}-mobile-${i}`, mobile, true));
+  return list;
 };
 
 const PROJECTS: Project[] = [
   {
     n: "01",
+    title: "PROJECT HAU",
+    kind: "2.5D Pixel Art Campus Adventure",
+    blurb:
+      "A 2.5D pixel art adventure that lets players explore the Holy Angel University campus, rebuilt 1:1 from the real buildings in Godot 4. Pixel art lives in a lit 3D world with real shadows, a time-of-day cycle, weather and ambient sound, and campus NPCs who talk and remember your answers.",
+    meta: ["Godot 4", "GDScript", "2.5D Pixel Art", "Shaders"],
+    image: "/mockups/ProjectHAU/project-hau-1.webp",
+    gallery: shots("ProjectHAU", "project-hau", [1596, 898]),
+    year: "2026",
+    group: true,
+    github: "https://github.com/SeanRDC/Project-HAU",
+  },
+  {
+    n: "02",
+    title: "HAU-SYNC",
+    kind: "Clinic Records & Appointment System",
+    blurb:
+      "A patient record and appointment system that replaces the Holy Angel University Clinic's paper logs. The front desk, nurse and doctor share one live record over WebSockets, with role-based access, audited views of patient data, medicine inventory and reports, all kept on the clinic's own network under the Data Privacy Act.",
+    meta: ["FastAPI", "React + TypeScript", "PostgreSQL", "WebSockets"],
+    image: "/mockups/ClinicSystem/hau-sync-1.webp",
+    gallery: shots("ClinicSystem", "hau-sync", [1903, 910], [720, 1564]),
+    year: "2026",
+    group: true,
+    github: "https://github.com/SeanRDC/Final-Project-Software-Engineering",
+  },
+  {
+    n: "03",
     title: "VELO",
     kind: "AI-Powered Canvas LMS Client",
     blurb:
       "A distraction-free, local-first Canvas LMS client that pulls every deadline across all enrolled courses into one sorted feed. It pairs a tool-calling AI co-pilot and study planner with offline caching, and ships with a scroll-driven landing page built in React and GSAP.",
     meta: ["Flutter", "Canvas REST API", "Groq AI", "React + GSAP"],
-    image: "/mockups/velo-1.webp",
-    gallery: [
-      "/mockups/velo-1.webp",
-      "/mockups/velo-2.webp",
-      "/mockups/velo-3.webp",
-    ],
+    image: "/mockups/VeloCopilot/velo-1.webp",
+    gallery: shots("VeloCopilot", "velo", [1919, 908], [720, 1561]),
     year: "2026",
     github: "https://github.com/SeanRDC/Velo-A-better-canvas",
     live: "https://velo-landing-page-delta.vercel.app/",
   },
   {
-    n: "02",
-    title: "ROUTER",
-    kind: "Agentic AI Notification Router",
-    blurb:
-      "An AI-powered WhatsApp routing agent built during a 24-hour HackerRank hackathon. It autonomously classifies multimodal messages into priority queues using strict Pydantic schema validation and automated rate-limit retries.",
-    meta: ["Python", "Gemini API", "Pydantic", "Google GenAI SDK"],
-    image: "/images/router-cover.webp",
-    gallery: [
-      "/mockups/router-1.webp",
-      "/mockups/router-2.webp",
-      "/mockups/router-3.webp",
-    ],
-    year: "2026",
-    github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
-  },
-  {
-    n: "03",
+    n: "04",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
       "A bespoke jewelry storefront featuring a live custom builder for dynamic metal and stone configurations, backed by a headless checkout flow integrated with the PayMongo API for secure, real-time order fulfillment.",
     meta: ["MERN Stack", "Custom Builder", "PayMongo", "MongoDB Atlas"],
     image: "/images/beaded-cover.webp",
-    gallery: [
-      "/mockups/beaded-1.webp",
-      "/mockups/beaded-2.webp",
-      "/mockups/beaded-3.webp",
-    ],
+    gallery: shots("BeadedCommerce", "beaded", [1919, 908], [720, 1249]),
     year: "2026",
     github: "https://github.com/SeanRDC/Beaded-By-Unknown-Website",
     live: "https://www.beadedbyunknown.shop",
   },
   {
-    n: "04",
+    n: "05",
     title: "PEONY",
     kind: "Digital Flower Encyclopedia",
     blurb:
       "A dynamic digital herbarium featuring a custom multi-parameter filtering engine, Google OAuth integration, and a custom 6-digit OTP verification system. Frontend rendering is optimized with debounced search and asynchronous skeleton loaders.",
     meta: ["React", "Framer Motion", "Google OAuth", "REST APIs"],
     image: "/images/flower-cover.webp",
-    gallery: [
-      "/mockups/flower-1.webp",
-      "/mockups/flower-2.webp",
-      "/mockups/flower-3.webp",
-    ],
+    gallery: shots("FlowerCatalogue", "flower", [1903, 907], [720, 1249]),
     year: "2026",
     github: "https://github.com/SeanRDC/Flower-Catalogue-Website",
     live: "https://flower-catalogue-website.vercel.app",
   },
   {
-    n: "05",
+    n: "06",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
@@ -100,18 +131,33 @@ const PROJECTS: Project[] = [
       "Performance Optimization",
     ],
     image: "/images/pixel-cover.webp",
-    gallery: [
-      "/mockups/pixel-1.webp",
-      "/mockups/pixel-2.webp",
-      "/mockups/pixel-3.webp",
-    ],
+    gallery: shots("PixelCommerce", "pixel", [1919, 907]),
     year: "2026",
     github: "https://github.com/SeanRDC/Pixel-Clothing-Website",
     live: "https://pixel-clothing.vercel.app",
   },
+  {
+    n: "07",
+    title: "ORCHESTRATE",
+    kind: "WhatsApp AI Notification Router",
+    blurb:
+      "An AI notification router for WhatsApp built during the 24-hour HackerRank Orchestrate hackathon. It reads text, image posters and voice notes alongside each user's history and sender trust, then has Gemini decide through a strict JSON schema whether a message should notify, wait for the digest, or be muted.",
+    meta: ["Python", "Gemini API", "Pandas", "Google GenAI SDK"],
+    image: "/images/router-cover.webp",
+    gallery: shots("WhatsAppRouter", "router", [1736, 955], undefined, 3),
+    year: "2026",
+    github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
+  },
 ];
 
 const N = PROJECTS.length;
+
+// Long titles shrink to fit their column instead of overflowing (or wrapping
+// mid flight-transition). --title-room is the width each layout gives the
+// title; Archivo at this width/weight averages ~0.85em per capital.
+const fitTitle = (title: string, size: string) => ({
+  fontSize: `min(${size}, calc(var(--title-room) / ${(title.length * 0.88).toFixed(2)}))`,
+});
 
 const GalleryContent = ({
   p,
@@ -130,6 +176,8 @@ const GalleryContent = ({
         <img
           src={p.image}
           alt={p.title}
+          loading="lazy"
+          decoding="async"
           className="block h-full w-full object-cover"
         />
         <div
@@ -147,10 +195,12 @@ const GalleryContent = ({
     <div className="min-w-0 md:col-span-5">
       <div className="mb-4 font-mono-x text-[11px] uppercase tracking-[0.3em] text-ink-dim">
         {p.kind}
+        {p.group && <span className="text-ink-faint"> / Group Project</span>}
       </div>
       <h2
         ref={titleRef}
-        className="t-colossal text-[clamp(42px,5.5vw,110px)] tracking-tight text-ink break-words w-fit origin-left m-0"
+        className="t-colossal text-[clamp(42px,5.5vw,110px)] tracking-tight text-ink break-words w-fit origin-left m-0 [--title-room:calc((100vw_-_168px)*5/12)]"
+        style={fitTitle(p.title, "clamp(42px,5.5vw,110px)")}
       >
         {p.title}
       </h2>
@@ -232,6 +282,32 @@ export default function ProjectsScene() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeGalleryIdx, setActiveGalleryIdx] = useState(0);
   const [isListView, setIsListView] = useState(true);
+
+  // Main previews only get a src once they're the active still or a neighbour,
+  // so opening a case study doesn't fetch and decode every full-size shot at once.
+  // Once loaded they stay loaded so the crossfade back still has an image.
+  const [primedShots, setPrimedShots] = useState<Set<number>>(() => new Set());
+  const primeAround = (idx: number) => (prev: Set<number>) =>
+    prev.has(idx - 1) && prev.has(idx) && prev.has(idx + 1)
+      ? prev
+      : new Set([...prev, idx - 1, idx, idx + 1]);
+
+  // Warm the list-view hover covers once the page is idle, so the first hover
+  // doesn't show an empty preview while the image downloads.
+  useEffect(() => {
+    const warm = () =>
+      PROJECTS.forEach((p) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = p.image;
+      });
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(warm, 2000);
+    return () => clearTimeout(id);
+  }, []);
 
   useGSAP(
     () => {
@@ -325,6 +401,7 @@ export default function ProjectsScene() {
     flushSync(() => {
       setSelectedProject(p);
       setActiveGalleryIdx(0);
+      setPrimedShots(new Set());
       galleryY.current = 0;
     });
 
@@ -580,6 +657,7 @@ export default function ProjectsScene() {
         setActiveGalleryIdx((prev) =>
           prev !== closestIdx ? closestIdx : prev,
         );
+        setPrimedShots(primeAround(closestIdx));
       }
       rafId = requestAnimationFrame(updateActive);
     };
@@ -659,6 +737,7 @@ export default function ProjectsScene() {
             <img
               src={activeImage}
               alt="Preview"
+              decoding="async"
               className="w-full h-full object-cover"
             />
           )}
@@ -696,12 +775,16 @@ export default function ProjectsScene() {
                         ref={(el) => {
                           titleRefs.current[`list-${p.n}`] = el;
                         }}
-                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-all duration-500 ease-out w-fit origin-left m-0 group-hover:translate-x-4 group-hover:opacity-70"
+                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-all duration-500 ease-out w-fit origin-left m-0 group-hover:translate-x-4 group-hover:opacity-70 [--title-room:calc(100vw_-_100px)] md:[--title-room:calc((100vw_-_128px)/2_-_80px)]"
+                        style={fitTitle(p.title, "clamp(40px,6vw,90px)")}
                       >
                         {p.title}
                       </h2>
                       <div className="mt-4 font-mono-x text-[11px] uppercase tracking-[0.2em] text-ink-dim">
                         {p.kind}
+                        {p.group && (
+                          <span className="text-ink-faint"> / Group Project</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -826,7 +909,13 @@ export default function ProjectsScene() {
             <div className="md:w-5/12 h-auto md:h-full flex flex-col justify-start md:justify-center px-8 md:px-16 relative shrink-0 z-[50010]">
               <div className="flex items-baseline gap-5 mb-8">
                 <div ref={realDetailTitleWrapRef} className="opacity-0">
-                  <h1 className="t-colossal text-[clamp(42px,5.5vw,110px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5]">
+                  <h1
+                    className="t-colossal text-[clamp(42px,5.5vw,110px)] leading-[0.85] tracking-tight m-0 w-fit text-[#f5f5f5] [--title-room:calc(100vw_-_124px)] md:[--title-room:calc(min(100vw,1800px)*5/12_-_190px)]"
+                    style={fitTitle(
+                      selectedProject.title,
+                      "clamp(42px,5.5vw,110px)",
+                    )}
+                  >
                     {selectedProject.title}
                   </h1>
                 </div>
@@ -834,6 +923,11 @@ export default function ProjectsScene() {
                   {selectedProject.year || "2026"}
                 </span>
               </div>
+              {selectedProject.group && (
+                <div className="detail-animate-in -mt-3 mb-6 font-mono-x text-[10px] uppercase tracking-[0.3em] text-[#777]">
+                  Group Project
+                </div>
+              )}
               <p className="detail-animate-in font-body text-base md:text-lg font-light leading-relaxed text-[#aaa] max-w-md">
                 {selectedProject.blurb}
               </p>
@@ -883,7 +977,13 @@ export default function ProjectsScene() {
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}
-                    src={img}
+                    src={img.src}
+                    srcSet={`${img.thumb} 480w, ${img.src} ${img.w}w`}
+                    sizes="100vw"
+                    width={img.w}
+                    height={img.h}
+                    loading="lazy"
+                    decoding="async"
                     alt="Preview"
                     className="w-full rounded-md border border-[#222]"
                   />
@@ -907,9 +1007,10 @@ export default function ProjectsScene() {
                       ref={(el) => {
                         thumbImgRefs.current[i] = el;
                       }}
-                      src={img}
+                      src={img.thumb}
                       alt="Thumbnail"
-                      className="w-full aspect-[4/3] object-cover rounded-md border border-[#333] origin-center transition-transform cursor-pointer"
+                      decoding="async"
+                      className={`w-full aspect-[4/3] object-cover rounded-md border border-[#333] origin-center transition-transform cursor-pointer ${img.mobile ? "object-top" : ""}`}
                       onClick={() => {
                         if (
                           qGalleryY.current &&
@@ -935,7 +1036,12 @@ export default function ProjectsScene() {
                 {selectedProject.gallery.map((img, i) => (
                   <img
                     key={i}
-                    src={img}
+                    src={
+                      Math.abs(i - activeGalleryIdx) <= 1 || primedShots.has(i)
+                        ? img.src
+                        : undefined
+                    }
+                    decoding="async"
                     alt="Main Preview"
                     className={`absolute max-w-[85%] max-h-[85%] object-contain transition-all duration-700 ease-out ${i === activeGalleryIdx ? "opacity-100 scale-100 blur-none" : "opacity-0 scale-95 blur-md pointer-events-none"}`}
                   />
