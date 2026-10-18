@@ -68,6 +68,18 @@ const PROJECTS: Project[] = [
   },
   {
     n: "02",
+    title: "WHATSAPP AGENT",
+    kind: "Multimodal AI Notification Router",
+    blurb:
+      "An AI notification router for WhatsApp built during the 24-hour HackerRank Orchestrate hackathon. It reads text, image posters and voice notes alongside each user's history and sender trust, then has Gemini decide through a strict JSON schema whether a message should notify, wait for the digest, or be muted.",
+    meta: ["Python", "Gemini API", "Pandas", "Google GenAI SDK"],
+    image: "/images/router-cover.webp",
+    gallery: shots("WhatsAppRouter", "router", [1736, 955], undefined, 3),
+    year: "2026",
+    github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
+  },
+  {
+    n: "03",
     title: "HAU-SYNC",
     kind: "Clinic Records & Appointment System",
     blurb:
@@ -80,20 +92,20 @@ const PROJECTS: Project[] = [
     github: "https://github.com/SeanRDC/Final-Project-Software-Engineering",
   },
   {
-    n: "03",
+    n: "04",
     title: "VELO",
     kind: "AI-Powered Canvas LMS Client",
     blurb:
       "A distraction-free, local-first Canvas LMS client that pulls every deadline across all enrolled courses into one sorted feed. It pairs a tool-calling AI co-pilot and study planner with offline caching, and ships with a scroll-driven landing page built in React and GSAP.",
     meta: ["Flutter", "Canvas REST API", "Groq AI", "React + GSAP"],
-    image: "/mockups/VeloCopilot/velo-1.webp",
+    image: "/images/velo-cover.webp",
     gallery: shots("VeloCopilot", "velo", [1919, 908], [720, 1561]),
     year: "2026",
     github: "https://github.com/SeanRDC/Velo-A-better-canvas",
     live: "https://velo-landing-page-delta.vercel.app/",
   },
   {
-    n: "04",
+    n: "05",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
@@ -106,7 +118,7 @@ const PROJECTS: Project[] = [
     live: "https://www.beadedbyunknown.shop",
   },
   {
-    n: "05",
+    n: "06",
     title: "PEONY",
     kind: "Digital Flower Encyclopedia",
     blurb:
@@ -119,7 +131,7 @@ const PROJECTS: Project[] = [
     live: "https://flower-catalogue-website.vercel.app",
   },
   {
-    n: "06",
+    n: "07",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
@@ -134,19 +146,7 @@ const PROJECTS: Project[] = [
     gallery: shots("PixelCommerce", "pixel", [1919, 907]),
     year: "2026",
     github: "https://github.com/SeanRDC/Pixel-Clothing-Website",
-    live: "https://pixel-clothing.vercel.app",
-  },
-  {
-    n: "07",
-    title: "ORCHESTRATE",
-    kind: "WhatsApp AI Notification Router",
-    blurb:
-      "An AI notification router for WhatsApp built during the 24-hour HackerRank Orchestrate hackathon. It reads text, image posters and voice notes alongside each user's history and sender trust, then has Gemini decide through a strict JSON schema whether a message should notify, wait for the digest, or be muted.",
-    meta: ["Python", "Gemini API", "Pandas", "Google GenAI SDK"],
-    image: "/images/router-cover.webp",
-    gallery: shots("WhatsAppRouter", "router", [1736, 955], undefined, 3),
-    year: "2026",
-    github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
+    live: "https://pixel-clothing-website.vercel.app/",
   },
 ];
 
@@ -682,6 +682,7 @@ export default function ProjectsScene() {
 
   const handleMouseEnter = (image: string) => {
     if (!isListView) return;
+    hoveredImage.current = image;
     setActiveImage(image);
     gsap.to([previewRef.current, cursorRef.current], {
       scale: 1,
@@ -692,6 +693,7 @@ export default function ProjectsScene() {
   };
 
   const handleMouseLeave = () => {
+    hoveredImage.current = null;
     gsap.to([previewRef.current, cursorRef.current], {
       scale: 0.8,
       autoAlpha: 0,
@@ -699,6 +701,56 @@ export default function ProjectsScene() {
       ease: "power2.in",
     });
   };
+
+  // Scrolling moves the list under a still pointer without firing mouseenter,
+  // so on scroll re-check which project sits under the last known pointer
+  // position and swap the preview to it.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+  const hoveredImage = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isListView || selectedProject) return;
+    let rafId = 0;
+
+    const onPointerMove = (e: MouseEvent) => {
+      pointer.current = { x: e.clientX, y: e.clientY };
+    };
+    const onPointerOut = (e: MouseEvent) => {
+      if (!e.relatedTarget) pointer.current = null;
+    };
+    const check = () => {
+      rafId = 0;
+      const p = pointer.current;
+      if (!p) return;
+      const item = document
+        .elementFromPoint(p.x, p.y)
+        ?.closest<HTMLElement>(".proj-list-item");
+      const image = item?.dataset.image ?? null;
+      if (image === hoveredImage.current) return;
+      if (image) {
+        xMovePreview.current?.(p.x);
+        yMovePreview.current?.(p.y);
+        xMoveCursor.current?.(p.x);
+        yMoveCursor.current?.(p.y);
+        handleMouseEnter(image);
+      } else {
+        handleMouseLeave();
+      }
+    };
+    const onScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(check);
+    };
+
+    window.addEventListener("mousemove", onPointerMove, { passive: true });
+    document.addEventListener("mouseout", onPointerOut);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("mousemove", onPointerMove);
+      document.removeEventListener("mouseout", onPointerOut);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [isListView, selectedProject]);
 
   const handleToggle = () => {
     setIsListView((prev) => !prev);
@@ -761,6 +813,7 @@ export default function ProjectsScene() {
               {PROJECTS.map((p) => (
                 <article
                   key={p.n}
+                  data-image={p.image}
                   onMouseEnter={() => handleMouseEnter(p.image)}
                   onMouseLeave={handleMouseLeave}
                   onClick={(e) => openProject(e, p)}
