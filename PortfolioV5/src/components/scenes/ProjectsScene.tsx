@@ -152,6 +152,9 @@ const PROJECTS: Project[] = [
 
 const N = PROJECTS.length;
 
+// True for a real mouse or trackpad; false for fingers and styluses.
+const canHover = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
 // Long titles shrink to fit their column instead of overflowing (or wrapping
 // mid flight-transition). --title-room is the width each layout gives the
 // title; Archivo at this width/weight averages ~0.85em per capital.
@@ -681,7 +684,9 @@ export default function ProjectsScene() {
   };
 
   const handleMouseEnter = (image: string) => {
-    if (!isListView) return;
+    // A tap fires emulated mouse events; on touch the preview and cursor
+    // would pop up and stay stuck, so they are mouse-only.
+    if (!isListView || !canHover()) return;
     hoveredImage.current = image;
     setActiveImage(image);
     gsap.to([previewRef.current, cursorRef.current], {
@@ -709,7 +714,7 @@ export default function ProjectsScene() {
   const hoveredImage = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isListView || selectedProject) return;
+    if (!isListView || selectedProject || !canHover()) return;
     let rafId = 0;
 
     const onPointerMove = (e: MouseEvent) => {
