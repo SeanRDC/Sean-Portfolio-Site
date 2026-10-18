@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useNavigate } from "react-router-dom";
-import { TILES } from "../data/certificates";
+import { FEATURED, TILES, type Featured } from "../data/certificates";
 import { usePageTitle } from "../lib/usePageTitle";
 import { holdCover, whenSettled, wipeCover, wipeReveal } from "../lib/circleWipe";
 
@@ -182,6 +182,24 @@ export default function CertificatesArchive() {
 
         {/* List Content */}
         <section className="flex flex-col w-full bg-paper/50 pb-20">
+          {/* Highlights: one lead card, two stacked beside it */}
+          <div className="feature-item flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-line-strong px-6 pb-6 pt-10 md:px-12" style={{ "--i": 0 } as React.CSSProperties}>
+            <h2 className="t-colossal m-0 text-[34px] uppercase leading-[0.9] text-ink md:text-[44px]">Highlights</h2>
+            <span className="t-serif-i text-[22px] text-ink-dim md:text-[28px]">the three that matter most</span>
+          </div>
+          <div className="grid border-b border-line-strong md:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
+            <FeatureCard f={FEATURED[0]} n="01" lead i={1} />
+            <div className="flex flex-col">
+              {FEATURED.slice(1).map((f, k) => (
+                <FeatureCard key={f.title} f={f} n={`0${k + 2}`} i={k + 2} />
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between border-b border-line px-6 pb-5 pt-9 text-[10px] uppercase tracking-[0.3em] text-ink-dim md:px-12">
+            <span>All Records</span>
+            <span>{TILES.length}</span>
+          </div>
+
           {TILES.map((t, i) => (
             <a
               key={`list-${i}`}
@@ -210,6 +228,66 @@ export default function CertificatesArchive() {
         </section>
         
       </div>
+    </div>
+  );
+}
+
+// A highlight card. The lead gets a large 4:3 frame and colossal title; the
+// two beside it are compact. No image yet: an empty frame. No link: not clickable.
+function FeatureCard({ f, n, lead = false, i }: { f: Featured; n: string; lead?: boolean; i: number }) {
+  const body = (
+    <>
+      <div
+        className={`relative flex items-center justify-center border border-line bg-paper-2 ${lead ? "aspect-[4/3] p-4 md:p-7" : "aspect-[16/10] p-3"}`}
+      >
+        {f.image && (
+          <img
+            src={f.image}
+            alt={`${f.title} certificate`}
+            decoding="async"
+            className={`block h-full w-full ${lead ? "object-contain shadow-[0_24px_48px_-20px_rgba(19,18,16,0.45)]" : "object-cover"}`}
+          />
+        )}
+        {lead && (
+          <span className="absolute left-4 top-4 bg-ink px-2.5 py-1.5 text-[9px] uppercase tracking-[0.25em] text-paper">
+            {n} · Lead
+          </span>
+        )}
+      </div>
+      <div className="flex items-end justify-between gap-6">
+        <div className="flex flex-col gap-2">
+          {!lead && <span className="text-[10px] text-ink-dim">{n}</span>}
+          <div
+            className={`uppercase text-ink ${lead ? "t-colossal text-[36px] leading-[0.85] md:text-[54px]" : "t-display text-[22px] leading-[0.95] md:text-[24px]"}`}
+          >
+            {f.title}
+          </div>
+          <div className={`uppercase text-ink-dim ${lead ? "text-[10px] tracking-[0.2em]" : "text-[9px] tracking-[0.2em]"}`}>
+            {f.meta}
+          </div>
+        </div>
+        {f.link &&
+          (lead ? (
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line-strong text-xl transition-colors duration-300 group-hover:bg-ink group-hover:text-paper">
+              ↗
+            </span>
+          ) : (
+            <span className="text-base transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span>
+          ))}
+      </div>
+    </>
+  );
+
+  const className = `feature-item group flex flex-col ${lead ? "gap-6 border-b border-line px-6 py-8 md:border-b-0 md:border-r md:py-9 md:pl-12 md:pr-10" : "flex-1 gap-4 border-b border-line px-6 py-8 last:border-b-0 md:px-10 md:py-9"}`;
+  const style = { "--i": i } as React.CSSProperties;
+
+  return f.link ? (
+    <a href={f.link} target="_blank" rel="noopener noreferrer" className={`${className} tap cursor-pointer`} style={style}>
+      {body}
+    </a>
+  ) : (
+    <div className={className} style={style}>
+      {body}
     </div>
   );
 }

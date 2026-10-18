@@ -163,8 +163,14 @@ body {
 /* Started by .archive-in once the page has settled; CSS so the compositor runs
    it, timed against the 1.2s circle reveal. */
 .sidebar-item,
+.feature-item,
 .list-item {
   opacity: 0;
+}
+.archive-in .feature-item {
+  animation: archive-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(500ms + var(--i, 0) * 110ms);
+  --rise: 28px;
 }
 .archive-in .sidebar-item {
   animation: archive-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -188,6 +194,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .archive-in .sidebar-item,
+  .archive-in .feature-item,
   .archive-in .list-item {
     animation: none;
     opacity: 1;

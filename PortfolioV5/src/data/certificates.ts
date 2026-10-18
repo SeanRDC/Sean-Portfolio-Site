@@ -8,6 +8,37 @@ export type Tile = {
   link?: string;
 };
 
+// The three highlights at the top of the archive; the first is the lead card.
+// Images are 1440px copies in /certs/featured. An entry without an image shows
+// an empty frame, and without a link it isn't clickable.
+export type Featured = {
+  title: string;
+  meta: string;
+  image?: string;
+  link?: string;
+};
+
+export const FEATURED: Featured[] = [
+  {
+    title: "n8n Automation",
+    meta: "n8n · Professional Certificate",
+    image: "/certs/featured/n8n/N5.webp",
+    link: "https://credentials.learn.n8n.io/credentials/eb3e1bbcb53a424c88bc1ecb7178dce3/",
+  },
+  {
+    title: "Google UX Design",
+    meta: "Google · Professional Certificate",
+    image: "/certs/featured/cg1.webp",
+    link: "https://www.coursera.org/account/accomplishments/professional-cert/5T8W98M6JAL7",
+  },
+  {
+    title: "IBM AI Developer",
+    meta: "IBM · Professional Certificate",
+    image: "/certs/featured/IBM/IBM.webp",
+    link: "https://www.coursera.org/account/accomplishments/professional-cert/M7119NHBMN66",
+  },
+];
+
 export const TILES: Tile[] = [
   {
     label: "Introduction to Networks",
@@ -342,5 +373,40 @@ export const TILES: Tile[] = [
     kind: "CERT",
     image: "/certs/IBM/IBM.webp",
     link: "https://www.coursera.org/account/accomplishments/professional-cert/M7119NHBMN66",
+  },
+  {
+    label: "n8n Quickstart",
+    meta: "n8n Academy - 2026",
+    kind: "CERT",
+    image: "/certs/n8n/N1.webp",
+    link: "https://learn.n8n.io/certificates/0a70f85a786247e6830569240c719860",
+  },
+  {
+    label: "Essentials: Your First Workflows",
+    meta: "n8n Academy - 2026",
+    kind: "CERT",
+    image: "/certs/n8n/N2.webp",
+    link: "https://learn.n8n.io/certificates/20bbf843b0c34c0ebbc9b8adea3310ba",
+  },
+  {
+    label: "Integrations: APIs & Connected Workflows",
+    meta: "n8n Academy - 2026",
+    kind: "CERT",
+    image: "/certs/n8n/N3.webp",
+    link: "https://learn.n8n.io/certificates/84eba77a7cce43ceb0c3798a96f51049",
+  },
+  {
+    label: "In Practice: AI, Testing & Best Practices",
+    meta: "n8n Academy - 2026",
+    kind: "CERT",
+    image: "/certs/n8n/N4.webp",
+    link: "https://learn.n8n.io/certificates/7b3e4c24343b412fb6ce25d3bd051395",
+  },
+  {
+    label: "n8n Professional Certificate",
+    meta: "n8n Academy - 2026",
+    kind: "CERT",
+    image: "/certs/n8n/N5.webp",
+    link: "https://credentials.learn.n8n.io/credentials/eb3e1bbcb53a424c88bc1ecb7178dce3/",
   },
 ];
