@@ -287,15 +287,6 @@ export default function ContactScene() {
               />
             </div>
 
-            {/* PAGE 3 */}
-            <div className="aspect-[8.5/11] w-full bg-paper shadow-2xl">
-              <img 
-                src="/resume/page3.webp" 
-                alt="Resume Page 3" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-
           </div>
         </div>
       )}
