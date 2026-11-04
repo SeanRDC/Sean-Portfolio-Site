@@ -109,10 +109,10 @@ const PROJECTS: Project[] = [
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
-      "A bespoke jewelry storefront featuring a live custom builder for dynamic metal and stone configurations, backed by a headless checkout flow integrated with the PayMongo API for secure, real-time order fulfillment.",
-    meta: ["MERN Stack", "Custom Builder", "PayMongo", "MongoDB Atlas"],
+      "A full-stack storefront for handcrafted bead jewelry with a custom bracelet builder that prices and sizes each design from real bead measurements. Checkout runs through PayMongo with signed webhooks and server-side totals, and a bespoke admin studio manages orders, catalogue, shipping and themes.",
+    meta: ["React + GSAP", "Node.js", "PayMongo", "MongoDB Atlas"],
     image: "/images/beaded-cover.webp",
-    gallery: shots("BeadedCommerce", "beaded", [1919, 908], [720, 1249]),
+    gallery: shots("BeadedCommerce", "beaded", [1920, 1200], [720, 1558]),
     year: "2026",
     github: "https://github.com/SeanRDC/Beaded-By-Unknown-Website",
     live: "https://www.beadedbyunknown.shop",
