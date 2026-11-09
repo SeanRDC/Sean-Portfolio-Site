@@ -189,7 +189,7 @@ export default function CertificatesArchive() {
           </div>
           <div className="grid grid-cols-1 border-b border-line-strong md:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
             <FeatureCard f={FEATURED[0]} n="01" lead i={1} />
-            <div className="flex flex-col">
+            <div className="grid grid-cols-2 md:flex md:flex-col">
               {FEATURED.slice(1).map((f, k) => (
                 <FeatureCard key={f.title} f={f} n={`0${k + 2}`} i={k + 2} />
               ))}
@@ -238,27 +238,27 @@ function FeatureCard({ f, n, lead = false, i }: { f: Featured; n: string; lead?:
   const body = (
     <>
       <div
-        className={`relative flex items-center justify-center border border-line bg-paper-2 ${lead ? "aspect-[4/3] p-4 md:p-7" : "aspect-[16/10] p-3"}`}
+        className={`relative flex items-center justify-center border border-line bg-paper-2 ${lead ? "aspect-[16/10] p-2.5 pt-8 md:aspect-[4/3] md:p-7" : "aspect-[4/3] p-1.5 md:aspect-[16/10] md:p-3"}`}
       >
         {f.image && (
           <img
             src={f.image}
             alt={`${f.title} certificate`}
             decoding="async"
-            className={`block h-full w-full ${lead ? "object-contain shadow-[0_24px_48px_-20px_rgba(19,18,16,0.45)]" : "object-cover"}`}
+            className={`block h-full w-full ${lead ? "object-contain shadow-[0_24px_48px_-20px_rgba(19,18,16,0.45)]" : "object-contain md:object-cover"}`}
           />
         )}
         {lead && (
-          <span className="absolute left-4 top-4 bg-ink px-2.5 py-1.5 text-[9px] uppercase tracking-[0.25em] text-paper">
+          <span className="absolute left-2 top-2 bg-ink px-2 py-1 text-[8px] uppercase tracking-[0.25em] text-paper md:left-4 md:top-4 md:px-2.5 md:py-1.5 md:text-[9px]">
             {n} · Lead
           </span>
         )}
       </div>
-      <div className="flex items-end justify-between gap-4 md:gap-6">
+      <div className={`flex items-end justify-between md:gap-6 ${lead ? "gap-4" : "gap-2"}`}>
         <div className="flex min-w-0 flex-col gap-2">
           {!lead && <span className="text-[10px] text-ink-dim">{n}</span>}
           <div
-            className={`uppercase text-ink ${lead ? "t-colossal text-[clamp(24px,7.6vw,36px)] leading-[0.85] md:text-[36px] lg:text-[clamp(30px,calc((100vw_-_340px)*0.075_-_20px),54px)]" : "t-display text-[22px] leading-[0.95] md:text-[24px]"}`}
+            className={`uppercase text-ink ${lead ? "t-colossal text-[clamp(24px,7.6vw,36px)] leading-[0.85] md:text-[36px] lg:text-[clamp(30px,calc((100vw_-_340px)*0.075_-_20px),54px)]" : "t-display text-[clamp(13px,3.9vw,22px)] leading-[1] md:text-[24px] md:leading-[0.95]"}`}
           >
             {f.title}
           </div>
@@ -278,7 +278,7 @@ function FeatureCard({ f, n, lead = false, i }: { f: Featured; n: string; lead?:
     </>
   );
 
-  const className = `feature-item group flex flex-col ${lead ? "gap-6 border-b border-line px-6 py-8 md:border-b-0 md:border-r md:py-9 md:pl-12 md:pr-10" : "flex-1 gap-4 border-b border-line px-6 py-8 last:border-b-0 md:px-10 md:py-9"}`;
+  const className = `feature-item group flex flex-col ${lead ? "gap-4 border-b border-line px-6 py-5 md:gap-6 md:border-b-0 md:border-r md:py-9 md:pl-12 md:pr-10" : "min-w-0 flex-1 gap-3 border-r border-line p-4 last:border-r-0 md:gap-4 md:border-b md:border-r-0 md:px-10 md:py-9 md:last:border-b-0"}`;
   const style = { "--i": i } as React.CSSProperties;
 
   return f.link ? (
