@@ -15,8 +15,9 @@ export function carveIntro({ letters, overlay }: IntroParts) {
   // The SVG is cropped to cover the screen, so a tall phone only shows a
   // narrow band of the 100-unit width. Fit the four letters into that band.
   const size = parseFloat(letters.S.getAttribute("font-size") ?? "24");
-  const { width, height } = letters.S.ownerSVGElement!.getBoundingClientRect();
-  const visible = 100 * Math.min(1, width / height);
+  // Read from the window: the SVG fills it, and its own box is wrong until
+  // the stylesheet has applied.
+  const visible = 100 * Math.min(1, window.innerWidth / window.innerHeight);
   const k = Math.min(1, (visible * 0.88) / 80);
   all.forEach((t, i) =>
     gsap.set(t, {

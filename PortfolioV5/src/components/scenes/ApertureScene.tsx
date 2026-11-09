@@ -11,11 +11,26 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ZOOM = 1.1;
 
-// Wait for the intro face so outlines are measured against the real letters,
-// but never hold the page back for more than a moment.
+// Safari can run this before the stylesheet has loaded, and fonts.load resolves
+// at once when no @font-face exists yet, so wait for the sheet first.
+const stylesReady = () =>
+  Promise.all(
+    [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')]
+      .filter((l) => !l.sheet)
+      .map(
+        (l) =>
+          new Promise((r) => {
+            l.addEventListener("load", r, { once: true });
+            l.addEventListener("error", r, { once: true });
+          }),
+      ),
+  );
+
+// Wait for the intro face so the letters open in the real font, but never hold
+// the page back for more than a moment.
 const fontReady = () =>
   Promise.race([
-    document.fonts.load("900 expanded 24px Archivo").catch(() => {}),
+    stylesReady().then(() => document.fonts.load("900 expanded 24px Archivo")).catch(() => {}),
     new Promise((r) => setTimeout(r, 2500)),
   ]);
 
