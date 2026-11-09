@@ -187,7 +187,7 @@ export default function CertificatesArchive() {
             <h2 className="t-colossal m-0 text-[34px] uppercase leading-[0.9] text-ink md:text-[44px]">Highlights</h2>
             <span className="t-serif-i text-[22px] text-ink-dim md:text-[28px]">the three that matter most</span>
           </div>
-          <div className="grid border-b border-line-strong md:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 border-b border-line-strong md:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
             <FeatureCard f={FEATURED[0]} n="01" lead i={1} />
             <div className="flex flex-col">
               {FEATURED.slice(1).map((f, k) => (
@@ -254,11 +254,11 @@ function FeatureCard({ f, n, lead = false, i }: { f: Featured; n: string; lead?:
           </span>
         )}
       </div>
-      <div className="flex items-end justify-between gap-6">
-        <div className="flex flex-col gap-2">
+      <div className="flex items-end justify-between gap-4 md:gap-6">
+        <div className="flex min-w-0 flex-col gap-2">
           {!lead && <span className="text-[10px] text-ink-dim">{n}</span>}
           <div
-            className={`uppercase text-ink ${lead ? "t-colossal text-[36px] leading-[0.85] md:text-[54px]" : "t-display text-[22px] leading-[0.95] md:text-[24px]"}`}
+            className={`uppercase text-ink ${lead ? "t-colossal text-[clamp(24px,7.6vw,36px)] leading-[0.85] md:text-[36px] lg:text-[clamp(30px,calc((100vw_-_340px)*0.075_-_20px),54px)]" : "t-display text-[22px] leading-[0.95] md:text-[24px]"}`}
           >
             {f.title}
           </div>
@@ -268,7 +268,7 @@ function FeatureCard({ f, n, lead = false, i }: { f: Featured; n: string; lead?:
         </div>
         {f.link &&
           (lead ? (
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line-strong text-xl transition-colors duration-300 group-hover:bg-ink group-hover:text-paper">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line-strong text-lg transition-colors md:h-14 md:w-14 md:text-xl duration-300 group-hover:bg-ink group-hover:text-paper">
               ↗
             </span>
           ) : (
