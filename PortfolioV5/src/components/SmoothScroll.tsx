@@ -6,6 +6,11 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// The intro always starts at the top, so a restored scroll position would play
+// it off-screen and drop the visitor mid-page on reload. Set through
+// ScrollTrigger because its refresh overwrites history.scrollRestoration.
+ScrollTrigger.clearScrollMemory("manual");
+
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({

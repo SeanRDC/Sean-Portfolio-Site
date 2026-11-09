@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
-import { glyphOutline } from "./glyphOutline";
+import { glyphOutline, letterBaseline } from "./glyphOutline";
 import type { IntroParts } from "./types";
 
 gsap.registerPlugin(DrawSVGPlugin);
@@ -19,7 +19,9 @@ export function carveIntro({ letters, overlay }: IntroParts) {
   const visible = 100 * Math.min(1, width / height);
   const k = Math.min(1, (visible * 0.88) / 80);
   all.forEach((t, i) =>
-    gsap.set(t, { attr: { "font-size": size * k, x: 50 + (i - 1.5) * 20 * k } }),
+    gsap.set(t, {
+      attr: { "font-size": size * k, x: 50 + (i - 1.5) * 20 * k, y: letterBaseline(size * k) },
+    }),
   );
 
   const outlines = all.map((t) =>
@@ -41,10 +43,10 @@ export function carveIntro({ letters, overlay }: IntroParts) {
   tl.to(outlines, { opacity: 0.35, duration: 0.5, ease: "power2.out", stagger: 0.1 }, "<");
   tl.to(outlines, { opacity: 0, duration: 0.35, ease: "power2.in" }, "+=0.15");
   tl.to([letters.R, letters.D, letters.C], { opacity: 0, duration: 0.6, ease: "power2.inOut" }, "<");
-  tl.to(letters.S, { attr: { x: 50, "font-size": size }, duration: 0.8, ease: "power2.inOut" }, "<0.1");
+  tl.to(letters.S, { attr: { x: 50, y: letterBaseline(size), "font-size": size }, duration: 0.8, ease: "power2.inOut" }, "<0.1");
   // R, D and C go back to their resting layout, hidden.
   tl.set([letters.R, letters.D, letters.C], {
-    attr: { "font-size": size, x: (i: number) => 40 + i * 20 },
+    attr: { "font-size": size, x: (i: number) => 40 + i * 20, y: letterBaseline(size) },
   });
   return tl;
 }

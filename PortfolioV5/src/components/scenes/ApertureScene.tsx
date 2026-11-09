@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { useLocation } from "react-router-dom";
 import StoneCanvas from "../StoneCanvas";
 import { carveIntro } from "../intro/carveIntro";
+import { letterBaseline } from "../intro/glyphOutline";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -111,10 +112,10 @@ export default function ApertureScene() {
   );
   
   return (
-    <section id="aperture" ref={sectionRef} className="relative h-screen">
+    <section id="aperture" ref={sectionRef} className="relative h-screen h-svh">
       <div 
         ref={containerRef}
-        className="sticky top-0 h-screen w-full overflow-hidden bg-paper origin-center will-change-transform"
+        className="sticky top-0 h-screen h-svh w-full overflow-hidden bg-paper origin-center will-change-transform"
       >
         <div className="absolute inset-0">
           <StoneCanvas
@@ -153,10 +154,10 @@ export default function ApertureScene() {
                 <rect width="100" height="100" fill="white" />
                 
                 {/* The SRDC Letters */}
-                <text ref={refS} x="20" y="49" fill="black" textAnchor="middle" dominantBaseline="central" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded", letterSpacing: "-0.04em" }}>S</text>
-                <text ref={refR} x="40" y="49" fill="black" textAnchor="middle" dominantBaseline="central" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded", letterSpacing: "-0.04em" }}>R</text>
-                <text ref={refD} x="60" y="49" fill="black" textAnchor="middle" dominantBaseline="central" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded", letterSpacing: "-0.04em" }}>D</text>
-                <text ref={refC} x="80" y="49" fill="black" textAnchor="middle" dominantBaseline="central" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded", letterSpacing: "-0.04em" }}>C</text>
+                <text ref={refS} x="20" y={letterBaseline(24)} fill="black" textAnchor="middle" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded" }}>S</text>
+                <text ref={refR} x="40" y={letterBaseline(24)} fill="black" textAnchor="middle" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded" }}>R</text>
+                <text ref={refD} x="60" y={letterBaseline(24)} fill="black" textAnchor="middle" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded" }}>D</text>
+                <text ref={refC} x="80" y={letterBaseline(24)} fill="black" textAnchor="middle" fontFamily="Archivo, sans-serif" fontWeight="900" fontSize="24" style={{ fontStretch: "expanded" }}>C</text>
               </mask>
               <radialGradient id="lip" cx="50%" cy="46%" r="55%">
                 <stop offset="60%" stopColor="var(--paper)" />

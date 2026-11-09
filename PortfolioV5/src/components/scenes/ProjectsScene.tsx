@@ -36,6 +36,7 @@ const shots = (
   desktop: [number, number],
   mobile?: [number, number],
   count = 5,
+  mobileCount = count,
 ): Shot[] => {
   const make = (name: string, [w, h]: [number, number], isMobile: boolean) => ({
     src: `/mockups/${folder}/${name}.webp`,
@@ -47,7 +48,7 @@ const shots = (
   const list: Shot[] = [];
   for (let i = 1; i <= count; i++) list.push(make(`${prefix}-${i}`, desktop, false));
   if (mobile)
-    for (let i = 1; i <= count; i++)
+    for (let i = 1; i <= mobileCount; i++)
       list.push(make(`${prefix}-mobile-${i}`, mobile, true));
   return list;
 };
@@ -106,6 +107,19 @@ const PROJECTS: Project[] = [
   },
   {
     n: "05",
+    title: "WAKO MATCHA",
+    kind: "Scroll-Driven 3D Storefront",
+    blurb:
+      "A matcha shop told through the product itself, with tins and tea tools modelled in Blender and moved by the scroll. Each of the four grades gets its own 3D stage, and the whole purchase flow works from browsing to confirmation as a front-end concept, with rendered stills for devices that can't run the 3D.",
+    meta: ["Next.js", "React Three Fiber", "GSAP + Lenis", "Blender"],
+    image: "/images/wako-cover.webp",
+    gallery: shots("WakoMatcha", "wako", [1920, 1080], [720, 1558], 9, 5),
+    year: "2026",
+    github: "https://github.com/SeanRDC/wako-matcha",
+    live: "https://wako-matcha.vercel.app",
+  },
+  {
+    n: "06",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
@@ -118,7 +132,7 @@ const PROJECTS: Project[] = [
     live: "https://www.beadedbyunknown.shop",
   },
   {
-    n: "06",
+    n: "07",
     title: "PEONY",
     kind: "Digital Flower Encyclopedia",
     blurb:
@@ -131,7 +145,7 @@ const PROJECTS: Project[] = [
     live: "https://flower-catalogue-website.vercel.app",
   },
   {
-    n: "07",
+    n: "08",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
@@ -959,7 +973,8 @@ export default function ProjectsScene() {
       <section
         ref={detailOverlayRef}
         style={{ display: "none" }}
-        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-y-auto md:overflow-hidden"
+        data-lenis-prevent
+        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-y-auto overscroll-contain md:overflow-hidden"
       >
         {selectedProject && (
           <div className="w-full min-h-full md:h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative pt-24 md:pt-0">
