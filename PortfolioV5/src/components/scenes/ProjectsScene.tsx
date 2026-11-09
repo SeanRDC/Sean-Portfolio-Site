@@ -694,8 +694,12 @@ export default function ProjectsScene() {
     }
   };
 
+  // Touch screens send a fake mouseenter on tap, which would pin the preview on.
+  const canHover = () =>
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   const handleMouseEnter = (image: string) => {
-    if (!isListView) return;
+    if (!isListView || !canHover()) return;
     hoveredImage.current = image;
     setActiveImage(image);
     gsap.to([previewRef.current, cursorRef.current], {
@@ -723,7 +727,7 @@ export default function ProjectsScene() {
   const hoveredImage = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isListView || selectedProject) return;
+    if (!isListView || selectedProject || !canHover()) return;
     let rafId = 0;
 
     const onPointerMove = (e: MouseEvent) => {
@@ -968,7 +972,8 @@ export default function ProjectsScene() {
       <section
         ref={detailOverlayRef}
         style={{ display: "none" }}
-        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-y-auto md:overflow-hidden"
+        data-lenis-prevent
+        className="fixed inset-0 z-[999995] bg-[#0a0a0a] text-[#f5f5f5] opacity-0 overflow-y-auto overscroll-contain md:overflow-hidden"
       >
         {selectedProject && (
           <div className="w-full min-h-full md:h-full flex flex-col md:flex-row max-w-[1800px] mx-auto relative pt-24 md:pt-0">

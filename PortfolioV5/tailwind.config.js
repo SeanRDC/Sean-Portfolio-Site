@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  // A tap on iOS would otherwise leave hover: styles stuck on until the next tap.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       colors: {
