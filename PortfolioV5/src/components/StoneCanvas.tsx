@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getGL, makeProgram, bindFullQuad } from "../lib/webgl";
 
 const FRAG = `
@@ -71,6 +71,7 @@ export default function StoneCanvas({
 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ currX: 0.5, currY: 0.5, targetX: 0.5, targetY: 0.5, amt: 0 });
+  const [glEpoch, setGlEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = ref.current;
@@ -146,14 +147,27 @@ export default function StoneCanvas({
     };
     if (interactive) window.addEventListener("pointermove", onMove, { passive: true });
 
+    // iOS drops WebGL contexts when the tab is backgrounded. Without
+    // preventDefault the browser never restores it and the stone stays blank.
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const onRestored = () => setGlEpoch((n) => n + 1);
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
+
     loop();
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       if (interactive) window.removeEventListener("pointermove", onMove);
     };
-  }, [seed, tint, flow, contrast, interactive]);
+  }, [seed, tint, flow, contrast, interactive, glEpoch]);
 
   return <canvas ref={ref} className={className} />;
 }
