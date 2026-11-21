@@ -73,7 +73,14 @@ export default function Nav() {
     let targetY = st ? st.start : target.getBoundingClientRect().top + window.scrollY;
 
     if (id === "projects") {
-      targetY += 500;
+      // Land with the first project card pinned under the nav. The stack
+      // wrapper is measured (not the card) because a card may already be stuck.
+      const stack = target.querySelector<HTMLElement>("[data-project-stack]");
+      const firstCard = stack?.firstElementChild;
+      if (stack && firstCard) {
+        const pinTop = parseFloat(getComputedStyle(firstCard).top) || 0;
+        targetY = stack.getBoundingClientRect().top + window.scrollY - pinTop;
+      }
     } else if (id === "profile") {
       targetY += 770;
     } else if (id === "stack") {
