@@ -26,6 +26,9 @@ type Project = {
   group?: boolean;
   github: string;
   live?: string;
+  // Card colour, taken from the project's own look; dark cards get paper text.
+  tint: string;
+  dark?: boolean;
 };
 
 // Desktop stills come first, then the mobile counterparts when a project has
@@ -66,6 +69,8 @@ const PROJECTS: Project[] = [
     year: "2026",
     group: true,
     github: "https://github.com/SeanRDC/Project-HAU",
+    tint: "#57553f",
+    dark: true,
   },
   {
     n: "02",
@@ -78,6 +83,8 @@ const PROJECTS: Project[] = [
     gallery: shots("WhatsAppRouter", "router", [1736, 955], undefined, 3),
     year: "2026",
     github: "https://github.com/SeanRDC/Orchestrate-Whatsapp-AI-Agent",
+    tint: "#13231d",
+    dark: true,
   },
   {
     n: "03",
@@ -91,6 +98,8 @@ const PROJECTS: Project[] = [
     year: "2026",
     group: true,
     github: "https://github.com/SeanRDC/Final-Project-Software-Engineering",
+    tint: "#6b1f29",
+    dark: true,
   },
   {
     n: "04",
@@ -103,10 +112,24 @@ const PROJECTS: Project[] = [
     gallery: shots("VeloCopilot", "velo", [1919, 908], [720, 1561]),
     year: "2026",
     github: "https://github.com/SeanRDC/Velo-A-better-canvas",
+    tint: "#e7e6e1",
     live: "https://velo-landing-page-delta.vercel.app/",
   },
   {
     n: "05",
+    title: "WAKO BEANS",
+    kind: "Scroll-Driven Coffee Storefront",
+    blurb:
+      "A coffee shop you walk down a mountain, from a 1,800 m Arabica farm to a 310 m Liberica one, covering all four coffee species grown in the Philippines. The bags and beans are built by Python script and rendered in Blender, a farm film scrubs with the scroll, and the shop works from bag to order confirmation, checked by Playwright and axe tests.",
+    meta: ["Next.js", "GSAP + Lenis", "Blender + Python", "Zustand + Zod"],
+    image: "/images/wako-beans-cover.webp",
+    gallery: shots("WakoBeans", "wako-beans", [1920, 1200], [720, 1209]),
+    year: "2026",
+    github: "https://github.com/SeanRDC/wako-beans",
+    tint: "#f2b632",
+  },
+  {
+    n: "06",
     title: "WAKO MATCHA",
     kind: "Scroll-Driven 3D Storefront",
     blurb:
@@ -116,10 +139,12 @@ const PROJECTS: Project[] = [
     gallery: shots("WakoMatcha", "wako", [1920, 1080], [720, 1558], 9, 5),
     year: "2026",
     github: "https://github.com/SeanRDC/wako-matcha",
+    tint: "#2f3d2a",
+    dark: true,
     live: "https://wako-matcha.vercel.app",
   },
   {
-    n: "06",
+    n: "07",
     title: "BEADED",
     kind: "Full-Stack E-Commerce Platform",
     blurb:
@@ -129,10 +154,11 @@ const PROJECTS: Project[] = [
     gallery: shots("BeadedCommerce", "beaded", [1920, 1200], [720, 1558]),
     year: "2026",
     github: "https://github.com/SeanRDC/Beaded-By-Unknown-Website",
+    tint: "#d9cfc4",
     live: "https://www.beadedbyunknown.shop",
   },
   {
-    n: "07",
+    n: "08",
     title: "PEONY",
     kind: "Digital Flower Encyclopedia",
     blurb:
@@ -142,10 +168,11 @@ const PROJECTS: Project[] = [
     gallery: shots("FlowerCatalogue", "flower", [1903, 907], [720, 1249]),
     year: "2026",
     github: "https://github.com/SeanRDC/Flower-Catalogue-Website",
+    tint: "#efd2dc",
     live: "https://flower-catalogue-website.vercel.app",
   },
   {
-    n: "08",
+    n: "09",
     title: "PIXEL",
     kind: "Modular E-Commerce Architecture",
     blurb:
@@ -160,11 +187,11 @@ const PROJECTS: Project[] = [
     gallery: shots("PixelCommerce", "pixel", [1919, 907]),
     year: "2026",
     github: "https://github.com/SeanRDC/Pixel-Clothing-Website",
+    tint: "#1f272b",
+    dark: true,
     live: "https://pixel-clothing-website.vercel.app/",
   },
 ];
-
-const N = PROJECTS.length;
 
 // True for a real mouse or trackpad; false for fingers and styluses.
 const canHover = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -176,89 +203,16 @@ const fitTitle = (title: string, size: string) => ({
   fontSize: `min(${size}, calc(var(--title-room) / ${(title.length * 0.88).toFixed(2)}))`,
 });
 
-const GalleryContent = ({
-  p,
-  N,
-  onNavigate,
-  titleRef,
-}: {
-  p: Project;
-  N: number;
-  onNavigate: (e: React.MouseEvent, p: Project) => void;
-  titleRef: React.Ref<HTMLHeadingElement>;
-}) => (
-  <div className="grid w-full grid-cols-1 items-center gap-10 md:grid-cols-12">
-    <div className="min-w-0 md:col-span-7">
-      <div className="relative aspect-[16/10] w-full overflow-hidden border border-line bg-ink/[0.02]">
-        <img
-          src={p.image}
-          alt={p.title}
-          loading="lazy"
-          decoding="async"
-          className="block h-full w-full object-cover"
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(120deg, rgba(243,239,231,0.1) 0%, transparent 40%, rgba(19,18,16,0.12) 100%)",
-          }}
-        />
-        <div className="absolute left-5 top-5 font-mono-x text-[10px] uppercase tracking-[0.25em] text-ink-soft bg-paper/50 backdrop-blur-sm px-2 py-1">
-          Still {p.n} / 0{N}
-        </div>
-      </div>
-    </div>
-    <div className="min-w-0 md:col-span-5">
-      <div className="mb-4 font-mono-x text-[11px] uppercase tracking-[0.3em] text-ink-dim">
-        {p.kind}
-        {p.group && <span className="text-ink-faint"> / Group Project</span>}
-      </div>
-      <h2
-        ref={titleRef}
-        className="t-colossal text-[clamp(42px,5.5vw,110px)] tracking-tight text-ink break-words w-fit origin-left m-0 [--title-room:calc((100vw_-_168px)*5/12)]"
-        style={fitTitle(p.title, "clamp(42px,5.5vw,110px)")}
-      >
-        {p.title}
-      </h2>
-      <p className="mt-6 max-w-md font-body text-[15px] font-light leading-relaxed text-ink-soft">
-        {p.blurb}
-      </p>
-      <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2">
-        {p.meta.map((m) => (
-          <span
-            key={m}
-            className="font-mono-x text-[11px] uppercase tracking-wider text-ink-dim"
-          >
-            <span className="mr-1.5 text-ink-faint">/</span>
-            {m}
-          </span>
-        ))}
-      </div>
-      <a
-        href={`#${p.n}`}
-        onClick={(e) => onNavigate(e, p)}
-        className="group mt-9 inline-flex items-center gap-3 border-b border-line-strong pb-1.5 transition-colors hover:border-ink cursor-pointer"
-      >
-        <span className="t-label text-[13px] uppercase tracking-[0.2em] text-ink">
-          Enter Case Study
-        </span>
-        <span className="font-mono-x text-base text-ink transition-transform group-hover:translate-x-1 group-hover:-translate-y-1">
-          ↗
-        </span>
-      </a>
-    </div>
-  </div>
-);
+// Each card sticks just under the fixed nav, a step lower than the card before
+// it, so the top edges of the cards underneath show as a pile.
+const STACK_TOP = 88;
+const STACK_STEP = 10;
 
 export default function ProjectsScene() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const btnRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
-  const previewRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
-  const xMovePreview = useRef<gsap.QuickToFunc | null>(null);
-  const yMovePreview = useRef<gsap.QuickToFunc | null>(null);
   const xMoveCursor = useRef<gsap.QuickToFunc | null>(null);
   const yMoveCursor = useRef<gsap.QuickToFunc | null>(null);
 
@@ -274,31 +228,8 @@ export default function ProjectsScene() {
   const galleryY = useRef(0);
   const qGalleryY = useRef<gsap.QuickToFunc | null>(null);
 
-  const galleryArticleRefs = useRef<(HTMLElement | null)[]>([]);
-  const galleryBarRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const galleryCountRef = useRef<HTMLSpanElement>(null);
-
-  // Written straight to the DOM so scrubbing the gallery doesn't re-render
-  // the whole scene through React state on every scroll frame.
-  const applyGallery = (progress: number) => {
-    const t = Math.min(1, Math.max(0, (progress - 0.08) / 0.84));
-    const active = Math.min(N - 1, Math.round(t * (N - 1)));
-    const shift = `translateX(-${t * (N - 1) * 100}%)`;
-    galleryArticleRefs.current.forEach((el) => {
-      if (el) el.style.transform = shift;
-    });
-    galleryBarRefs.current.forEach((el, i) => {
-      if (el)
-        el.style.background = i <= active ? "var(--ink)" : "var(--line-strong)";
-    });
-    if (galleryCountRef.current)
-      galleryCountRef.current.textContent = `0${active + 1} / 0${N}`;
-  };
-
-  const [activeImage, setActiveImage] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeGalleryIdx, setActiveGalleryIdx] = useState(0);
-  const [isListView, setIsListView] = useState(true);
 
   // Main previews only get a src once they're the active still or a neighbour,
   // so opening a case study doesn't fetch and decode every full-size shot at once.
@@ -309,101 +240,69 @@ export default function ProjectsScene() {
       ? prev
       : new Set([...prev, idx - 1, idx, idx + 1]);
 
-  // Warm the list-view hover covers once the page is idle, so the first hover
-  // doesn't show an empty preview while the image downloads.
-  useEffect(() => {
-    const warm = () =>
-      PROJECTS.forEach((p) => {
-        const img = new Image();
-        img.decoding = "async";
-        img.src = p.image;
-      });
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(warm, { timeout: 4000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = setTimeout(warm, 2000);
-    return () => clearTimeout(id);
-  }, []);
-
   useGSAP(
     () => {
-      if (previewRef.current && cursorRef.current) {
-        // Follow the mouse with transforms (compositor only) instead of left/top,
-        // which forced a layout + repaint on every frame of the follow.
-        gsap.set([previewRef.current, cursorRef.current], {
-          xPercent: -50,
-          yPercent: -50,
-        });
-        xMovePreview.current = gsap.quickTo(previewRef.current, "x", {
-          duration: 0.4,
-          ease: "power3",
-        });
-        yMovePreview.current = gsap.quickTo(previewRef.current, "y", {
-          duration: 0.4,
-          ease: "power3",
-        });
-        xMoveCursor.current = gsap.quickTo(cursorRef.current, "x", {
-          duration: 0.2,
-          ease: "power3",
-        });
-        yMoveCursor.current = gsap.quickTo(cursorRef.current, "y", {
-          duration: 0.2,
-          ease: "power3",
-        });
-      }
-
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top 65%",
-        end: "bottom 35%",
-        animation: gsap.fromTo(
-          btnRef.current,
-          { autoAlpha: 0, y: 20 },
-          { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" },
-        ),
-        toggleActions: "play reverse play reverse",
+      if (!cursorRef.current) return;
+      // Follow the mouse with transforms (compositor only) instead of left/top.
+      gsap.set(cursorRef.current, { xPercent: -50, yPercent: -50 });
+      xMoveCursor.current = gsap.quickTo(cursorRef.current, "x", {
+        duration: 0.2,
+        ease: "power3",
       });
-
-      if (isListView) {
-        gsap.utils.toArray(".proj-list-item").forEach((item: any) => {
-          gsap.fromTo(
-            item,
-            { autoAlpha: 0, y: 40 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: item,
-                start: "top 85%",
-                toggleActions: "play none none reverse",
-              },
-            },
-          );
-        });
-      } else {
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
-          onUpdate: (self) => applyGallery(self.progress),
-          onRefresh: (self) => applyGallery(self.progress),
-        });
-      }
+      yMoveCursor.current = gsap.quickTo(cursorRef.current, "y", {
+        duration: 0.2,
+        ease: "power3",
+      });
     },
-    { scope: sectionRef, dependencies: [isListView] },
+    { scope: sectionRef },
   );
 
+  // As the next card slides over a pinned card, the pinned one shrinks a little
+  // and darkens, so the pile reads as depth. Written to a CSS variable straight
+  // on the DOM so scrolling never re-renders the scene.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let rafId = 0;
+
+    const update = () => {
+      rafId = 0;
+      const section = sectionRef.current;
+      if (!section) return;
+      const box = section.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > window.innerHeight) return;
+
+      const cards = cardRefs.current;
+      const rects = cards.map((c) => c?.getBoundingClientRect());
+      cards.forEach((card, i) => {
+        const cur = rects[i];
+        const next = rects[i + 1];
+        if (!card || !cur) return;
+        const covered = next
+          ? Math.min(1, Math.max(0, 1 - (next.top - cur.top) / cur.height))
+          : 0;
+        card.style.setProperty("--stack", covered.toFixed(4));
+      });
+    };
+    const onScroll = () => {
+      if (!rafId) rafId = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   // --- SEAMLESS TRANSITION IN ---
-  const openProject = (e: React.MouseEvent, p: Project) => {
+  const openProject = (e: React.SyntheticEvent, p: Project) => {
     e.preventDefault();
     handleMouseLeave();
 
-    const sourceTitle =
-      titleRefs.current[`${isListView ? "list" : "gallery"}-${p.n}`];
+    const sourceTitle = titleRefs.current[p.n];
     if (
       !sourceTitle ||
       !flyingTitleRef.current ||
@@ -500,10 +399,7 @@ export default function ProjectsScene() {
   const closeProject = () => {
     if (!selectedProject) return;
 
-    const sourceTitle =
-      titleRefs.current[
-        `${isListView ? "list" : "gallery"}-${selectedProject.n}`
-      ];
+    const sourceTitle = titleRefs.current[selectedProject.n];
     if (
       !sourceTitle ||
       !flyingTitleRef.current ||
@@ -585,7 +481,7 @@ export default function ProjectsScene() {
     window.addEventListener("triggerCloseProject", handleTriggerClose);
     return () =>
       window.removeEventListener("triggerCloseProject", handleTriggerClose);
-  }, [selectedProject, isListView]);
+  }, [selectedProject]);
 
   // --- CUSTOM SCROLL GALLERY LOGIC ---
   useEffect(() => {
@@ -684,26 +580,16 @@ export default function ProjectsScene() {
   }, [selectedProject]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (
-      xMovePreview.current &&
-      yMovePreview.current &&
-      xMoveCursor.current &&
-      yMoveCursor.current
-    ) {
-      xMovePreview.current(e.clientX);
-      yMovePreview.current(e.clientY);
-      xMoveCursor.current(e.clientX);
-      yMoveCursor.current(e.clientY);
-    }
+    xMoveCursor.current?.(e.clientX);
+    yMoveCursor.current?.(e.clientY);
   };
 
-  const handleMouseEnter = (image: string) => {
-    // A tap fires emulated mouse events; on touch the preview and cursor
-    // would pop up and stay stuck, so they are mouse-only.
-    if (!isListView || !canHover()) return;
-    hoveredImage.current = image;
-    setActiveImage(image);
-    gsap.to([previewRef.current, cursorRef.current], {
+  const handleMouseEnter = () => {
+    // A tap fires emulated mouse events; on touch the cursor would pop up and
+    // stay stuck, so it is mouse-only.
+    if (!canHover()) return;
+    hovering.current = true;
+    gsap.to(cursorRef.current, {
       scale: 1,
       autoAlpha: 1,
       duration: 0.3,
@@ -712,23 +598,22 @@ export default function ProjectsScene() {
   };
 
   const handleMouseLeave = () => {
-    hoveredImage.current = null;
-    gsap.to([previewRef.current, cursorRef.current], {
-      scale: 0.8,
+    hovering.current = false;
+    gsap.to(cursorRef.current, {
+      scale: 0.5,
       autoAlpha: 0,
       duration: 0.3,
       ease: "power2.in",
     });
   };
 
-  // Scrolling moves the list under a still pointer without firing mouseenter,
-  // so on scroll re-check which project sits under the last known pointer
-  // position and swap the preview to it.
+  // Scrolling moves the cards under a still pointer without firing mouseenter,
+  // so on scroll re-check whether a card sits under the last pointer position.
   const pointer = useRef<{ x: number; y: number } | null>(null);
-  const hoveredImage = useRef<string | null>(null);
+  const hovering = useRef(false);
 
   useEffect(() => {
-    if (!isListView || selectedProject || !canHover()) return;
+    if (selectedProject || !canHover()) return;
     let rafId = 0;
 
     const onPointerMove = (e: MouseEvent) => {
@@ -741,17 +626,14 @@ export default function ProjectsScene() {
       rafId = 0;
       const p = pointer.current;
       if (!p) return;
-      const item = document
+      const over = !!document
         .elementFromPoint(p.x, p.y)
-        ?.closest<HTMLElement>(".proj-list-item");
-      const image = item?.dataset.image ?? null;
-      if (image === hoveredImage.current) return;
-      if (image) {
-        xMovePreview.current?.(p.x);
-        yMovePreview.current?.(p.y);
+        ?.closest(".proj-card");
+      if (over === hovering.current) return;
+      if (over) {
         xMoveCursor.current?.(p.x);
         yMoveCursor.current?.(p.y);
-        handleMouseEnter(image);
+        handleMouseEnter();
       } else {
         handleMouseLeave();
       }
@@ -769,50 +651,17 @@ export default function ProjectsScene() {
       document.removeEventListener("mouseout", onPointerOut);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [isListView, selectedProject]);
-
-  const handleToggle = () => {
-    setIsListView((prev) => !prev);
-    setTimeout(() => {
-      if (sectionRef.current) {
-        const y =
-          sectionRef.current.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: y, behavior: "instant" });
-      }
-      ScrollTrigger.refresh();
-    }, 0);
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) setIsListView(true);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [selectedProject]);
 
   return (
     <div className="relative">
-      {/* 1. MAIN PROJECTS SCENE */}
+      {/* 1. MAIN PROJECTS SCENE: a stack of cards that pin and pile up */}
       <section
         ref={sectionRef}
-        className={`relative bg-paper ${isListView ? "cursor-none" : ""}`}
-        style={{ height: isListView ? "auto" : `${(N + 1) * 100}vh` }}
+        className="relative bg-paper px-4 pt-32 md:px-16"
         id="projects"
+        onMouseMove={handleMouseMove}
       >
-        <div
-          ref={previewRef}
-          className="pointer-events-none fixed left-0 top-0 z-40 w-[300px] md:w-[450px] aspect-[4/3] overflow-hidden border border-line shadow-2xl opacity-0 scale-90 bg-paper"
-        >
-          {activeImage && (
-            <img
-              src={activeImage}
-              alt="Preview"
-              decoding="async"
-              className="w-full h-full object-cover"
-            />
-          )}
-        </div>
         <div
           ref={cursorRef}
           className="pointer-events-none fixed left-0 top-0 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-ink text-paper font-mono-x text-[9px] font-bold uppercase tracking-widest opacity-0 scale-50"
@@ -820,140 +669,96 @@ export default function ProjectsScene() {
           View
         </div>
 
-        {isListView ? (
-          <div
-            className="min-h-screen py-32 px-6 md:px-16"
-            onMouseMove={handleMouseMove}
-          >
-            <div className="mb-20 font-mono-x text-[10px] uppercase tracking-[0.3em] text-ink-dim">
-              020 — Project Index
-            </div>
-            <div className="flex w-full flex-col border-t border-line-strong">
-              {PROJECTS.map((p) => (
-                <article
-                  key={p.n}
-                  data-image={p.image}
-                  onMouseEnter={() => handleMouseEnter(p.image)}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={(e) => openProject(e, p)}
-                  className="proj-list-item tap group flex flex-col items-start justify-between border-b border-line py-12 transition-colors hover:bg-ink/[0.02] md:flex-row md:items-center cursor-none"
-                >
-                  <div className="flex items-baseline gap-6 md:w-1/2 md:gap-12 pointer-events-none">
-                    <span className="font-mono-x text-[12px] text-ink-faint shrink-0">
-                      {p.n}
-                    </span>
-                    <div>
-                      <h2
-                        ref={(el) => {
-                          titleRefs.current[`list-${p.n}`] = el;
-                        }}
-                        className="t-colossal text-[clamp(40px,6vw,90px)] leading-[0.85] tracking-tight text-ink transition-all duration-500 ease-out w-fit origin-left m-0 group-hover:translate-x-4 group-hover:opacity-70 [--title-room:calc(100vw_-_100px)] md:[--title-room:calc((100vw_-_128px)/2_-_80px)]"
-                        style={fitTitle(p.title, "clamp(40px,6vw,90px)")}
-                      >
-                        {p.title}
-                      </h2>
-                      <div className="mt-4 font-mono-x text-[11px] uppercase tracking-[0.2em] text-ink-dim">
-                        {p.kind}
-                        {p.group && (
-                          <span className="text-ink-faint"> / Group Project</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-8 flex w-full flex-col md:mt-0 md:w-1/2 md:flex-row md:items-center md:justify-between md:pl-10 pointer-events-none">
-                    <div className="max-w-sm">
-                      <p className="font-body text-[14px] font-light leading-relaxed text-ink-soft line-clamp-2">
-                        {p.blurb}
-                      </p>
-                      <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
-                        {p.meta.map((m) => (
-                          <span
-                            key={m}
-                            className="font-mono-x text-[10px] uppercase tracking-wider text-ink-dim"
-                          >
-                            <span className="mr-1.5 text-ink-faint">/</span>
-                            {m}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="hidden md:flex mt-8 h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink transition-all group-hover:scale-110 group-hover:bg-ink group-hover:text-paper md:mt-0">
-                      <span className="font-mono-x text-xl">↗</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="sticky top-0 h-screen w-full overflow-hidden">
-            <div className="flex h-full w-full">
-              {PROJECTS.map((p, i) => (
-                <article
-                  key={p.n}
-                  ref={(el) => {
-                    galleryArticleRefs.current[i] = el;
-                  }}
-                  className="relative flex h-full w-full shrink-0 items-center px-6 md:px-16"
-                  style={{ willChange: "transform" }}
-                >
-                  <GalleryContent
-                    p={p}
-                    N={N}
-                    onNavigate={openProject}
-                    titleRef={(el) => {
-                      titleRefs.current[`gallery-${p.n}`] = el;
-                    }}
-                  />
-                </article>
-              ))}
-            </div>
-            <div className="pointer-events-none absolute left-6 top-24 font-mono-x text-[10px] uppercase tracking-[0.3em] text-ink-dim md:left-16">
-              020 — Gallery View
-            </div>
-            <div className="pointer-events-none absolute inset-x-6 bottom-8 flex items-center gap-4 md:inset-x-16">
-              <div className="flex flex-1 items-center gap-1.5">
-                {PROJECTS.map((p, i) => (
-                  <div
-                    key={p.n}
-                    ref={(el) => {
-                      galleryBarRefs.current[i] = el;
-                    }}
-                    className="h-px flex-1 transition-colors duration-300"
-                    style={{
-                      background:
-                        i === 0 ? "var(--ink)" : "var(--line-strong)",
-                    }}
-                  />
-                ))}
-              </div>
-              <span
-                ref={galleryCountRef}
-                className="font-mono-x text-[10px] tabular-nums text-ink-dim transition-all"
-              >
-                {`01 / 0${N}`}
-              </span>
-            </div>
-          </div>
-        )}
+        <div className="mx-auto mb-16 max-w-[1500px] font-mono-x text-[10px] uppercase tracking-[0.3em] text-ink-dim md:mb-20">
+          020 — Project Index
+        </div>
 
-        <div className="hidden md:block pointer-events-none fixed bottom-16 right-1/2 translate-x-1/2 md:translate-x-0 md:bottom-8 md:right-10 z-[100]">
-          <div ref={btnRef} className="pointer-events-auto invisible opacity-0">
-            <button
-              onClick={handleToggle}
-              className="group block w-[190px] h-[40px] bg-ink cursor-pointer border-none p-0 outline-none"
-              style={{ clipPath: "polygon(0% 0%, calc(100% - 10px) 0%, 100% 10px, 100% 100%, 0% 100%)" }}
+        <div
+          data-project-stack
+          className="mx-auto flex max-w-[1500px] flex-col gap-[8vh] pb-[22vh]"
+        >
+          {PROJECTS.map((p, i) => (
+            <article
+              key={p.n}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+              role="link"
+              tabIndex={0}
+              aria-label={`Open the ${p.title} case study`}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onClick={(e) => openProject(e, p)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") openProject(e, p);
+              }}
+              className="proj-card tap group sticky grid origin-top cursor-pointer gap-5 overflow-hidden border border-black/10 p-4 outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-4 focus-visible:ring-offset-paper md:cursor-none md:grid-cols-12 md:items-stretch md:gap-10 md:p-8"
+              style={{
+                top: STACK_TOP + i * STACK_STEP,
+                background: p.tint,
+                color: p.dark ? "var(--paper)" : "var(--ink)",
+                transform: "scale(calc(1 - var(--stack, 0) * 0.05))",
+              }}
             >
-              <div className="relative flex h-full items-center justify-between px-5 font-mono-x text-[10px] font-bold uppercase tracking-[0.2em] text-paper">
-                <span>{isListView ? "Gallery View" : "List View"}</span>
-                <div className="transition-transform duration-500 group-hover:rotate-90">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75.86 61.58" width="10" height="10" fill="currentColor">
-                    <path d="m43.32 30.13 32.54-19.09-13.57-7.29-26.5 18.92-1.35.14L6.84 0 2.85 4.96l23.71 25.79L0 50.99l13.1 10.59 31.88-22.73 L59.8 59.79 l15.93-4.26 -8.22-13.66z" />
-                  </svg>
+              <div className="relative aspect-[16/10] overflow-hidden md:col-span-7">
+                <img
+                  src={p.image}
+                  alt={`${p.title} cover`}
+                  loading="lazy"
+                  decoding="async"
+                  className="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+              </div>
+
+              <div className="flex min-w-0 flex-col justify-between gap-5 md:col-span-5 md:py-2">
+                <div>
+                  <div className="font-mono-x text-[11px] uppercase tracking-[0.25em] opacity-70">
+                    {p.n} <span className="opacity-60">/</span> {p.year || "2026"}
+                    {p.group && <span className="opacity-80"> / Group Project</span>}
+                  </div>
+                  <h2
+                    ref={(el) => {
+                      titleRefs.current[p.n] = el;
+                    }}
+                    className="t-colossal m-0 mt-4 w-fit origin-left text-[clamp(34px,4.6vw,84px)] leading-[0.85] tracking-tight [--title-room:calc(100vw_-_72px)] md:mt-6 md:[--title-room:calc((min(100vw,1628px)_-_128px)*5/12_-_80px)]"
+                    style={fitTitle(p.title, "clamp(34px,4.6vw,84px)")}
+                  >
+                    {p.title}
+                  </h2>
+                  <div className="mt-3 font-mono-x text-[11px] uppercase tracking-[0.2em] opacity-70 md:mt-4">
+                    {p.kind}
+                  </div>
+                  <p className="mt-6 hidden max-w-md font-body text-[15px] font-light leading-relaxed opacity-85 md:line-clamp-4">
+                    {p.blurb}
+                  </p>
+                </div>
+
+                <div className="flex items-end justify-between gap-6">
+                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                    {p.meta.map((m) => (
+                      <span
+                        key={m}
+                        className="font-mono-x text-[10px] uppercase tracking-wider opacity-75"
+                      >
+                        <span className="mr-1.5 opacity-60">/</span>
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-current font-mono-x text-lg opacity-80 transition-transform duration-300 group-hover:scale-110 md:h-14 md:w-14">
+                    ↗
+                  </span>
                 </div>
               </div>
-            </button>
-          </div>
+
+              {/* Darkens as the next card slides over this one */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-black"
+                style={{ opacity: "calc(var(--stack, 0) * 0.35)" }}
+              />
+            </article>
+          ))}
         </div>
       </section>
 
